@@ -1,0 +1,25 @@
+###### prepare_data.sh
+
+###### Lang8
+I. pip3 install langid
+
+###### NUCLE
+I. release3.3 of nucle should be changed to gzip
+
+II. prepare_data_modified.sh:
+	(1) release3.2 -> release3.3
+	(2) comment `remove -rf tmp/`
+
+III. nltk for python2 is needed but pip2 is not in the repo of Ubuntu20.04.
+	One solution: download pkgs from pypi and install from source code.
+	
+IV. nltkv2.0b7 dependencies: 
+	PyYAML 3.08
+	setuptools 0.6c11.
+
+V. punkt/english.pickle is needed. Download it from github of nltk.
+
+###### download.sh
+I. sudo apt-get install curl
+
+II. urls in the script cannot be accessed without vpn. Get the real urls and download them.
