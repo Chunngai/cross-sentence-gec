@@ -1,25 +1,41 @@
 ###### prepare_data.sh
 
-###### Lang8
-I. pip3 install langid
+# Lang8
+I. langid (pip3)
 
-###### NUCLE
-I. release3.3 of nucle should be changed to gzip
+# NUCLE
+I. release3.3 of nucle: bz2 -> gz
 
-II. prepare_data_modified.sh:
-	(1) release3.2 -> release3.3
-	(2) comment `remove -rf tmp/`
-
-III. nltk for python2 is needed but pip2 is not in the repo of Ubuntu20.04.
+II. nltk for python2 is needed but pip2 is not in the repo of Ubuntu20.04.
 	One solution: download pkgs from pypi and install from source code.
 	
-IV. nltkv2.0b7 dependencies: 
+III. nltkv2.0b7 dependencies: 
 	PyYAML 3.08
 	setuptools 0.6c11.
 
-V. punkt/english.pickle is needed. Download it from github of nltk.
+IV. punkt/english.pickle is needed. Download it from github of nltk.
 
 ###### download.sh
-I. sudo apt-get install curl
+I. curl (apt)
 
 II. urls in the script cannot be accessed without vpn. Get the real urls and download them.
+
+###### decode.sh
+I. Something goes wrong when using ssh. Works well when using https.
+
+###### Calculating p, r, f:
+I. Use m2 scorer.
+
+II. Some problems in conll14st-test-data/noalt/official-2014.0.m2:
+	
+	S Through those sites we are able to talk to them , to know what their activities are and who their friends are , etc. From the surface point of view it is no doubt that these sites help us to 
+    have a better relationship with our relatives despite of the distance .
+	A 1 2|||Pform|||these|||REQUIRED|||-NONE-|||0
+	A 25 26|||ArtOrDet|||a|||REQUIRED|||-NONE-|||0
+	A 26 27|||Wci|||superficial|||REQUIRED|||-NONE-|||0
+	A 30 30|||Mec|||,|||REQUIRED|||-NONE-|||0
+	A 48 49|||Trans||||||REQUIRED|||-NONE-|||0
+	
+	There are two sentences above as S. But actually there should be two separately. Thus the original m2 file cannot be used to calculate p, r, f. 
+
+III. Evaluating conll14: may take some time.
