@@ -7,17 +7,23 @@ set -x
 
 ###### Lang8
 
+sudo apt-get update
 sudo apt-get -y install python3-pip
 pip3 install langid
 
 ###### NUCLE
 
-# python2 installation for Ubuntu 20.04 or later.
-sudo add-apt-repository universe
-sudo apt update 
-sudo apt -y install python2
-# python2 installation for Ubuntu before 20.04.
-sudo apt-get install python2.7
+# python2
+case `lsb_release -rs` in
+        20.[0-9][0-9])
+                sudo add-apt-repository universe
+                sudo apt update
+                sudo apt -y install python2
+                ;;
+        *)
+                sudo apt-get install python2.7
+                ;;
+esac
 
 # setuptools
 wget https://files.pythonhosted.org/packages/25/5d/cc55d39ac39383dd6e04ae80501b9af3cc455be64740ad68a4e12ec81b00/setuptools-0.6c11-py2.7.egg
@@ -35,12 +41,10 @@ tar xzvf nltk*
 cd nltk-2.0b7/
 sudo python2 setup.py install
 
-echo "nltk_data/tokenizers/punkt/english.pickle" should be placed in one of the following folders:
-echo	'/home/neko/nltk_data'
-echo	'/usr/share/nltk_data'
-echo	'/usr/local/share/nltk_data'
-echo	'/usr/lib/nltk_data'
-echo	'/usr/local/lib/nltk_data'
+# nltk data
+sudo apt-get -y install git
+git clone https://github.com/nltk/nltk_data
+sudo mv nltk_data /usr/local/lib/
 
 ###### download.sh
 sudo apt-get -y install curl
