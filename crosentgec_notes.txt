@@ -101,3 +101,5 @@ III. Evaluating conll14: Some problems when eval 333rd and 334th.
 		(1) The output is bad.
 	Works well when rm 333rd and 334th.
 	               
+###### Ideas:
+I. Context: LSTM for encoding and Transformer for decoding?
