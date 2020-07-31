@@ -1,0 +1,305 @@
+FConvCustomEncoder(
+  (embed_tokens): Embedding(30004, 500, padding_idx=1)
+  (embed_positions): LearnedPositionalEmbedding(1024, 500, padding_idx=1)
+  (fc1): Linear(in_features=500, out_features=1024, bias=True)
+  (projections): ModuleList(
+    (0): None
+    (1): None
+    (2): None
+  )
+  (convolutions): ModuleList(
+    (0): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (1): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (2): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+  )
+  (fc2): Linear(in_features=1024, out_features=500, bias=True)
+)FConvCustomEncoder(
+  (embed_tokens): Embedding(30004, 500, padding_idx=1)
+  (embed_positions): LearnedPositionalEmbedding(1024, 500, padding_idx=1)
+  (fc1): Linear(in_features=500, out_features=1024, bias=True)
+  (projections): ModuleList(
+    (0): None
+    (1): None
+    (2): None
+    (3): None
+    (4): None
+    (5): None
+    (6): None
+  )
+  (convolutions): ModuleList(
+    (0): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (1): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (2): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (3): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (4): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (5): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (6): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+  )
+  (fc2): Linear(in_features=1024, out_features=500, bias=True)
+)FConvCustomDecoder(
+  (embed_tokens): Embedding(30004, 500, padding_idx=1)
+  (embed_positions): LearnedPositionalEmbedding(1024, 500, padding_idx=1)
+  (fc1): Linear(in_features=500, out_features=1024, bias=True)
+  (projections): ModuleList(
+    (0): None
+    (1): None
+    (2): None
+    (3): None
+    (4): None
+    (5): None
+    (6): None
+  )
+  (convolutions): ModuleList(
+    (0): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (1): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (2): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (3): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (4): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (5): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (6): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+  )
+  (auxattention): ModuleList(
+    (0): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (1): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (2): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (3): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (4): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (5): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (6): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+  )
+  (attention): ModuleList(
+    (0): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (1): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (2): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (3): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (4): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (5): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (6): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+  )
+  (auxgates): ModuleList(
+    (0): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (1): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (2): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (3): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (4): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (5): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (6): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+  )
+  (fc2): Linear(in_features=1024, out_features=500, bias=True)
+  (fc3): Linear(in_features=500, out_features=30004, bias=True)
+)FConvCustomEncoder(
+  (embed_tokens): Embedding(30004, 500, padding_idx=1)
+  (embed_positions): LearnedPositionalEmbedding(1024, 500, padding_idx=1)
+  (fc1): Linear(in_features=500, out_features=1024, bias=True)
+  (projections): ModuleList(
+    (0): None
+    (1): None
+    (2): None
+  )
+  (convolutions): ModuleList(
+    (0): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (1): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (2): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+  )
+  (fc2): Linear(in_features=1024, out_features=500, bias=True)
+)FConvCustomEncoder(
+  (embed_tokens): Embedding(30004, 500, padding_idx=1)
+  (embed_positions): LearnedPositionalEmbedding(1024, 500, padding_idx=1)
+  (fc1): Linear(in_features=500, out_features=1024, bias=True)
+  (projections): ModuleList(
+    (0): None
+    (1): None
+    (2): None
+    (3): None
+    (4): None
+    (5): None
+    (6): None
+  )
+  (convolutions): ModuleList(
+    (0): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (1): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (2): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (3): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (4): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (5): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+    (6): ConvTBC(1024, 2048, kernel_size=(3,), padding=(1,))
+  )
+  (fc2): Linear(in_features=1024, out_features=500, bias=True)
+)FConvCustomDecoder(
+  (embed_tokens): Embedding(30004, 500, padding_idx=1)
+  (embed_positions): LearnedPositionalEmbedding(1024, 500, padding_idx=1)
+  (fc1): Linear(in_features=500, out_features=1024, bias=True)
+  (projections): ModuleList(
+    (0): None
+    (1): None
+    (2): None
+    (3): None
+    (4): None
+    (5): None
+    (6): None
+  )
+  (convolutions): ModuleList(
+    (0): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (1): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (2): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (3): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (4): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (5): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+    (6): LinearizedConvolution(1024, 2048, kernel_size=(3,), padding=(2,))
+  )
+  (auxattention): ModuleList(
+    (0): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (1): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (2): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (3): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (4): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (5): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (6): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+  )
+  (attention): ModuleList(
+    (0): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (1): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (2): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (3): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (4): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (5): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+    (6): AttentionLayer(
+      (in_projection): Linear(in_features=1024, out_features=500, bias=True)
+      (out_projection): Linear(in_features=500, out_features=1024, bias=True)
+    )
+  )
+  (auxgates): ModuleList(
+    (0): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (1): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (2): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (3): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (4): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (5): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+    (6): Gating(
+      (decoder_state_proj): Linear(in_features=1024, out_features=1024, bias=True)
+      (attn_proj): Linear(in_features=1024, out_features=1024, bias=True)
+    )
+  )
+  (fc2): Linear(in_features=1024, out_features=500, bias=True)
+  (fc3): Linear(in_features=500, out_features=30004, bias=True)
+)
