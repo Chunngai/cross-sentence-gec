@@ -160,9 +160,6 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
   Lang8 and NUCLE as training set is better.  
   \-\-\-  
   Found four candidates:  
-  1. GECToR – Grammatical Error Correction_ Tag, Not Rewrite (Seems not easy to modify)  
-  2. Encoder-Decoder Models Can Benefit from Pre-trained Masked Language Models in Grammatical Error Correction  
-  3. Improving Grammatical Error Correction via Pre-Training a Copy-Augmented Architecture with Unlabeled Data  
-  4. A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning  
-
-  Models of the papers are implemented with fairseq, except the first one.
+  1. Encoder-Decoder Models Can Benefit from Pre-trained Masked Language Models in Grammatical Error Correction  
+  2. Improving Grammatical Error Correction via Pre-Training a Copy-Augmented Architecture with Unlabeled Data  
+  3. A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning  
