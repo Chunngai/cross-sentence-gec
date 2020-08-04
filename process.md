@@ -88,8 +88,9 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 - [x] Read: Toward Making the Most of Context in Neural Machine Translation  
   After exp: not read.
 - [x] Review: LSTM, GRU  
-- [ ] Read: papers about Transformer + Context  
 - [ ] How to train the avg and ens?  
+
+---
 
 # Aug 1
 ## · Papers · | Fairseq
@@ -97,6 +98,8 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
   - [ ] (Fairseq) P2 L | Each convolution ... Why does the param W is 2d?  
   - [ ] (Fairseq) P2 L | where A, B ... What's A, B?  
   - [ ] (Fairseq) P4 L | ...compared to recurrent nets where ... In a timestep only one GLU in the decoder?
+
+---
 
 # Aug 2
 ## · Questions ·
@@ -117,6 +120,8 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 
 ### Questions
 - [ ] P1 R | Considering target side history: suffers from err prop. Why?
+
+---
 
 # Aug 3
 ## · Papers · | Gates | Context Gates for Neural Machine Translation, Tu et al., 2017  
@@ -141,3 +146,23 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 
 ### Questions
 - [ ] Does the crosentgec model have the problem in Notes.2?
+
+---
+
+# Aug 4
+
+## · Notes ·
+1. Papers of GEC with context info after 2014: only the crosentgec is found, with keywords "context", "discourse", "cross-sentence", "document-level"
+
+## · TODOs ·
+- [x] Find a Transformer-based GEC paper, with code provided.  
+  Fairseq implementation is better.  
+  Lang8 and NUCLE as training set is better.  
+  \-\-\-  
+  Found four candidates:  
+  1. GECToR – Grammatical Error Correction_ Tag, Not Rewrite (Seems not easy to modify)  
+  2. Encoder-Decoder Models Can Benefit from Pre-trained Masked Language Models in Grammatical Error Correction  
+  3. Improving Grammatical Error Correction via Pre-Training a Copy-Augmented Architecture with Unlabeled Data  
+  4. A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning  
+
+  Models of the papers are implemented with fairseq, except the first one.
