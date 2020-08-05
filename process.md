@@ -155,11 +155,47 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 1. Papers of GEC with context info after 2014: only the crosentgec is found, with keywords "context", "discourse", "cross-sentence", "document-level"
 
 ## · TODOs ·
-- [x] Find a Transformer-based GEC paper, with code provided.  
+- [x] Find some Transformer-based GEC papers, with code provided.  
   Fairseq implementation is better.  
   Lang8 and NUCLE as training set is better.  
   \-\-\-  
-  Found four candidates:  
+  Found three candidates:  
   1. Encoder-Decoder Models Can Benefit from Pre-trained Masked Language Models in Grammatical Error Correction  
   2. Improving Grammatical Error Correction via Pre-Training a Copy-Augmented Architecture with Unlabeled Data  
   3. A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning  
+
+## · Papers · | GEC & Transformer & Fairseq | Encoder-Decoder Models Can Benefit from Pre-trained Masked Language Models in Grammatical Error Correction
+### Contributions
+1. Investigates how to effectively incorporate a pre-trained MLM into an encoder-decoder model for gec.  
+  init / fuse / combime (mask / GED)
+
+#### Notes
+1. Seems not easy to further improve the performance of the model.  
+2. Code provided, but seems it's not complete of something. Maybe it can be used for further improve the performance of a model.  
+3. The crosentgec model also use a MLM.  
+
+---
+
+# Aug 5
+
+## · Papers · | GEC & Transformer & Fairseq | Improving Grammatical Error Correction via Pre-Training a Copy-Augmented Architecture with Unlabeled Data
+### Contributions
+1. Copy-augmented arch for gec.  
+2. Pretrain with DAE.
+3. Adds token- / sentence level multi-task learning for the GEC task.
+
+### Notes
+1. Seems that the code is a mixture of multiple techniques, hard to tell the function of each part.
+
+## · Papers · | GEC & Transformer & Fairseq | A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning
+### Contributions
+1. Noising function.
+2. Transfer learning.
+3. Context-aware neural spellchecker.
+
+### Notes
+1. Uses fairseq-0.6.1.
+2. Future work: multi-sentence context.
+3. The code is detailed. The structure is clear and the modified parts in fairseq are explained in a file. Modified code is also marked with triple quotes in code.
+4. The paper is also detailed.
+5. Seems that the paper with its code is an ideal starting-point.
