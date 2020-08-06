@@ -189,7 +189,7 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 
 ## · Papers · | GEC & Transformer & Fairseq | A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning
 ### Contributions
-1. Noising function.
+1. Realistic noising function.
 2. Transfer learning.
 3. Context-aware neural spellchecker.
 
@@ -199,3 +199,23 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 3. The code is detailed. The structure is clear and the modified parts in fairseq are explained in a file. Modified code is also marked with triple quotes in code.
 4. The paper is also detailed.
 5. Seems that the paper with its code is an ideal starting-point.
+
+---
+
+# Aug 6
+## · Papers · | GEC & Transformer & Fairseq | A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning
+
+### Notes
+1. The mixture weight param of the copy aug arch is like the gating param, controlling how much info should be copied and how much be generated.
+2. The type-based nosing approach is similar to the one proposed by us.
+
+### TODOs
+- [ ] Learn: Copy-aug.
+
+### Ideas
+1. Noising func + back translation. Can also introduce typo or something.
+2. The W&I+L dataset also contains doc-level errors and can be used to train a gec model considering contexts.
+
+### Questions
+- [ ] P5 R | What's the minor tokenization issues?
+- [ ] P5 R | Error type control.
