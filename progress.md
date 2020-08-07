@@ -203,6 +203,7 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 ---
 
 # Aug 6
+
 ## · Papers · | GEC & Transformer & Fairseq | A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning
 
 ### Notes
@@ -210,7 +211,7 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 2. The type-based nosing approach is similar to the one proposed by us.
 
 ### TODOs
-- [ ] Learn: Copy-aug.
+- [x] Learn: Copy-aug.
 
 ### Ideas
 1. Noising func + back translation. Can also introduce typo or something.
@@ -219,3 +220,11 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 ### Questions
 - [ ] P5 R | What's the minor tokenization issues?
 - [ ] P5 R | Error type control.
+
+---
+
+# Aug 7
+
+## · Ideas ·
+1. Pre-trained embeddings.
+2. Pre-trained LM models. (Is it ok to use a pre-trained decoder since the model is trained with pseudo data?)
