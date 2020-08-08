@@ -228,3 +228,14 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 ## · Ideas ·
 1. Pre-trained embeddings.
 2. Pre-trained LM models. (Is it ok to use a pre-trained decoder since the model is trained with pseudo data?)
+
+---
+
+# Aug 8
+## · Notes ·
+1. Modified files:
+  1. setup.sh
+  2. requirements.txt
+  3. preprocess.py
+2. New files:
+  1. proprocess_clean.sh
