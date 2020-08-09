@@ -44,6 +44,12 @@ python -c "import site, os; \
 ###### NEW ######
 pip install torch -i $INDEX_URL --timeout $TIMEOUT  # Needed by spell in preprocess.py
 
+# Moves README.md and LICENSE to repo_info.
 mkdir repo_info
 mv README.md repo_info
 mv LICENSE repo_info
+
+# average_perceptron_tagger.picker is needed in the perturbation step. 
+sudo mkdir -p /usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/
+sudo mv averaged_perceptron_tagger.pickle  /usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/
+
