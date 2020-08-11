@@ -231,12 +231,66 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 
 ---
 
-# Aug 8
+# Aug 8 / 9 / 10
 ## · Notes ·
 1. Modified files:
   1. setup.sh
-  2. requirements.txt
+  2. requirements.txt  # spacy ver issue, for python 3.8.
   3. preprocess.py
+  4. prepare.py
+  5. text/__init__.py of pattern3  # for python 3.8.
+  6. gec/util.py  # f"+ {prompt}"
+  7. helo_word-master/fairseq/fairseq/search.py", line 83  # for python 3.8.
 2. New files:
   1. proprocess_clean.sh
   2. get_datasets.sh
+3. Requirements:
+  1. errant for bea2019 -> spacy 1.9.0 -> python3.6
+  2. Python 2.7
+  3. pytorch 1.4.0
+4. Warnings:
+  1. train.py
+  > /home/neko/GEC/helo_word-master/fairseq/fairseq/optim/adam.py:121: UserWarning: This overload of add_ is deprecated:  
+	add_(Number alpha, Tensor other)  
+Consider using one of the following signatures instead:  
+	add_(Tensor other, *, Number alpha) (Triggered internally at  /pytorch/torch/csrc/utils/python_arg_parser.cpp:766.)
+5. Errors:
+  1. evaluate.py
+  > Traceback (most recent call last):                                                                       
+  File "/home/neko/.virtualenvs/gec_exp_1/bin/fairseq-generate", line 33, in <module>  
+    sys.exit(load_entry_point('fairseq', 'console_scripts', 'fairseq-generate')())  
+  File "/home/neko/GEC/helo_word-master/fairseq/fairseq_cli/generate.py", line 188, in cli_main  
+    main(args)  
+  File "/home/neko/GEC/helo_word-master/fairseq/fairseq_cli/generate.py", line 106, in main  
+    hypos = task.inference_step(generator, models, sample, prefix_tokens)  
+  File "/home/neko/GEC/helo_word-master/fairseq/fairseq/tasks/fairseq_task.py", line 242, in inference_step  
+    return generator.generate(models, sample, prefix_tokens=prefix_tokens)  
+  File "/home/neko/.virtualenvs/gec_exp_1/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 15, in decorate_context  
+    return func(*args, **kwargs)  
+  File "/home/neko/GEC/helo_word-master/fairseq/fairseq/sequence_generator.py", line 372, in generate  
+    cand_scores, cand_indices, cand_beams = self.search.step(  
+  File "/home/neko/GEC/helo_word-master/fairseq/fairseq/search.py", line 83, in step  
+    torch.div(self.indices_buf, vocab_size, out=self.beams_buf)  
+RuntimeError: Integer division of tensors using div or / is no longer supported, and in a future release div will perform true division as in Python 3. Use true_divide or floor_divide (// in Python) instead.
+INFO:root:[Run-ckpt] 2. postprocess into /home/neko/GEC/helo_word-master/track1/outputs/pretrain-base-lr0.0005-dr0.3/checkpoint1.wi.dev.cor
+
+  2. evaluate.py
+  > Traceback (most recent call last):  
+  File "/home/neko/GEC/helo_word-master/errant/parallel_to_m2.py", line 79, in <module>  
+    main(args)  
+  File "/home/neko/GEC/helo_word-master/errant/parallel_to_m2.py", line 55, in main  
+    cat = cat_rules.autoTypeEdit(auto_edit, proc_orig, proc_cor, gb_spell, tag_map, nlp, stemmer)  
+  File "/home/neko/GEC/helo_word-master/errant/scripts/cat_rules.py", line 65, in autoTypeEdit  
+    cat = getTwoSidedType(orig_toks, cor_toks, gb_spell, tag_map, nlp, stemmer)  
+  File "/home/neko/GEC/helo_word-master/errant/scripts/cat_rules.py", line 187, in getTwoSidedType  
+    if sameLemma(orig_toks[0], cor_toks[0], nlp) and \  
+  File "/home/neko/GEC/helo_word-master/errant/scripts/cat_rules.py", line 333, in sameLemma  
+    orig_lemmas.append(nlp.vocab.morphology.lemmatize(pos, orig_tok.lower, nlp.vocab.morphology.tag_map))  
+  File "morphology.pyx", line 243, in spacy.morphology.Morphology.lemmatize  
+  File "strings.pyx", line 152, in spacy.strings.StringStore.as_string  
+  File "strings.pyx", line 120, in spacy.strings.StringStore.__getitem__  
+TypeError: unhashable type: 'dict'
+
+  3. find_best in evaluate.main.
+  > INFO:root:[Evaluate] highest score on /home/neko/GEC/helo_word-master/data/parallel/raw/wi.dev.ori  
+cannot find highest basename from /home/neko/GEC/helo_word-master/track1/outputs/pretrain-base-lr0.0005-dr0.3
