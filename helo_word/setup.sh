@@ -3,8 +3,17 @@
 set -e
 set -x
 
+# [NEW] Exits if the ver of python is not 3.6.*.
+case `python -V` in
+	"Python 3.6."[0-9][0-9]*)
+		;;
+	*)
+		exit
+esac
+
 # [NEW] Uses the src of tuna to speed up the doenload.
 INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple/
+# INDEX_URL=https://mirrors.aliyun.com/pypi/simple/
 # [NEW] Adds timeout.
 TIMEOUT=180
 
@@ -19,7 +28,7 @@ pip install --upgrade -r requirements.txt --timeout $TIMEOUT -i $INDEX_URL  # [M
 # python -m spacy download en
 # [Note] The above command may not be able to work.
 # [MODIFIED] Alternative of `python -m spacy download en`
-EN_CORE_WEB_SM='https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz'  # For spacy >= 2.3.0, <2.4.0
+EN_CORE_WEB_SM='https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-1.2.0/en_core_web_sm-1.2.0.tar.gz'  # For spacy 1.9.0.
 pip install $EN_CORE_WEB_SM --timeout $TIMEOUT
 python -m spacy link en_core_web_sm en  # Creates a shourcut link.
 
@@ -27,11 +36,16 @@ python -m spacy link en_core_web_sm en  # Creates a shourcut link.
 pip install --editable fairseq
 
 # errant
-# [Note] Does not specify the ver. of errant.
-git clone https://github.com/chrisjbryant/errant
+#git clone https://github.com/chrisjbryant/errant
+# [Note] Ver. of errant should be compatable.
+# [MODIFIED] Specifies the bea2019st branch of errant.
+if [ ! -d errant ]
+then
+	git clone https://github.com/chrisjbryant/errant -b bea2019st
+fi
 
 # pattern3 (see https://www.clips.uantwerpen.be/pages/pattern for any installation issues)
-pip install pattern3 --timeout $TIMEOUT -i $INDEX_URL  # Adds -i and --timeout.
+pip install pattern3 --timeout $TIMEOUT -i $INDEX_URL  # [MODIFIED] Adds -i and --timeout.
 
 # python -c "import site; print(site.getsitepackages())"
 # ['PATH_TO_SITE_PACKAGES']
@@ -42,7 +56,7 @@ python -c "import site, os; \
 	[os.system(f'cp tree.py {path}/pattern3/text/') if os.path.exists(path) else None for path in path_to_site_packages]"
 
 ###### NEW ######
-pip install torch -i $INDEX_URL --timeout $TIMEOUT  # Needed by spell in preprocess.py
+pip install torch==1.4.0 -i $INDEX_URL --timeout $TIMEOUT  # Needed by spell in preprocess.py
 
 # Moves README.md and LICENSE to repo_info.
 mkdir repo_info

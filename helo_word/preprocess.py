@@ -19,8 +19,9 @@ def maybe_download(dir, cmd):
         logging.info(f"skip this step as {dir} is NOT empty")
     else:
         # print(cmd)  (MODIFIED)
+        # (MODIFIED)
         for sub_cmd in cmd:
-            print(f"+ {sub_cmd}")
+            print(f"+ {sub_cmd}")  # (NEW)
             os.system(sub_cmd)
 
 
@@ -37,7 +38,7 @@ def print_log(log_info):
     """
     Prints the log following a '\n'.
     """
-    logging.info("\n")
+    print()
     logging.info(log_info)
 
 
@@ -75,6 +76,7 @@ if __name__ == "__main__":
     fp.make_dirs()
 
     """ DOWNLOAD DATA """
+    print_log("------ ------ ------")
     print_log("###### STEP 0. Download data")
 
     print_log("###### STEP 0-1. Download Gutenberg Text")
@@ -168,7 +170,10 @@ if __name__ == "__main__":
     # logging.info(f"NO PUBLIC DATA AVAILABLE.\n "
     #              f"Please visit 'https://www.cl.cam.ac.uk/research/nl/bea2019st/' to obtain data and extract file to {fp.nucle_m2}/*m2")
     print_log("###### STEP 0-6.1. Download LANG8")
-    os.mkdir(f"{fp.bea19}/lang8.bea19")  # (NOTE) `f"{fp.bea19}/lang8.bea19"` should be an attr of `fp`.
+    try:
+        os.mkdir(f"{fp.bea19}/lang8.bea19")  # (NOTE) `f"{fp.bea19}/lang8.bea19"` should be an attr of `fp`.
+    except:
+        pass
     maybe_download(
         f"{fp.bea19}/lang8.bea19",
 
@@ -180,7 +185,10 @@ if __name__ == "__main__":
     )
 
     print_log("###### STEP 0-6.2. Download NUCLE")
-    os.mkdir(f"{fp.bea19}/nucle3.3")  # (NOTE) `f"{fp.bea19}/nucle3.3"` should be an attr of `fp`.
+    try:
+        os.mkdir(f"{fp.bea19}/nucle3.3")  # (NOTE) `f"{fp.bea19}/nucle3.3"` should be an attr of `fp`.
+    except:
+        pass
     maybe_download(
         f"{fp.bea19}/nucle3.3",
 
@@ -249,6 +257,7 @@ if __name__ == "__main__":
     # maybe_download(fp.errant, "git clone https://github.com/chrisjbryant/errant.git")
 
     """ TOKENIZE DATA FOR PRETRAINING """
+    print_log("------ ------ ------")
     print_log("STEP 1. Word-tokenize the original files and merge them")
 
     print_log("STEP 1-1. gutenberg")
@@ -267,12 +276,14 @@ if __name__ == "__main__":
              (fpath, fp.WIKI103_TXT, args.max_tokens))
 
     """ TRAIN BPE MODEL """
+    print_log("------ ------ ------")
     print_log("STEP 2. Train bpe model")
 
     maybe_do(fp.BPE_MODEL, bpe.train,
              (fp.GUTENBERG_TXT, fp.BPE_MODEL.replace(".model", ""), args.vocab_size, 1.0, 'bpe'))
 
     """ wi.dev -> wi.dev.3k, wi.dev.1k """
+    print_log("------ ------ ------")
     print_log("STEP 3. Split wi.dev into wi.dev.3k and wi.dev.1k")
 
     fpaths = sorted(glob(f'{fp.wi_m2}/*.dev.gold.bea19.m2'))
@@ -283,8 +294,9 @@ if __name__ == "__main__":
 
     """ PERTURB DATA FOR PRETRAINING """
     """ AND MAKE PARALLEL FILES """
+    print_log("------ ------ ------")
     print_log("STEP 4. Perturb and make parallel files")
-    """
+
     for track_no in ("1", "3", "0"):
         print_log(f"Track {track_no}")
         print_log("STEP 4-1. writing perturbation scenario")
@@ -317,8 +329,9 @@ if __name__ == "__main__":
                  (word2ptbs, fp.BPE_MODEL, fp.WIKI103_TXT,
                   eval(f"fp.WIKI103_ORI{track_no}"), eval(f"fp.WIKI103_COR{track_no}"), args.n_epochs[2],
                   args.word_change_prob, args.type_change_prob))
-    """
+
     """ PARALLELIZE DATA FOR TRAIN & DEV & TEST """
+    print_log("------ ------ ------")
     print_log("STEP 5. m2 to parallel")
 
     print_log("STEP 5-1. fce")
@@ -363,6 +376,7 @@ if __name__ == "__main__":
 
     """ STEP I: FIX TOKENIZATION ERRORS """
     """ STEP II: SPELLCHECK """
+    print_log("------ ------ ------")
     print_log("STEP 6. spell-check")
 
     print_log("STEP 6-1. fce")
@@ -396,6 +410,7 @@ if __name__ == "__main__":
     maybe_do(fp.CONLL2014_SP_ORI, spell.check, (fp.CONLL2014_ORI, fp.CONLL2014_SP_ORI))
 
     """ STEP III: BPE """
+    print_log("------ ------ ------")
     print_log("STEP 7. bpe-tokenize")
 
     print_log("STEP 7-1. fce")
