@@ -1,0 +1,1896 @@
+(myconda) root@576918a23912:/mnt/fairseq/fairseq/examples/translation# bash prepare-iwslt14.sh | tee -a ../../log.txt 
++ '[' '!' -d mosesdecoder ']'
++ '[' '!' -d subword-nmt ']'
++ SCRIPTS=mosesdecoder/scripts
++ TOKENIZER=mosesdecoder/scripts/tokenizer/tokenizer.perl
++ LC=mosesdecoder/scripts/tokenizer/lowercase.perl
++ CLEAN=mosesdecoder/scripts/training/clean-corpus-n.perl
++ BPEROOT=subword-nmt/subword_nmt
++ BPE_TOKENS=10000
++ URL=https://wit3.fbk.eu/archive/2014-01/texts/de/en/de-en.tgz
++ GZ=de-en.tgz
++ '[' '!' -d mosesdecoder/scripts ']'
++ src=de
++ tgt=en
++ lang=de-en
++ prep=iwslt14.tokenized.de-en
++ tmp=iwslt14.tokenized.de-en/tmp
++ orig=orig
++ mkdir -p orig iwslt14.tokenized.de-en/tmp iwslt14.tokenized.de-en
++ echo 'Downloading data from https://wit3.fbk.eu/archive/2014-01/texts/de/en/de-en.tgz...'
++ cd orig
+Downloading data from https://wit3.fbk.eu/archive/2014-01/texts/de/en/de-en.tgz...
++ '[' '!' -f de-en.tgz ']'
++ '[' -f de-en.tgz ']'
++ echo 'Data successfully downloaded.'
++ tar zxvf de-en.tgz
+Data successfully downloaded.
+de-en/
+de-en/IWSLT14.TED.dev2010.de-en.de.xml
+de-en/IWSLT14.TED.dev2010.de-en.en.xml
+de-en/IWSLT14.TED.tst2010.de-en.de.xml
+de-en/IWSLT14.TED.tst2010.de-en.en.xml
+de-en/IWSLT14.TED.tst2011.de-en.de.xml
+de-en/IWSLT14.TED.tst2011.de-en.en.xml
+de-en/IWSLT14.TED.tst2012.de-en.de.xml
+de-en/IWSLT14.TED.tst2012.de-en.en.xml
+de-en/IWSLT14.TEDX.dev2012.de-en.de.xml
+de-en/IWSLT14.TEDX.dev2012.de-en.en.xml
+de-en/README
+de-en/train.en
+de-en/train.tags.de-en.de
+de-en/train.tags.de-en.en
++ cd ..
++ echo 'pre-processing train data...'
+pre-processing train data...
++ for l in $src $tgt
++ f=train.tags.de-en.de
++ tok=train.tags.de-en.tok.de
++ cat orig/de-en/train.tags.de-en.de
++ grep -v '<url>'
++ grep -v '<keywords>'
++ grep -v '<talkid>'
++ sed -e 's/<description>//g'
++ sed -e 's/<title>//g'
++ sed -e 's/<\/title>//g'
++ sed -e 's/<\/description>//g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l de
+Tokenizer Version 1.1
+Language: de
+Number of threads: 8
++ echo ''
++ for l in $src $tgt
+
++ f=train.tags.de-en.en
++ tok=train.tags.de-en.tok.en
++ cat orig/de-en/train.tags.de-en.en
++ grep -v '<talkid>'
++ grep -v '<keywords>'
++ sed -e 's/<title>//g'
++ sed -e 's/<\/title>//g'
++ sed -e 's/<description>//g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l en
++ grep -v '<url>'
++ sed -e 's/<\/description>//g'
+Tokenizer Version 1.1
+Language: en
+Number of threads: 8
++ echo ''
+
++ perl mosesdecoder/scripts/training/clean-corpus-n.perl -ratio 1.5 iwslt14.tokenized.de-en/tmp/train.tags.de-en.tok de en iwslt14.tokenized.de-en/tmp/train.tags.de-en.clean 1 175
+clean-corpus.perl: processing iwslt14.tokenized.de-en/tmp/train.tags.de-en.tok.de & .en to iwslt14.tokenized.de-en/tmp/train.tags.de-en.clean, cutoff 1-175, ratio 1.5
+..........(100000).......
+Input sentences: 174443  Output sentences:  167522
++ for l in $src $tgt
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
++ for l in $src $tgt
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
++ echo 'pre-processing valid/test data...'
+pre-processing valid/test data...
++ for l in $src $tgt
+++ ls orig/de-en/IWSLT14.TED.dev2010.de-en.de.xml orig/de-en/IWSLT14.TED.tst2010.de-en.de.xml orig/de-en/IWSLT14.TED.tst2011.de-en.de.xml orig/de-en/IWSLT14.TED.tst2012.de-en.de.xml orig/de-en/IWSLT14.TEDX.dev2012.de-en.de.xml
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
++ fname=IWSLT14.TED.dev2010.de-en.de.xml
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TED.dev2010.de-en.de
++ echo orig/de-en/IWSLT14.TED.dev2010.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.dev2010.de-en.de
+orig/de-en/IWSLT14.TED.dev2010.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.dev2010.de-en.de
++ grep '<seg id' orig/de-en/IWSLT14.TED.dev2010.de-en.de.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\s*<\/seg>\s*//g'
++ sed -e 's/\’/\'\''/g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l de
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
+Tokenizer Version 1.1
+Language: de
+Number of threads: 8
++ echo ''
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
++ fname=IWSLT14.TED.tst2010.de-en.de.xml
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2010.de-en.de
+
++ echo orig/de-en/IWSLT14.TED.tst2010.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2010.de-en.de
+orig/de-en/IWSLT14.TED.tst2010.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2010.de-en.de
++ grep '<seg id' orig/de-en/IWSLT14.TED.tst2010.de-en.de.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\s*<\/seg>\s*//g'
++ sed -e 's/\’/\'\''/g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l de
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
+Tokenizer Version 1.1
+Language: de
+Number of threads: 8
++ echo ''
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
++ fname=IWSLT14.TED.tst2011.de-en.de.xml
+
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2011.de-en.de
++ echo orig/de-en/IWSLT14.TED.tst2011.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2011.de-en.de
+orig/de-en/IWSLT14.TED.tst2011.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2011.de-en.de
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ grep '<seg id' orig/de-en/IWSLT14.TED.tst2011.de-en.de.xml
++ sed -e 's/\s*<\/seg>\s*//g'
++ sed -e 's/\’/\'\''/g'
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l de
+Tokenizer Version 1.1
+Language: de
+Number of threads: 8
++ echo ''
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
+
++ fname=IWSLT14.TED.tst2012.de-en.de.xml
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2012.de-en.de
++ echo orig/de-en/IWSLT14.TED.tst2012.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2012.de-en.de
+orig/de-en/IWSLT14.TED.tst2012.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2012.de-en.de
++ grep '<seg id' orig/de-en/IWSLT14.TED.tst2012.de-en.de.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\s*<\/seg>\s*//g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l de
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
++ sed -e 's/\’/\'\''/g'
+Tokenizer Version 1.1
+Language: de
+Number of threads: 8
++ echo ''
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
++ fname=IWSLT14.TEDX.dev2012.de-en.de.xml
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TEDX.dev2012.de-en.de
+
++ echo orig/de-en/IWSLT14.TEDX.dev2012.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TEDX.dev2012.de-en.de
+orig/de-en/IWSLT14.TEDX.dev2012.de-en.de.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TEDX.dev2012.de-en.de
++ grep '<seg id' orig/de-en/IWSLT14.TEDX.dev2012.de-en.de.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\s*<\/seg>\s*//g'
++ sed -e 's/\’/\'\''/g'
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l de
+Tokenizer Version 1.1
+Language: de
+Number of threads: 8
++ echo ''
++ for l in $src $tgt
+
+++ ls orig/de-en/IWSLT14.TED.dev2010.de-en.en.xml orig/de-en/IWSLT14.TED.tst2010.de-en.en.xml orig/de-en/IWSLT14.TED.tst2011.de-en.en.xml orig/de-en/IWSLT14.TED.tst2012.de-en.en.xml orig/de-en/IWSLT14.TEDX.dev2012.de-en.en.xml
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
++ fname=IWSLT14.TED.dev2010.de-en.en.xml
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TED.dev2010.de-en.en
++ echo orig/de-en/IWSLT14.TED.dev2010.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.dev2010.de-en.en
+orig/de-en/IWSLT14.TED.dev2010.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.dev2010.de-en.en
++ grep '<seg id' orig/de-en/IWSLT14.TED.dev2010.de-en.en.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\’/\'\''/g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l en
++ sed -e 's/\s*<\/seg>\s*//g'
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
+Tokenizer Version 1.1
+Language: en
+Number of threads: 8
++ echo ''
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
++ fname=IWSLT14.TED.tst2010.de-en.en.xml
+
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2010.de-en.en
++ echo orig/de-en/IWSLT14.TED.tst2010.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2010.de-en.en
+orig/de-en/IWSLT14.TED.tst2010.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2010.de-en.en
++ grep '<seg id' orig/de-en/IWSLT14.TED.tst2010.de-en.en.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\s*<\/seg>\s*//g'
++ sed -e 's/\’/\'\''/g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l en
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
+Tokenizer Version 1.1
+Language: en
+Number of threads: 8
++ echo ''
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
+
++ fname=IWSLT14.TED.tst2011.de-en.en.xml
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2011.de-en.en
++ echo orig/de-en/IWSLT14.TED.tst2011.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2011.de-en.en
+orig/de-en/IWSLT14.TED.tst2011.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2011.de-en.en
++ grep '<seg id' orig/de-en/IWSLT14.TED.tst2011.de-en.en.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\s*<\/seg>\s*//g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l en
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
++ sed -e 's/\’/\'\''/g'
+Tokenizer Version 1.1
+Language: en
+Number of threads: 8
++ echo ''
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
+
++ fname=IWSLT14.TED.tst2012.de-en.en.xml
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2012.de-en.en
++ echo orig/de-en/IWSLT14.TED.tst2012.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2012.de-en.en
+orig/de-en/IWSLT14.TED.tst2012.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2012.de-en.en
++ grep '<seg id' orig/de-en/IWSLT14.TED.tst2012.de-en.en.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\’/\'\''/g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l en
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
++ sed -e 's/\s*<\/seg>\s*//g'
+Tokenizer Version 1.1
+Language: en
+Number of threads: 8
++ echo ''
++ for o in `ls $orig/$lang/IWSLT14.TED*.$l.xml`
+
++ fname=IWSLT14.TEDX.dev2012.de-en.en.xml
++ f=iwslt14.tokenized.de-en/tmp/IWSLT14.TEDX.dev2012.de-en.en
++ echo orig/de-en/IWSLT14.TEDX.dev2012.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TEDX.dev2012.de-en.en
+orig/de-en/IWSLT14.TEDX.dev2012.de-en.en.xml iwslt14.tokenized.de-en/tmp/IWSLT14.TEDX.dev2012.de-en.en
++ grep '<seg id' orig/de-en/IWSLT14.TEDX.dev2012.de-en.en.xml
++ sed -e 's/<seg id="[0-9]*">\s*//g'
++ sed -e 's/\s*<\/seg>\s*//g'
++ perl mosesdecoder/scripts/tokenizer/tokenizer.perl -threads 8 -l en
++ sed -e 's/\’/\'\''/g'
++ perl mosesdecoder/scripts/tokenizer/lowercase.perl
+Tokenizer Version 1.1
+Language: en
+Number of threads: 8
++ echo ''
+
++ echo 'creating train, valid, test...'
+creating train, valid, test...
++ for l in $src $tgt
++ awk '{if (NR%23 == 0)  print $0; }' iwslt14.tokenized.de-en/tmp/train.tags.de-en.de
++ awk '{if (NR%23 != 0)  print $0; }' iwslt14.tokenized.de-en/tmp/train.tags.de-en.de
++ cat iwslt14.tokenized.de-en/tmp/IWSLT14.TED.dev2010.de-en.de iwslt14.tokenized.de-en/tmp/IWSLT14.TEDX.dev2012.de-en.de iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2010.de-en.de iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2011.de-en.de iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2012.de-en.de
++ for l in $src $tgt
++ awk '{if (NR%23 == 0)  print $0; }' iwslt14.tokenized.de-en/tmp/train.tags.de-en.en
++ awk '{if (NR%23 != 0)  print $0; }' iwslt14.tokenized.de-en/tmp/train.tags.de-en.en
++ cat iwslt14.tokenized.de-en/tmp/IWSLT14.TED.dev2010.de-en.en iwslt14.tokenized.de-en/tmp/IWSLT14.TEDX.dev2012.de-en.en iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2010.de-en.en iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2011.de-en.en iwslt14.tokenized.de-en/tmp/IWSLT14.TED.tst2012.de-en.en
++ TRAIN=iwslt14.tokenized.de-en/tmp/train.en-de
++ BPE_CODE=iwslt14.tokenized.de-en/code
++ rm -f iwslt14.tokenized.de-en/tmp/train.en-de
++ for l in $src $tgt
++ cat iwslt14.tokenized.de-en/tmp/train.de
++ for l in $src $tgt
++ cat iwslt14.tokenized.de-en/tmp/train.en
++ echo 'learn_bpe.py on iwslt14.tokenized.de-en/tmp/train.en-de...'
+learn_bpe.py on iwslt14.tokenized.de-en/tmp/train.en-de...
++ python subword-nmt/subword_nmt/learn_bpe.py -s 10000
++ for L in $src $tgt
++ for f in train.$L valid.$L test.$L
++ echo 'apply_bpe.py to train.de...'
++ python subword-nmt/subword_nmt/apply_bpe.py -c iwslt14.tokenized.de-en/code
+apply_bpe.py to train.de...
++ for f in train.$L valid.$L test.$L
++ echo 'apply_bpe.py to valid.de...'
++ python subword-nmt/subword_nmt/apply_bpe.py -c iwslt14.tokenized.de-en/code
+apply_bpe.py to valid.de...
++ for f in train.$L valid.$L test.$L
++ echo 'apply_bpe.py to test.de...'
++ python subword-nmt/subword_nmt/apply_bpe.py -c iwslt14.tokenized.de-en/code
+apply_bpe.py to test.de...
++ for L in $src $tgt
++ for f in train.$L valid.$L test.$L
++ echo 'apply_bpe.py to train.en...'
++ python subword-nmt/subword_nmt/apply_bpe.py -c iwslt14.tokenized.de-en/code
+apply_bpe.py to train.en...
++ for f in train.$L valid.$L test.$L
++ echo 'apply_bpe.py to valid.en...'
++ python subword-nmt/subword_nmt/apply_bpe.py -c iwslt14.tokenized.de-en/code
+apply_bpe.py to valid.en...
++ for f in train.$L valid.$L test.$L
++ echo 'apply_bpe.py to test.en...'
+apply_bpe.py to test.en...
++ python subword-nmt/subword_nmt/apply_bpe.py -c iwslt14.tokenized.de-en/code
+(myconda) root@576918a23912:/mnt/fairseq/fairseq/examples/translation# 
+
+(myconda) root@576918a23912:/mnt/fairseq/fairseq# fairseq-preprocess --source-lang de --target-lang en \
+>     --trainpref $TEXT/train --validpref $TEXT/valid --testpref $TEXT/test \
+>     --destdir data-bin/iwslt14.tokenized.de-en | tee -a log
+2020-07-24 09:36:59 | INFO | fairseq_cli.preprocess | Namespace(align_suffix=None, alignfile=None, all_gather_list_size=16384, bf16=False, bpe=None, checkpoint_suffix='', cpu=False, criterion='cross_entropy', dataset_impl='mmap', destdir='data-bin/iwslt14.tokenized.de-en', empty_cache_freq=0, fp16=False, fp16_init_scale=128, fp16_no_flatten_grads=False, fp16_scale_tolerance=0.0, fp16_scale_window=None, joined_dictionary=False, log_format=None, log_interval=100, lr_scheduler='fixed', memory_efficient_bf16=False, memory_efficient_fp16=False, min_loss_scale=0.0001, model_parallel_size=1, no_progress_bar=False, nwordssrc=-1, nwordstgt=-1, only_source=False, optimizer='nag', padding_factor=8, profile=False, quantization_config_path=None, seed=None, source_lang='de', srcdict=None, target_lang='en', task='translation', tensorboard_logdir='', testpref='examples/translation/iwslt14.tokenized.de-en/test', tgtdict=None, threshold_loss_scale=None, thresholdsrc=0, thresholdtgt=0, tokenizer=None, tpu=False, trainpref='examples/translation/iwslt14.tokenized.de-en/train', user_dir=None, validpref='examples/translation/iwslt14.tokenized.de-en/valid', workers=1)
+2020-07-24 09:37:12 | INFO | fairseq_cli.preprocess | [de] Dictionary: 8848 types
+2020-07-24 09:37:32 | INFO | fairseq_cli.preprocess | [de] examples/translation/iwslt14.tokenized.de-en/train.de: 160239 sents, 4035591 tokens, 0.0% replaced by <unk>
+2020-07-24 09:37:32 | INFO | fairseq_cli.preprocess | [de] Dictionary: 8848 types
+2020-07-24 09:37:33 | INFO | fairseq_cli.preprocess | [de] examples/translation/iwslt14.tokenized.de-en/valid.de: 7283 sents, 182592 tokens, 0.0192% replaced by <unk>
+2020-07-24 09:37:33 | INFO | fairseq_cli.preprocess | [de] Dictionary: 8848 types
+2020-07-24 09:37:34 | INFO | fairseq_cli.preprocess | [de] examples/translation/iwslt14.tokenized.de-en/test.de: 6750 sents, 161838 tokens, 0.0636% replaced by <unk>
+2020-07-24 09:37:34 | INFO | fairseq_cli.preprocess | [en] Dictionary: 6632 types
+2020-07-24 09:37:53 | INFO | fairseq_cli.preprocess | [en] examples/translation/iwslt14.tokenized.de-en/train.en: 160239 sents, 3949114 tokens, 0.0% replaced by <unk>
+2020-07-24 09:37:53 | INFO | fairseq_cli.preprocess | [en] Dictionary: 6632 types
+2020-07-24 09:37:54 | INFO | fairseq_cli.preprocess | [en] examples/translation/iwslt14.tokenized.de-en/valid.en: 7283 sents, 178622 tokens, 0.00448% replaced by <unk>
+2020-07-24 09:37:54 | INFO | fairseq_cli.preprocess | [en] Dictionary: 6632 types
+2020-07-24 09:37:55 | INFO | fairseq_cli.preprocess | [en] examples/translation/iwslt14.tokenized.de-en/test.en: 6750 sents, 156928 tokens, 0.00892% replaced by <unk>
+2020-07-24 09:37:55 | INFO | fairseq_cli.preprocess | Wrote preprocessed data to data-bin/iwslt14.tokenized.de-en
+
+(myconda) root@576918a23912:/mnt/fairseq/fairseq# mkdir -p checkpoints/fconv
+(myconda) root@576918a23912:/mnt/fairseq/fairseq# CUDA_VISIBLE_DEVICES=0 fairseq-train data-bin/iwslt14.tokenized.de-en \
+>     --lr 0.25 --clip-norm 0.1 --dropout 0.2 --max-tokens 4000 \
+>     --arch fconv_iwslt_de_en --save-dir checkpoints/fconv | tee -a log
+2020-07-24 09:39:07 | INFO | fairseq_cli.train | Namespace(all_gather_list_size=16384, arch='fconv_iwslt_de_en', best_checkpoint_metric='loss', bf16=False, bpe=None, broadcast_buffers=False, bucket_cap_mb=25, checkpoint_suffix='', clip_norm=0.1, cpu=False, criterion='cross_entropy', curriculum=0, data='data-bin/iwslt14.tokenized.de-en', data_buffer_size=10, dataset_impl=None, ddp_backend='c10d', decoder_attention='True', decoder_embed_dim=256, decoder_embed_path=None, decoder_layers='[(256, 3)] * 3', decoder_out_embed_dim=256, device_id=0, disable_validation=False, distributed_backend='nccl', distributed_init_method=None, distributed_no_spawn=False, distributed_port=-1, distributed_rank=0, distributed_world_size=1, distributed_wrapper='DDP', dropout=0.2, empty_cache_freq=0, encoder_embed_dim=256, encoder_embed_path=None, encoder_layers='[(256, 3)] * 4', eval_bleu=False, eval_bleu_args=None, eval_bleu_detok='space', eval_bleu_detok_args=None, eval_bleu_print_samples=False, eval_bleu_remove_bpe=None, eval_tokenized_bleu=False, fast_stat_sync=False, find_unused_parameters=False, fix_batches_to_gpus=False, fixed_validation_seed=None, force_anneal=None, fp16=False, fp16_init_scale=128, fp16_no_flatten_grads=False, fp16_scale_tolerance=0.0, fp16_scale_window=None, keep_best_checkpoints=-1, keep_interval_updates=-1, keep_last_epochs=-1, left_pad_source='True', left_pad_target='False', load_alignments=False, localsgd_frequency=3, log_format=None, log_interval=100, lr=[0.25], lr_scheduler='fixed', lr_shrink=0.1, max_epoch=0, max_sentences=None, max_sentences_valid=None, max_source_positions=1024, max_target_positions=1024, max_tokens=4000, max_tokens_valid=4000, max_update=0, maximize_best_checkpoint_metric=False, memory_efficient_bf16=False, memory_efficient_fp16=False, min_loss_scale=0.0001, min_lr=-1, model_parallel_size=1, momentum=0.99, no_epoch_checkpoints=False, no_last_checkpoints=False, no_progress_bar=False, no_save=False, no_save_optimizer_state=False, no_seed_provided=True, nprocs_per_node=1, num_batch_buckets=0, num_workers=1, optimizer='nag', optimizer_overrides='{}', patience=-1, profile=False, quantization_config_path=None, required_batch_size_multiple=8, reset_dataloader=False, reset_lr_scheduler=False, reset_meters=False, reset_optimizer=False, restore_file='checkpoint_last.pt', save_dir='checkpoints/fconv', save_interval=1, save_interval_updates=0, seed=1, sentence_avg=False, share_input_output_embed=False, skip_invalid_size_inputs_valid_test=False, slowmo_algorithm='LocalSGD', slowmo_momentum=None, source_lang=None, stop_time_hours=0, target_lang=None, task='translation', tensorboard_logdir='', threshold_loss_scale=None, tokenizer=None, tpu=False, train_subset='train', truncate_source=False, update_freq=[1], upsample_primary=1, use_bmuf=False, user_dir=None, valid_subset='valid', validate_interval=1, warmup_updates=0, weight_decay=0.0)
+2020-07-24 09:39:07 | INFO | fairseq.tasks.translation | [de] dictionary: 8848 types
+2020-07-24 09:39:07 | INFO | fairseq.tasks.translation | [en] dictionary: 6632 types
+2020-07-24 09:39:07 | INFO | fairseq.data.data_utils | loaded 7283 examples from: data-bin/iwslt14.tokenized.de-en/valid.de-en.de
+2020-07-24 09:39:07 | INFO | fairseq.data.data_utils | loaded 7283 examples from: data-bin/iwslt14.tokenized.de-en/valid.de-en.en
+2020-07-24 09:39:07 | INFO | fairseq.tasks.translation | data-bin/iwslt14.tokenized.de-en valid de-en 7283 examples
+2020-07-24 09:39:07 | INFO | fairseq_cli.train | FConvModel(
+  (encoder): FConvEncoder(
+    (dropout_module): FairseqDropout()
+    (embed_tokens): Embedding(8848, 256, padding_idx=1)
+    (embed_positions): LearnedPositionalEmbedding(1024, 256, padding_idx=1)
+    (fc1): Linear(in_features=256, out_features=256, bias=True)
+    (projections): ModuleList(
+      (0): None
+      (1): None
+      (2): None
+      (3): None
+    )
+    (convolutions): ModuleList(
+      (0): ConvTBC(256, 512, kernel_size=(3,), padding=(1,))
+      (1): ConvTBC(256, 512, kernel_size=(3,), padding=(1,))
+      (2): ConvTBC(256, 512, kernel_size=(3,), padding=(1,))
+      (3): ConvTBC(256, 512, kernel_size=(3,), padding=(1,))
+    )
+    (fc2): Linear(in_features=256, out_features=256, bias=True)
+  )
+  (decoder): FConvDecoder(
+    (dropout_module): FairseqDropout()
+    (embed_tokens): Embedding(6632, 256, padding_idx=1)
+    (embed_positions): LearnedPositionalEmbedding(1024, 256, padding_idx=1)
+    (fc1): Linear(in_features=256, out_features=256, bias=True)
+    (projections): ModuleList(
+      (0): None
+      (1): None
+      (2): None
+    )
+    (convolutions): ModuleList(
+      (0): LinearizedConvolution(256, 512, kernel_size=(3,), padding=(2,))
+      (1): LinearizedConvolution(256, 512, kernel_size=(3,), padding=(2,))
+      (2): LinearizedConvolution(256, 512, kernel_size=(3,), padding=(2,))
+    )
+    (attention): ModuleList(
+      (0): AttentionLayer(
+        (in_projection): Linear(in_features=256, out_features=256, bias=True)
+        (out_projection): Linear(in_features=256, out_features=256, bias=True)
+      )
+      (1): AttentionLayer(
+        (in_projection): Linear(in_features=256, out_features=256, bias=True)
+        (out_projection): Linear(in_features=256, out_features=256, bias=True)
+      )
+      (2): AttentionLayer(
+        (in_projection): Linear(in_features=256, out_features=256, bias=True)
+        (out_projection): Linear(in_features=256, out_features=256, bias=True)
+      )
+    )
+    (fc2): Linear(in_features=256, out_features=256, bias=True)
+    (fc3): Linear(in_features=256, out_features=6632, bias=True)
+  )
+)
+2020-07-24 09:39:07 | INFO | fairseq_cli.train | model fconv_iwslt_de_en, criterion CrossEntropyCriterion
+2020-07-24 09:39:07 | INFO | fairseq_cli.train | num. model params: 9618384 (num. trained: 9618384)
+2020-07-24 09:39:09 | INFO | fairseq.utils | ***********************CUDA enviroments for all 1 workers***********************
+2020-07-24 09:39:09 | INFO | fairseq.utils | rank   0: capabilities =  7.5  ; total memory = 7.795 GB ; name = GeForce RTX 2070                        
+2020-07-24 09:39:09 | INFO | fairseq.utils | ***********************CUDA enviroments for all 1 workers***********************
+2020-07-24 09:39:09 | INFO | fairseq_cli.train | training on 1 devices (GPUs/TPUs)
+2020-07-24 09:39:09 | INFO | fairseq_cli.train | max tokens per GPU = 4000 and max sentences per GPU = None
+2020-07-24 09:39:09 | INFO | fairseq.trainer | no existing checkpoint found checkpoints/fconv/checkpoint_last.pt
+2020-07-24 09:39:09 | INFO | fairseq.trainer | loading train data for epoch 1
+2020-07-24 09:39:09 | INFO | fairseq.data.data_utils | loaded 160239 examples from: data-bin/iwslt14.tokenized.de-en/train.de-en.de
+2020-07-24 09:39:09 | INFO | fairseq.data.data_utils | loaded 160239 examples from: data-bin/iwslt14.tokenized.de-en/train.de-en.en
+2020-07-24 09:39:09 | INFO | fairseq.tasks.translation | data-bin/iwslt14.tokenized.de-en train de-en 160239 examples
+2020-07-24 09:39:11 | INFO | fairseq.trainer | NOTE: your device may support faster training with --fp16
+2020-07-24 09:39:11 | INFO | fairseq_cli.train | begin training epoch 1
+epoch 001:   0%|                                                            | 0/1131 [00:00<?, ?it/s]/mnt/fairseq/fairseq/fairseq/utils.py:301: UserWarning: amp_C fused kernels unavailable, disabling multi_tensor_l2norm; you may get better performance by installing NVIDIA's apex library
+  warnings.warn(
+epoch 001: 100%|▉| 1127/1131 [00:37<00:00, 30.09it/s, loss=6.388, ppl=83.76, wps=105324, ups=30.09, w2020-07-24 09:39:49 | INFO | fairseq_cli.train | begin validation on "valid" subset
+                                                                                                    2020-07-24 09:39:50 | INFO | valid | epoch 001 | valid on 'valid' subset | loss 5.951 | ppl 61.87 | wps 260955 | wpb 2835.3 | bsz 115.6 | num_updates 1131
+2020-07-24 09:39:50 | INFO | fairseq_cli.train | begin save checkpoint
+2020-07-24 09:39:54 | INFO | fairseq.checkpoint_utils | saved checkpoint checkpoints/fconv/checkpoint1.pt (epoch 1 @ 1131 updates, score 5.951) (writing took 4.074857961386442 seconds)
+2020-07-24 09:39:54 | INFO | fairseq_cli.train | end of epoch 1 (average epoch stats below)          
+2020-07-24 09:39:54 | INFO | train | epoch 001 | loss 7.551 | ppl 187.51 | wps 92743 | ups 26.56 | wpb 3491.7 | bsz 141.7 | num_updates 1131 | lr 0.25 | gnorm 0.551 | clip 100 | train_wall 37 | wall 45
+2020-07-24 09:39:54 | INFO | fairseq_cli.train | begin training epoch 1
+epoch 002: 100%|▉| 1129/1131 [00:37<00:00, 29.85it/s, loss=5.085, ppl=33.95, wps=104390, ups=29.9, wp2020-07-24 09:40:32 | INFO | fairseq_cli.train | begin validation on "valid" subset
+                                                                                                    2020-07-24 09:40:32 | INFO | valid | epoch 002 | valid on 'valid' subset | loss 4.694 | ppl 25.88 | wps 259747 | wpb 2835.3 | bsz 115.6 | num_updates 2262 | best_loss 4.694
+2020-07-24 09:40:32 | INFO | fairseq_cli.train | begin save checkpoint
+2020-07-24 09:40:35 | INFO | fairseq.checkpoint_utils | saved checkpoint checkpoints/fconv/checkpoint2.pt (epoch 2 @ 2262 updates, score 4.694) (writing took 2.4782336726784706 seconds)
+2020-07-24 09:40:35 | INFO | fairseq_cli.train | end of epoch 2 (average epoch stats below)          
+2020-07-24 09:40:35 | INFO | train | epoch 002 | loss 5.543 | ppl 46.63 | wps 95862 | ups 27.45 | wpb 3491.7 | bsz 141.7 | num_updates 2262 | lr 0.25 | gnorm 0.444 | clip 100 | train_wall 37 | wall 86
+2020-07-24 09:40:35 | INFO | fairseq_cli.train | begin training epoch 2
+epoch 003: 100%|▉| 1127/1131 [00:37<00:00, 30.17it/s, loss=4.508, ppl=22.75, wps=102335, ups=29.94, w2020-07-24 09:41:13 | INFO | fairseq_cli.train | begin validation on "valid" subset
+                                                                                                    2020-07-24 09:41:14 | INFO | valid | epoch 003 | valid on 'valid' subset | loss 4.148 | ppl 17.73 | wps 261159 | wpb 2835.3 | bsz 115.6 | num_updates 3393 | best_loss 4.148
+2020-07-24 09:41:14 | INFO | fairseq_cli.train | begin save checkpoint
+2020-07-24 09:41:16 | INFO | fairseq.checkpoint_utils | saved checkpoint checkpoints/fconv/checkpoint3.pt (epoch 3 @ 3393 updates, score 4.148) (writing took 2.2124005183577538 seconds)
+2020-07-24 09:41:16 | INFO | fairseq_cli.train | end of epoch 3 (average epoch stats below)          
+2020-07-24 09:41:16 | INFO | train | epoch 003 | loss 4.672 | ppl 25.49 | wps 96270.8 | ups 27.57 | wpb 3491.7 | bsz 141.7 | num_updates 3393 | lr 0.25 | gnorm 0.472 | clip 100 | train_wall 38 | wall 127
+2020-07-24 09:41:16 | INFO | fairseq_cli.train | begin training epoch 3
+epoch 004: 100%|▉| 1127/1131 [00:38<00:00, 29.79it/s, loss=4.094, ppl=17.08, wps=104504, ups=29.63, w2020-07-24 09:41:54 | INFO | fairseq_cli.train | begin validation on "valid" subset
+                                                                                                    2020-07-24 09:41:55 | INFO | valid | epoch 004 | valid on 'valid' subset | loss 3.833 | ppl 14.25 | wps 259012 | wpb 2835.3 | bsz 115.6 | num_updates 4524 | best_loss 3.833
+2020-07-24 09:41:55 | INFO | fairseq_cli.train | begin save checkpoint
+2020-07-24 09:41:58 | INFO | fairseq.checkpoint_utils | saved checkpoint checkpoints/fconv/checkpoint4.pt (epoch 4 @ 4524 updates, score 3.833) (writing took 2.962455317378044 seconds)
+2020-07-24 09:41:58 | INFO | fairseq_cli.train | end of epoch 4 (average epoch stats below)          
+2020-07-24 09:41:58 | INFO | train | epoch 004 | loss 4.22 | ppl 18.64 | wps 94347.7 | ups 27.02 | wpb 3491.7 | bsz 141.7 | num_updates 4524 | lr 0.25 | gnorm 0.453 | clip 100 | train_wall 38 | wall 169
+2020-07-24 09:41:58 | INFO | fairseq_cli.train | begin training epoch 4
+epoch 005: 100%|▉| 1129/1131 [00:38<00:00, 29.69it/s, loss=3.961, ppl=15.57, wps=103914, ups=29.93, w2020-07-24 09:42:36 | INFO | fairseq_cli.train | begin validation on "valid" subset
+                                                                                                    2020-07-24 09:42:37 | INFO | valid | epoch 005 | valid on 'valid' subset | loss 3.611 | ppl 12.21 | wps 259964 | wpb 2835.3 | bsz 115.6 | num_updates 5655 | best_loss 3.611
+2020-07-24 09:42:37 | INFO | fairseq_cli.train | begin save checkpoint
+2020-07-24 09:42:41 | INFO | fairseq.checkpoint_utils | saved checkpoint checkpoints/fconv/checkpoint5.pt (epoch 5 @ 5655 updates, score 3.611) (writing took 4.101587988436222 seconds)
+2020-07-24 09:42:41 | INFO | fairseq_cli.train | end of epoch 5 (average epoch stats below)          
+2020-07-24 09:42:41 | INFO | train | epoch 005 | loss 3.943 | ppl 15.38 | wps 91863.8 | ups 26.31 | wpb 3491.7 | bsz 141.7 | num_updates 5655 | lr 0.25 | gnorm 0.435 | clip 100 | train_wall 38 | wall 212
+2020-07-24 09:42:41 | INFO | fairseq_cli.train | begin training epoch 5
+epoch 006: 100%|▉| 1130/1131 [00:38<00:00, 30.22it/s, loss=3.799, ppl=13.92, wps=103206, ups=29.66, w2020-07-24 09:43:19 | INFO | fairseq_cli.train | begin validation on "valid" subset
+                                                                                                    2020-07-24 09:43:20 | INFO | valid | epoch 006 | valid on 'valid' subset | loss 3.511 | ppl 11.4 | wps 259259 | wpb 2835.3 | bsz 115.6 | num_updates 6786 | best_loss 3.511
+2020-07-24 09:43:20 | INFO | fairseq_cli.train | begin save checkpoint
+2020-07-24 09:43:21 | INFO | fairseq.checkpoint_utils | saved checkpoint checkpoints/fconv/checkpoint6.pt (epoch 6 @ 6786 updates, score 3.511) (writing took 1.7382120378315449 seconds)
+2020-07-24 09:43:21 | INFO | fairseq_cli.train | end of epoch 6 (average epoch stats below)          
+2020-07-24 09:43:21 | INFO | train | epoch 006 | loss 3.755 | ppl 13.51 | wps 97101.4 | ups 27.81 | wpb 3491.7 | bsz 141.7 | num_updates 6786 | lr 0.25 | gnorm 0.422 | clip 100 | train_wall 38 | wall 252
+2020-07-24 09:43:21 | INFO | fairseq_cli.train | begin training epoch 6
+epoch 007:   2%| | 17/1131 [00:00<00:42, 26.29it/s, loss=3.694, ppl=12.94, wps=58973.2, ups=16.94, wp
+
+(myconda) root@576918a23912:/mnt/fairseq/fairseq# fairseq-generate data-bin/iwslt14.tokenized.de-en \>     --path checkpoints/fconv/checkpoint_best.pt \
+>     --batch-size 128 --beam 5 | tee -a log
+2020-07-24 09:45:11 | INFO | fairseq_cli.generate | Namespace(all_gather_list_size=16384, beam=5, bf16=False, bpe=None, broadcast_buffers=False, bucket_cap_mb=25, checkpoint_suffix='', cpu=False, criterion='cross_entropy', data='data-bin/iwslt14.tokenized.de-en', data_buffer_size=10, dataset_impl=None, ddp_backend='c10d', decoding_format=None, device_id=0, distributed_backend='nccl', distributed_init_method=None, distributed_no_spawn=False, distributed_port=-1, distributed_rank=0, distributed_world_size=1, distributed_wrapper='DDP', diverse_beam_groups=-1, diverse_beam_strength=0.5, diversity_rate=-1.0, empty_cache_freq=0, eval_bleu=False, eval_bleu_args=None, eval_bleu_detok='space', eval_bleu_detok_args=None, eval_bleu_print_samples=False, eval_bleu_remove_bpe=None, eval_tokenized_bleu=False, fast_stat_sync=False, find_unused_parameters=False, fix_batches_to_gpus=False, force_anneal=None, fp16=False, fp16_init_scale=128, fp16_no_flatten_grads=False, fp16_scale_tolerance=0.0, fp16_scale_window=None, gen_subset='test', iter_decode_eos_penalty=0.0, iter_decode_force_max_iter=False, iter_decode_max_iter=10, iter_decode_with_beam=1, iter_decode_with_external_reranker=False, left_pad_source='True', left_pad_target='False', lenpen=1, load_alignments=False, localsgd_frequency=3, log_format=None, log_interval=100, lr_scheduler='fixed', lr_shrink=0.1, match_source_len=False, max_len_a=0, max_len_b=200, max_sentences=128, max_source_positions=1024, max_target_positions=1024, max_tokens=None, memory_efficient_bf16=False, memory_efficient_fp16=False, min_len=1, min_loss_scale=0.0001, model_overrides='{}', model_parallel_size=1, momentum=0.99, nbest=1, no_beamable_mm=False, no_early_stop=False, no_progress_bar=False, no_repeat_ngram_size=0, no_seed_provided=True, nprocs_per_node=1, num_batch_buckets=0, num_shards=1, num_workers=1, optimizer='nag', path='checkpoints/fconv/checkpoint_best.pt', prefix_size=0, print_alignment=False, print_step=False, profile=False, quantization_config_path=None, quiet=False, remove_bpe=None, replace_unk=None, required_batch_size_multiple=8, results_path=None, retain_dropout=False, retain_dropout_modules=None, retain_iter_history=False, sacrebleu=False, sampling=False, sampling_topk=-1, sampling_topp=-1.0, score_reference=False, seed=1, shard_id=0, skip_invalid_size_inputs_valid_test=False, slowmo_algorithm='LocalSGD', slowmo_momentum=None, source_lang=None, target_lang=None, task='translation', temperature=1.0, tensorboard_logdir='', threshold_loss_scale=None, tokenizer=None, tpu=False, truncate_source=False, unkpen=0, unnormalized=False, upsample_primary=1, user_dir=None, warmup_updates=0, weight_decay=0.0)
+2020-07-24 09:45:11 | INFO | fairseq.tasks.translation | [de] dictionary: 8848 types
+2020-07-24 09:45:11 | INFO | fairseq.tasks.translation | [en] dictionary: 6632 types
+2020-07-24 09:45:11 | INFO | fairseq.data.data_utils | loaded 6750 examples from: data-bin/iwslt14.tokenized.de-en/test.de-en.de
+2020-07-24 09:45:11 | INFO | fairseq.data.data_utils | loaded 6750 examples from: data-bin/iwslt14.tokenized.de-en/test.de-en.en
+2020-07-24 09:45:11 | INFO | fairseq.tasks.translation | data-bin/iwslt14.tokenized.de-en test de-en 6750 examples
+2020-07-24 09:45:11 | INFO | fairseq_cli.generate | loading model(s) from checkpoints/fconv/checkpoint_best.pt
+  0%|                                                                         | 0/53 [00:00<?, ?it/s]S-1951	das geht schnell .
+T-1951	it goes fast .
+H-1951	-1.1753536462783813	this is fast .
+D-1951	-1.1753536462783813	this is fast .
+P-1951	-2.2896 -0.2049 -2.8008 -0.2437 -0.3378
+S-1749	sie brauchen zeit .
+T-1749	you need time .
+H-1749	-0.6868095397949219	you need time .
+D-1749	-0.6868095397949219	you need time .
+P-1749	-1.8894 -0.6838 -0.2781 -0.4649 -0.1178
+S-3406	und er sagt ...
+T-3406	and he says ...
+H-3406	-0.5304465293884277	and he says ...
+D-3406	-0.5304465293884277	and he says ...
+P-3406	-0.1666 -0.3019 -1.4483 -0.6752 -0.0603
+S-3250	wir wissen das .
+T-3250	we know that .
+H-3250	-0.25982919335365295	we know that .
+D-3250	-0.25982919335365295	we know that .
+P-3250	-0.2310 -0.1661 -0.6171 -0.2293 -0.0556
+S-3036	ta@@ -@@ da !
+T-3036	ta@@ -@@ da !
+H-3036	-1.7414041757583618	ta@@ p there !
+D-3036	-1.7414041757583618	ta@@ p there !
+P-3036	-3.4324 -3.4594 -1.2853 -0.3803 -0.1496
+S-4288	ich danke ihnen .
+T-4288	thank you .
+H-4288	-0.09075042605400085	thank you .
+D-4288	-0.09075042605400085	thank you .
+P-4288	-0.2041 -0.0087 -0.0866 -0.0636
+S-1990	hier ist sie .
+T-1990	here it is .
+H-1990	-1.3528367280960083	here &apos;s it .
+D-1990	-1.3528367280960083	here &apos;s it .
+P-1990	-1.4005 -1.4476 -3.3580 -0.3440 -0.2140
+S-3668	das waren wir .
+T-3668	that was us .
+H-3668	-0.9493918418884277	that &apos;s what we were .
+D-3668	-0.9493918418884277	that &apos;s what we were .
+P-3668	-1.9173 -0.9892 -1.9629 -0.0765 -1.0148 -0.6545 -0.0305
+S-4176	nach einer woche .
+T-4176	after one week .
+H-4176	-0.631858766078949	after a week .
+D-4176	-0.631858766078949	after a week .
+P-4176	-1.6212 -1.1421 -0.1239 -0.2574 -0.0147
+S-1562	musik als sprache .
+T-1562	music as language .
+H-1562	-0.699103057384491	music as a language .
+D-1562	-0.699103057384491	music as a language .
+P-1562	-1.3802 -1.3605 -0.9922 -0.2287 -0.2191 -0.0139
+S-1211	das ist falsch .
+T-1211	that &apos;s wrong .
+H-1211	-0.7875798344612122	that &apos;s wrong .
+D-1211	-0.7875798344612122	that &apos;s wrong .
+P-1211	-1.5492 -0.3364 -1.6298 -0.1737 -0.2488
+S-705	das ist schwer .
+T-705	this is hard .
+H-705	-0.9098858833312988	that &apos;s hard .
+D-705	-0.9098858833312988	that &apos;s hard .
+P-705	-1.4957 -0.3527 -2.1274 -0.3670 -0.2067
+S-49	es ist interessant .
+T-49	it &apos;s interesting .
+H-49	-0.28659793734550476	it &apos;s interesting .
+D-49	-0.28659793734550476	it &apos;s interesting .
+P-49	-0.3885 -0.2240 -0.3983 -0.2293 -0.1929
+S-4450	... noch nicht .
+T-4450	... yet .
+H-4450	-1.4064297676086426	... no .
+D-4450	-1.4064297676086426	... no .
+P-4450	-2.0279 -2.8059 -0.6924 -0.0996
+S-2151	halt zwei@@ mal .
+T-2151	like twice over .
+H-2151	-1.8968473672866821	it &apos;s a second time .
+D-2151	-1.8968473672866821	it &apos;s a second time .
+P-2151	-4.4646 -0.9018 -3.0517 -0.7919 -3.7353 -0.3135 -0.0191
+S-3044	toll@@ er trick ?
+T-3044	nice one .
+H-3044	-1.9271111488342285	so , does it happen ?
+D-3044	-1.9271111488342285	so , does it happen ?
+P-3044	-3.9836 -1.4184 -3.4724 -1.3183 -3.0105 -0.1687 -0.1178
+S-3633	ein paar weniger .
+T-3633	a few less .
+H-3633	-0.6929624080657959	a few less .
+D-3633	-0.6929624080657959	a few less .
+P-3633	-1.5084 -0.7382 -0.4296 -0.7630 -0.0257
+S-5507	solar@@ technologie ist ...
+T-5507	solar technology is ...
+H-5507	-0.9108014702796936	solar technology is ...
+D-5507	-0.9108014702796936	solar technology is ...
+P-5507	-1.3128 -0.1230 -0.1495 -2.9069 -0.0618
+S-5505	das ist nicht ...
+T-5505	this is not ...
+H-5505	-1.0090665817260742	that &apos;s not -- it &apos;s not ...
+D-5505	-1.0090665817260742	that &apos;s not -- it &apos;s not ...
+P-5505	-1.3766 -0.2660 -0.0392 -3.6549 -2.8157 -0.1867 -0.2590 -0.4765 -0.0070
+S-1662	nämlich das singen .
+T-1662	which is sing@@ ing .
+H-1662	-1.474779725074768	this is the sing@@ ing .
+D-1662	-1.474779725074768	this is the sing@@ ing .
+P-1662	-4.0990 -0.6997 -0.9840 -2.6982 -0.9610 -0.8120 -0.0696
+S-1530	aber es geht .
+T-1530	it is possible though .
+H-1530	-0.8398551940917969	but it &apos;s about it .
+D-1530	-0.8398551940917969	but it &apos;s about it .
+P-1530	-0.1763 -0.2652 -0.6976 -2.9505 -1.5793 -0.1650 -0.0451
+S-1428	findet nicht statt .
+T-1428	that doesn &apos;t happen .
+H-1428	-1.44365394115448	it doesn &apos;t happen .
+D-1428	-1.44365394115448	it doesn &apos;t happen .
+P-1428	-3.4975 -0.7207 0.0000 -2.7333 -1.6351 -0.0753
+S-1009	ja , hallo .
+T-1009	yes , hell@@ o .
+H-1009	-0.5139772891998291	yes , hell@@ o .
+D-1009	-0.5139772891998291	yes , hell@@ o .
+P-1009	-0.7424 -0.0929 -1.6205 -0.0738 -0.1440 -0.4101
+S-6040	wir lieben innovation .
+T-6040	we love innovation .
+H-6040	-0.20219188928604126	we love innovation .
+D-6040	-0.20219188928604126	we love innovation .
+P-6040	-0.2982 -0.2560 -0.1705 -0.1680 -0.1183
+S-4175	von se@@ attle ...
+T-4175	from se@@ attle ...
+H-4175	-1.6953306198120117	from se@@ attle ...
+D-4175	-1.6953306198120117	from se@@ attle ...
+P-4175	-3.8841 -1.8300 -0.6212 -2.0536 -0.0877
+S-4370	ich danke euch .
+T-4370	thank you guys .
+H-4370	-0.0994434654712677	thank you .
+D-4370	-0.0994434654712677	thank you .
+P-4370	-0.2704 -0.0034 -0.0655 -0.0585
+S-5306	wir waren arm .
+T-5306	we were poor .
+H-5306	-0.8263738751411438	we were poor .
+D-5306	-0.8263738751411438	we were poor .
+P-5306	-0.1823 -0.6040 -2.9222 -0.2576 -0.1658
+S-5131	sind das alle ?
+T-5131	is that all ?
+H-5131	-1.0224206447601318	are that all ?
+D-5131	-1.0224206447601318	are that all ?
+P-5131	-0.7121 -1.9097 -1.2335 -1.1962 -0.0606
+S-4719	ich bin tom .
+T-4719	i &apos;m tom .
+H-4719	-0.7987306714057922	i &apos;m tom .
+D-4719	-0.7987306714057922	i &apos;m tom .
+P-4719	-0.2474 -0.5555 -2.8916 -0.0873 -0.2118
+S-4615	1,@@ 5 millionen .
+T-4615	1.@@ 5 million .
+H-4615	-0.6327131390571594	1.@@ 5 million .
+D-4615	-0.6327131390571594	1.@@ 5 million .
+P-4615	-2.5106 -0.0375 -0.0299 -0.5784 -0.0071
+S-4567	ja . okay .
+T-4567	yeah . okay .
+H-4567	-0.4343271851539612	yes . okay .
+D-4567	-0.4343271851539612	yes . okay .
+P-4567	-0.9476 -0.0839 -0.9591 -0.0226 -0.1585
+S-2798	ich weiß nicht .
+T-2798	i don &apos;t know .
+H-2798	-0.2643612027168274	i don &apos;t know .
+D-2798	-0.2643612027168274	i don &apos;t know .
+P-2798	-0.2538 -0.5101 -0.0000 -0.0866 -0.6679 -0.0678
+S-5495	vielen dank .
+T-5495	thank you .
+H-5495	-0.09775665402412415	thank you .
+D-5495	-0.09775665402412415	thank you .
+P-5495	-0.2745 -0.0204 -0.0732 -0.0230
+S-5447	vielen dank .
+T-5447	thank you .
+H-5447	-0.09775665402412415	thank you .
+D-5447	-0.09775665402412415	thank you .
+P-5447	-0.2745 -0.0204 -0.0732 -0.0230
+S-5210	wo@@ ah !
+T-5210	woo@@ o !
+H-5210	-2.3202271461486816	so , what &apos;s going on .
+D-5210	-2.3202271461486816	so , what &apos;s going on .
+P-5210	-4.2754 -1.6897 -3.9774 -2.1788 -3.6857 -0.6806 -1.8531 -0.2210
+S-5592	ziemlich einfach .
+T-5592	pretty simple .
+H-5592	-0.5005269646644592	pretty simple .
+D-5592	-0.5005269646644592	pretty simple .
+P-5592	-1.3124 -0.5359 -0.0746 -0.0792
+S-5882	vielen dank .
+T-5882	thank you .
+H-5882	-0.09775665402412415	thank you .
+D-5882	-0.09775665402412415	thank you .
+P-5882	-0.2745 -0.0204 -0.0732 -0.0230
+S-5269	vielen dank .
+T-5269	thank you .
+H-5269	-0.09775665402412415	thank you .
+D-5269	-0.09775665402412415	thank you .
+P-5269	-0.2745 -0.0204 -0.0732 -0.0230
+S-6749	vielen dank .
+T-6749	thank you .
+H-6749	-0.09775665402412415	thank you .
+D-6749	-0.09775665402412415	thank you .
+P-6749	-0.2745 -0.0204 -0.0732 -0.0230
+S-5067	vielen dank .
+T-5067	thank you .
+H-5067	-0.09775665402412415	thank you .
+D-5067	-0.09775665402412415	thank you .
+P-5067	-0.2745 -0.0204 -0.0732 -0.0230
+S-4968	vielen dank .
+T-4968	thank you .
+H-4968	-0.09775665402412415	thank you .
+D-4968	-0.09775665402412415	thank you .
+P-4968	-0.2745 -0.0204 -0.0732 -0.0230
+S-4402	vielen dank .
+T-4402	thank you .
+H-4402	-0.09775665402412415	thank you .
+D-4402	-0.09775665402412415	thank you .
+P-4402	-0.2745 -0.0204 -0.0732 -0.0230
+S-4110	danke schön .
+T-4110	thank you .
+H-4110	-0.051047202199697495	thank you .
+D-4110	-0.051047202199697495	thank you .
+P-4110	-0.0804 -0.0109 -0.0497 -0.0631
+S-4101	vielen dank .
+T-4101	thank you .
+H-4101	-0.09775665402412415	thank you .
+D-4101	-0.09775665402412415	thank you .
+P-4101	-0.2745 -0.0204 -0.0732 -0.0230
+S-4053	vielen dank .
+T-4053	thank you .
+H-4053	-0.09775665402412415	thank you .
+D-4053	-0.09775665402412415	thank you .
+P-4053	-0.2745 -0.0204 -0.0732 -0.0230
+S-6329	danke schön .
+T-6329	thank you .
+H-6329	-0.051047202199697495	thank you .
+D-6329	-0.051047202199697495	thank you .
+P-6329	-0.0804 -0.0109 -0.0497 -0.0631
+S-3822	vielen dank .
+T-3822	thank you .
+H-3822	-0.09775665402412415	thank you .
+D-3822	-0.09775665402412415	thank you .
+P-3822	-0.2745 -0.0204 -0.0732 -0.0230
+S-1533	das geht .
+T-1533	it &apos;s possible .
+H-1533	-1.173763394355774	that &apos;s what &apos;s going on .
+D-1533	-1.173763394355774	that &apos;s what &apos;s going on .
+P-1533	-2.1880 -0.3455 -2.2075 -2.2268 -1.3393 -0.7891 -0.2761 -0.0178
+S-1377	einen einzigen ?
+T-1377	just one single one ?
+H-1377	-1.5743135213851929	a single one ?
+D-1377	-1.5743135213851929	a single one ?
+P-1377	-3.6416 -1.5830 -2.3030 -0.2362 -0.1078
+S-885	vielen dank ,
+T-885	thank you very much .
+H-885	-0.15659157931804657	thank you .
+D-885	-0.15659157931804657	thank you .
+P-885	-0.3308 -0.0245 -0.2319 -0.0391
+S-6619	vielen dank .
+T-6619	thank you very much .
+H-6619	-0.09775665402412415	thank you .
+D-6619	-0.09775665402412415	thank you .
+P-6619	-0.2745 -0.0204 -0.0732 -0.0230
+S-5196	vielen dank .
+T-5196	thank you very much .
+H-5196	-0.09775665402412415	thank you .
+D-5196	-0.09775665402412415	thank you .
+P-5196	-0.2745 -0.0204 -0.0732 -0.0230
+S-3255	vielen dank .
+T-3255	thank you so much .
+H-3255	-0.09775665402412415	thank you .
+D-3255	-0.09775665402412415	thank you .
+P-3255	-0.2745 -0.0204 -0.0732 -0.0230
+S-2791	vielen dank .
+T-2791	thank you very much .
+H-2791	-0.09775665402412415	thank you .
+D-2791	-0.09775665402412415	thank you .
+P-2791	-0.2745 -0.0204 -0.0732 -0.0230
+S-1389	allein darüber .
+T-1389	just because of that .
+H-1389	-1.3598183393478394	just about it .
+D-1389	-1.3598183393478394	just about it .
+P-1389	-3.1973 -1.8502 -1.4244 -0.2687 -0.0585
+S-2227	im ernst .
+T-2227	no kid@@ ding .
+H-2227	-1.783159613609314	it &apos;s serious .
+D-2227	-1.783159613609314	it &apos;s serious .
+P-2227	-3.8515 -0.9859 -3.0899 -0.8947 -0.0938
+S-3093	nun ja ,
+T-3093	yes , well ...
+H-3093	-0.8768303394317627	well , yeah .
+D-3093	-0.8768303394317627	well , yeah .
+P-3093	-0.8881 -0.5184 -2.1305 -0.6099 -0.2373
+S-816	vielen dank .
+T-816	thank you very much .
+H-816	-0.09775665402412415	thank you .
+D-816	-0.09775665402412415	thank you .
+P-816	-0.2745 -0.0204 -0.0732 -0.0230
+S-207	vielen dank .
+T-207	thank you so much .
+H-207	-0.09775665402412415	thank you .
+D-207	-0.09775665402412415	thank you .
+P-207	-0.2745 -0.0204 -0.0732 -0.0230
+S-151	vielen dank .
+T-151	thank you very much .
+H-151	-0.09775665402412415	thank you .
+D-151	-0.09775665402412415	thank you .
+P-151	-0.2745 -0.0204 -0.0732 -0.0230
+S-5198	das stimmt .
+T-5198	it &apos;s true .
+H-5198	-0.5756848454475403	that &apos;s true .
+D-5198	-0.5756848454475403	that &apos;s true .
+P-5198	-1.8469 -0.3060 -0.5381 -0.1128 -0.0747
+S-4717	geht das ?
+T-4717	is that something ?
+H-4717	-1.5045279264450073	is that ?
+D-4717	-1.5045279264450073	is that ?
+P-4717	-3.2508 -1.4461 -1.1132 -0.2080
+S-3824	vielen dank .
+T-3824	thank you .
+H-3824	-0.09775665402412415	thank you .
+D-3824	-0.09775665402412415	thank you .
+P-3824	-0.2745 -0.0204 -0.0732 -0.0230
+S-3774	vielen dank .
+T-3774	thank you .
+H-3774	-0.09775665402412415	thank you .
+D-3774	-0.09775665402412415	thank you .
+P-3774	-0.2745 -0.0204 -0.0732 -0.0230
+S-3786	vielen dank .
+T-3786	thank you .
+H-3786	-0.09775665402412415	thank you .
+D-3786	-0.09775665402412415	thank you .
+P-3786	-0.2745 -0.0204 -0.0732 -0.0230
+S-881	vielen dank .
+T-881	thank you .
+H-881	-0.09775665402412415	thank you .
+D-881	-0.09775665402412415	thank you .
+P-881	-0.2745 -0.0204 -0.0732 -0.0230
+S-631	vielleicht nicht .
+T-631	maybe not .
+H-631	-0.6823597550392151	maybe not .
+D-631	-0.6823597550392151	maybe not .
+P-631	-0.7577 -1.1008 -0.8248 -0.0461
+S-1726	besch@@ issen .
+T-1726	terrible .
+H-1726	-2.302675485610962	it &apos;s going to be de@@ plo@@ yed .
+D-1726	-2.302675485610962	it &apos;s going to be de@@ plo@@ yed .
+P-1726	-4.8798 -1.4502 -5.3522 -0.1257 -1.0019 -5.4481 -3.9627 -0.6897 -0.1097 -0.0067
+S-2919	f@@ ein .
+T-2919	fine .
+H-2919	-1.089887022972107	f@@ one .
+D-2919	-1.089887022972107	f@@ one .
+P-2919	-2.6551 -1.5985 -0.0409 -0.0651
+S-3789	vielen dank .
+T-3789	thanks .
+H-3789	-0.09775665402412415	thank you .
+D-3789	-0.09775665402412415	thank you .
+P-3789	-0.2745 -0.0204 -0.0732 -0.0230
+S-4704	einzigarti@@ g .
+T-4704	unique .
+H-4704	-1.295162320137024	it &apos;s unique .
+D-4704	-1.295162320137024	it &apos;s unique .
+P-4704	-4.2251 -0.9111 -1.0266 -0.2739 -0.0391
+S-551	vielen dank .
+T-551	thank you .
+H-551	-0.09775665402412415	thank you .
+D-551	-0.09775665402412415	thank you .
+P-551	-0.2745 -0.0204 -0.0732 -0.0230
+S-1489	nachhal@@ tig .
+T-1489	sustainable .
+H-1489	-0.9504755139350891	sustain@@ ability .
+D-1489	-0.9504755139350891	sustain@@ ability .
+P-1489	-2.7863 -0.6360 -0.3620 -0.0176
+S-723	ol@@ é !
+T-723	o@@ le !
+H-723	-1.4985322952270508	ol@@ ds !
+D-723	-1.4985322952270508	ol@@ ds !
+P-723	-3.0174 -2.6104 -0.3098 -0.0565
+S-841	vielen dank .
+T-841	thank you .
+H-841	-0.09775665402412415	thank you .
+D-841	-0.09775665402412415	thank you .
+P-841	-0.2745 -0.0204 -0.0732 -0.0230
+S-3263	6@@ 0.000 .
+T-3263	6@@ 0,000 .
+H-3263	-1.1417250633239746	6@@ 0,000 .
+D-3263	-1.1417250633239746	6@@ 0,000 .
+P-3263	-3.9389 -0.4455 -0.1461 -0.0365
+S-2086	vielen dank .
+T-2086	thank you .
+H-2086	-0.09775665402412415	thank you .
+D-2086	-0.09775665402412415	thank you .
+P-2086	-0.2745 -0.0204 -0.0732 -0.0230
+S-2650	vielen dank .
+T-2650	thank you .
+H-2650	-0.09775665402412415	thank you .
+D-2650	-0.09775665402412415	thank you .
+P-2650	-0.2745 -0.0204 -0.0732 -0.0230
+S-1197	come on .
+T-1197	come on .
+H-1197	-2.2781665325164795	it &apos;s on the end .
+D-1197	-2.2781665325164795	it &apos;s on the end .
+P-1197	-4.4356 -0.6109 -4.0785 -2.4068 -3.7509 -0.6037 -0.0608
+S-2649	vielen dank .
+T-2649	thank you .
+H-2649	-0.09775665402412415	thank you .
+D-2649	-0.09775665402412415	thank you .
+P-2649	-0.2745 -0.0204 -0.0732 -0.0230
+S-1126	vielen dank .
+T-1126	thank you .
+H-1126	-0.09775665402412415	thank you .
+D-1126	-0.09775665402412415	thank you .
+P-1126	-0.2745 -0.0204 -0.0732 -0.0230
+S-2051	vielen dank .
+T-2051	thank you .
+H-2051	-0.09775665402412415	thank you .
+D-2051	-0.09775665402412415	thank you .
+P-2051	-0.2745 -0.0204 -0.0732 -0.0230
+S-1722	danke schön .
+T-1722	thank you .
+H-1722	-0.051047202199697495	thank you .
+D-1722	-0.051047202199697495	thank you .
+P-1722	-0.0804 -0.0109 -0.0497 -0.0631
+S-1517	posi@@ tiv .
+T-1517	posi@@ tively .
+H-1517	-2.029775381088257	so positive .
+D-1517	-2.029775381088257	so positive .
+P-1517	-4.1807 -3.6121 -0.2368 -0.0895
+S-1560	danke schön .
+T-1560	thank you .
+H-1560	-0.051047202199697495	thank you .
+D-1560	-0.051047202199697495	thank you .
+P-1560	-0.0804 -0.0109 -0.0497 -0.0631
+S-3859	ja !
+T-3859	yeah .
+H-3859	-0.6200199127197266	yes !
+D-3859	-0.6200199127197266	yes !
+P-3859	-1.2534 -0.5308 -0.0759
+S-1552	ja ?
+T-1552	right ?
+H-1552	-0.5997938513755798	yes ?
+D-1552	-0.5997938513755798	yes ?
+P-1552	-1.6554 -0.0576 -0.0863
+S-3625	kreativität .
+T-3625	creativity .
+H-3625	-0.4355885088443756	creativity .
+D-3625	-0.4355885088443756	creativity .
+P-3625	-0.9848 -0.2086 -0.1133
+S-4628	ja .
+T-4628	yeah .
+H-4628	-0.47348886728286743	yes .
+D-4628	-0.47348886728286743	yes .
+P-4628	-1.1798 -0.1593 -0.0814
+S-4562	danke .
+T-4562	thanks .
+H-4562	-0.03357789292931557	thank you .
+D-4562	-0.03357789292931557	thank you .
+P-4562	-0.0735 -0.0083 -0.0342 -0.0184
+S-4625	okay .
+T-4625	okay .
+H-4625	-0.3419652581214905	okay .
+D-4625	-0.3419652581214905	okay .
+P-4625	-0.6580 -0.1070 -0.2610
+S-4955	wirklich .
+T-4955	really .
+H-4955	-0.9710608124732971	really .
+D-4955	-0.9710608124732971	really .
+P-4955	-1.9078 -0.9147 -0.0907
+S-5504	nein .
+T-5504	no .
+H-5504	-0.2628885507583618	no .
+D-5504	-0.2628885507583618	no .
+P-5504	-0.1404 -0.5736 -0.0747
+S-1546	ja ?
+T-1546	right ?
+H-1546	-0.5997938513755798	yes ?
+D-1546	-0.5997938513755798	yes ?
+P-1546	-1.6554 -0.0576 -0.0863
+S-721	danke .
+T-721	thank you .
+H-721	-0.03357789292931557	thank you .
+D-721	-0.03357789292931557	thank you .
+P-721	-0.0735 -0.0083 -0.0342 -0.0184
+S-1456	dabei .
+T-1456	whereas .
+  2%|█                                                      | 1/53 [00:00<00:26,  1.95it/s, wps=1097]
+D-1456	-1.7345733642578125	that &apos;s what we &apos;re doing .
+P-1456	-4.1226 -0.7591 -2.2652 -2.9981 -2.1697 -0.8241 -0.7259 -0.0118
+S-1464	ja ?
+T-1464	right ?
+H-1464	-0.5997938513755798	yes ?
+D-1464	-0.5997938513755798	yes ?
+P-1464	-1.6554 -0.0576 -0.0863
+S-3090	ungefähr .
+T-3090	sort of .
+H-3090	-1.356266736984253	it &apos;s about it .
+D-3090	-1.356266736984253	it &apos;s about it .
+P-3090	-3.5664 -0.6600 -0.2105 -3.0621 -0.5210 -0.1176
+S-1357	ja .
+T-1357	yes .
+H-1357	-0.47348886728286743	yes .
+D-1357	-0.47348886728286743	yes .
+P-1357	-1.1798 -0.1593 -0.0814
+S-1365	ja .
+T-1365	yes .
+H-1365	-0.47348886728286743	yes .
+D-1365	-0.47348886728286743	yes .
+P-1365	-1.1798 -0.1593 -0.0814
+S-1531	ja .
+T-1531	yes .
+H-1531	-0.47348886728286743	yes .
+D-1531	-0.47348886728286743	yes .
+P-1531	-1.1798 -0.1593 -0.0814
+S-1514	ja ?
+T-1514	right ?
+H-1514	-0.5997938513755798	yes ?
+D-1514	-0.5997938513755798	yes ?
+P-1514	-1.6554 -0.0576 -0.0863
+S-1470	ja ?
+T-1470	yes ?
+H-1470	-0.5997938513755798	yes ?
+D-1470	-0.5997938513755798	yes ?
+P-1470	-1.6554 -0.0576 -0.0863
+S-1486	ja ?
+T-1486	right ?
+H-1486	-0.5997938513755798	yes ?
+D-1486	-0.5997938513755798	yes ?
+P-1486	-1.6554 -0.0576 -0.0863
+S-1510	ja ?
+T-1510	right ?
+H-1510	-0.5997938513755798	yes ?
+D-1510	-0.5997938513755798	yes ?
+P-1510	-1.6554 -0.0576 -0.0863
+S-5506	okay .
+T-5506	okay .
+H-5506	-0.3419652581214905	okay .
+D-5506	-0.3419652581214905	okay .
+P-5506	-0.6580 -0.1070 -0.2610
+S-1347	ja ?
+T-1347	right ?
+H-1347	-0.5997938513755798	yes ?
+D-1347	-0.5997938513755798	yes ?
+P-1347	-1.6554 -0.0576 -0.0863
+S-3748	danke .
+T-3748	thank you .
+H-3748	-0.03357789292931557	thank you .
+D-3748	-0.03357789292931557	thank you .
+P-3748	-0.0735 -0.0083 -0.0342 -0.0184
+S-3253	danke .
+T-3253	thank you .
+H-3253	-0.03357789292931557	thank you .
+D-3253	-0.03357789292931557	thank you .
+P-3253	-0.0735 -0.0083 -0.0342 -0.0184
+S-4626	fantastisch .
+T-4626	a@@ wes@@ ome .
+H-4626	-1.1633145809173584	fantastic .
+D-4626	-1.1633145809173584	fantastic .
+P-4626	-3.1672 -0.2682 -0.0545
+S-5639	danke .
+T-5639	thank you .
+H-5639	-0.03357789292931557	thank you .
+D-5639	-0.03357789292931557	thank you .
+P-5639	-0.0735 -0.0083 -0.0342 -0.0184
+S-5136	gut .
+T-5136	all right .
+H-5136	-0.8464527726173401	well .
+D-5136	-0.8464527726173401	well .
+P-5136	-1.5489 -0.7706 -0.2198
+S-4887	danke .
+T-4887	thank you .
+H-4887	-0.03357789292931557	thank you .
+D-4887	-0.03357789292931557	thank you .
+P-4887	-0.0735 -0.0083 -0.0342 -0.0184
+S-4461	danke .
+T-4461	thank you .
+H-4461	-0.03357789292931557	thank you .
+D-4461	-0.03357789292931557	thank you .
+P-4461	-0.0735 -0.0083 -0.0342 -0.0184
+S-4336	danke .
+T-4336	thank you .
+H-4336	-0.03357789292931557	thank you .
+D-4336	-0.03357789292931557	thank you .
+P-4336	-0.0735 -0.0083 -0.0342 -0.0184
+S-4258	danke .
+T-4258	thank you .
+H-4258	-0.03357789292931557	thank you .
+D-4258	-0.03357789292931557	thank you .
+P-4258	-0.0735 -0.0083 -0.0342 -0.0184
+S-3878	danke .
+T-3878	thank you .
+H-3878	-0.03357789292931557	thank you .
+D-3878	-0.03357789292931557	thank you .
+P-3878	-0.0735 -0.0083 -0.0342 -0.0184
+S-722	danke .
+T-722	thank you .
+H-722	-0.03357789292931557	thank you .
+D-722	-0.03357789292931557	thank you .
+P-722	-0.0735 -0.0083 -0.0342 -0.0184
+S-737	wow !
+T-737	who@@ a !
+H-737	-0.7434067130088806	wow !
+D-737	-0.7434067130088806	wow !
+P-737	-1.9388 -0.1735 -0.1179
+S-3017	danke .
+T-3017	thank you .
+H-3017	-0.03357789292931557	thank you .
+D-3017	-0.03357789292931557	thank you .
+P-3017	-0.0735 -0.0083 -0.0342 -0.0184
+S-3016	danke .
+T-3016	thank you .
+H-3016	-0.03357789292931557	thank you .
+D-3016	-0.03357789292931557	thank you .
+P-3016	-0.0735 -0.0083 -0.0342 -0.0184
+S-2283	danke .
+T-2283	thank you .
+H-2283	-0.03357789292931557	thank you .
+D-2283	-0.03357789292931557	thank you .
+P-2283	-0.0735 -0.0083 -0.0342 -0.0184
+S-1450	ja ?
+T-1450	you see ?
+H-1450	-0.5997938513755798	yes ?
+D-1450	-0.5997938513755798	yes ?
+P-1450	-1.6554 -0.0576 -0.0863
+S-1411	ja ?
+T-1411	you see ?
+H-1411	-0.5997938513755798	yes ?
+D-1411	-0.5997938513755798	yes ?
+P-1411	-1.6554 -0.0576 -0.0863
+S-1379	ja ?
+T-1379	you see ?
+H-1379	-0.5997938513755798	yes ?
+D-1379	-0.5997938513755798	yes ?
+P-1379	-1.6554 -0.0576 -0.0863
+S-1376	ja ?
+T-1376	have you ?
+H-1376	-0.5997938513755798	yes ?
+D-1376	-0.5997938513755798	yes ?
+P-1376	-1.6554 -0.0576 -0.0863
+S-861	hallo !
+T-861	hell@@ o !
+H-861	-0.9187867045402527	hell@@ o !
+D-861	-0.9187867045402527	hell@@ o !
+P-861	-2.8318 -0.0576 -0.3281 -0.4576
+S-1267	warum ?
+T-1267	why ?
+H-1267	-0.2748892903327942	why ?
+D-1267	-0.2748892903327942	why ?
+P-1267	-0.3664 -0.4109 -0.0474
+S-6361	1.000 , sehr gut .
+T-6361	1,000 , very good .
+H-6361	-0.4585708677768707	1,000 , very good .
+D-6361	-0.4585708677768707	1,000 , very good .
+P-6361	-1.1192 -0.4274 -0.4394 -0.6251 -0.1157 -0.0247
+S-6545	was ist hier passiert ?
+T-6545	so what happens here ?
+H-6545	-0.7543409466743469	what &apos;s happening here ?
+D-6545	-0.7543409466743469	what &apos;s happening here ?
+P-6545	-0.3919 -1.0480 -1.3382 -1.4210 -0.2686 -0.0583
+S-5321	zentr@@ en wurden aufgebaut .
+T-5321	centers were establi@@ shed .
+H-5321	-2.0140328407287598	the centers were built .
+D-5321	-2.0140328407287598	the centers were built .
+P-5321	-3.4797 -3.2970 -1.8984 -1.9869 -1.3669 -0.0554
+S-5384	ich weiß es nicht .
+T-5384	i don &apos;t know .
+H-5384	-0.23698796331882477	i don &apos;t know it .
+D-5384	-0.23698796331882477	i don &apos;t know it .
+P-5384	-0.2635 -0.5872 -0.0000 -0.0642 -0.4883 -0.1577 -0.0980
+S-5553	und das ist wichtig .
+T-5553	and that &apos;s important .
+H-5553	-0.38639160990715027	and that &apos;s important .
+D-5553	-0.38639160990715027	and that &apos;s important .
+P-5553	-0.1373 -0.9902 -0.3461 -0.3214 -0.3902 -0.1331
+S-5783	bewer@@ te sie wieder .
+T-5783	sc@@ ore them again .
+H-5783	-1.816853642463684	so , you &apos;ve got it again .
+D-5783	-1.816853642463684	so , you &apos;ve got it again .
+P-5783	-3.8837 -1.8151 -2.0109 -4.3159 -0.8718 -2.6814 -0.5413 -0.2202 -0.0114
+S-6334	hey , warum nicht ?
+T-6334	hey , why not ?
+H-6334	-0.4238198399543762	hey , why not ?
+D-6334	-0.4238198399543762	hey , why not ?
+P-6334	-0.3021 -0.2264 -0.6685 -0.4578 -0.8548 -0.0334
+S-5152	aber wissen sie was ?
+T-5152	but you know what ?
+H-5152	-0.4235462546348572	but you know what ?
+D-5152	-0.4235462546348572	but you know what ?
+P-5152	-0.1864 -1.9511 -0.0224 -0.0981 -0.2560 -0.0274
+S-4685	ban ist blan@@ k .
+T-4685	ban is blan@@ k .
+H-4685	-2.0015463829040527	and that &apos;s what &apos;s going on .
+D-4685	-2.0015463829040527	and that &apos;s what &apos;s going on .
+P-4685	-2.6806 -3.1749 -0.3998 -4.2707 -2.3273 -3.0888 -1.0109 -1.0188 -0.0420
+S-6636	diese leute verdienen geld .
+T-6636	these guys make money .
+H-6636	-1.1688647270202637	these people deser@@ ve money .
+D-6636	-1.1688647270202637	these people deser@@ ve money .
+P-6636	-1.5666 -0.2068 -2.2446 -1.2035 -2.7591 -0.1818 -0.0196
+S-241	diese tage sind vorbei .
+T-241	and those days are gone .
+H-241	-1.0657930374145508	these days are over .
+D-241	-1.0657930374145508	these days are over .
+P-241	-1.6391 -0.0423 -1.5511 -1.8415 -1.2784 -0.0423
+S-629	können wir es ändern ?
+T-629	can we do this differently ?
+H-629	-0.29425591230392456	can we change it ?
+D-629	-0.29425591230392456	can we change it ?
+P-629	-0.3962 -0.3408 -0.4593 -0.4231 -0.1087 -0.0374
+S-807	dies ist die letzte .
+T-807	this is the last one .
+H-807	-0.5422971248626709	this is the last one .
+D-807	-0.5422971248626709	this is the last one .
+P-807	-0.5114 -0.0498 -0.1191 -0.3187 -2.4797 -0.2980 -0.0194
+S-863	flie@@ gende kat@@ ze .
+T-863	fly away , c@@ at .
+H-863	-1.429914116859436	flying c@@ at .
+D-863	-1.429914116859436	flying c@@ at .
+P-863	-3.3629 -2.3435 -0.7705 -0.5619 -0.1107
+S-5220	was ist hier passiert ?
+T-5220	so what happened here ?
+H-5220	-0.7543409466743469	what &apos;s happening here ?
+D-5220	-0.7543409466743469	what &apos;s happening here ?
+P-5220	-0.3919 -1.0480 -1.3382 -1.4210 -0.2686 -0.0583
+S-1046	was sind heute medien ?
+T-1046	what is the media today ?
+H-1046	-1.3323036432266235	what &apos;s going on today ?
+D-1046	-1.3323036432266235	what &apos;s going on today ?
+P-1046	-0.6082 -2.1274 -2.8205 -0.5596 -1.0480 -2.0507 -0.1118
+S-3680	er öffnet die tür .
+T-3680	he answers the door .
+H-3680	-0.40525302290916443	he op@@ ens the door .
+D-3680	-0.40525302290916443	he op@@ ens the door .
+P-3680	-0.9179 -0.8019 -0.2544 -0.4830 -0.0980 -0.2345 -0.0471
+S-3737	warum nicht länger leben ?
+T-3737	why not live longer ?
+H-3737	-0.9056147933006287	why no longer life ?
+D-3737	-0.9056147933006287	why no longer life ?
+P-3737	-0.1235 -3.3894 -0.0324 -0.5149 -1.3212 -0.0523
+S-3098	ja , ich weiß .
+T-3098	yeah , i know .
+H-3098	-0.31984230875968933	yes , i know .
+D-3098	-0.31984230875968933	yes , i know .
+P-3098	-0.8392 -0.0684 -0.2386 -0.1993 -0.5014 -0.0721
+S-3564	es gibt kein normal .
+T-3564	there &apos;s no normal .
+H-3564	-0.5159481763839722	there &apos;s no normal .
+D-3564	-0.5159481763839722	there &apos;s no normal .
+P-3564	-0.6304 -0.9121 -0.0278 -0.6460 -0.7814 -0.0981
+S-3578	oh , also der .
+T-3578	oh , that guy .
+H-3578	-1.3636435270309448	oh , oh , that &apos;s the one .
+D-3578	-1.3636435270309448	oh , oh , that &apos;s the one .
+P-3578	-0.7414 -0.2380 -3.0510 -0.5092 -2.8896 -0.6195 -1.3854 -3.8065 -0.3853 -0.0106
+S-3629	das ist sehr gut .
+T-3629	that &apos;s very good .
+H-3629	-0.5594187378883362	that &apos;s very good .
+D-3629	-0.5594187378883362	that &apos;s very good .
+P-3629	-1.4372 -0.3768 -0.5437 -0.5838 -0.3582 -0.0569
+S-3631	schon ein paar mehr .
+T-3631	quite a few more .
+H-3631	-1.1187676191329956	there &apos;s a couple of more .
+D-3631	-1.1187676191329956	there &apos;s a couple of more .
+P-3631	-4.1652 -0.6869 -0.9457 -1.2221 -0.8948 -0.3343 -0.6688 -0.0322
+S-1401	wir können es anders .
+T-1401	we can do it differently .
+H-1401	-0.8228549957275391	we can do it differently .
+D-1401	-0.8228549957275391	we can do it differently .
+P-1401	-0.2137 -0.1629 -3.0874 -0.4080 -1.7081 -0.1333 -0.0466
+S-4636	ich war ersta@@ unt .
+T-4636	i was ama@@ zed .
+H-4636	-0.6286486387252808	i was ama@@ zed .
+D-4636	-0.6286486387252808	i was ama@@ zed .
+P-4636	-0.2289 -0.3434 -2.2394 -0.2459 -0.6391 -0.0752
+S-3776	es hat sensor@@ en --
+T-3776	it has sensor@@ s .
+H-3776	-0.9632826447486877	it has sensor@@ s .
+D-3776	-0.9632826447486877	it has sensor@@ s .
+P-3776	-0.6541 -0.8031 -1.6608 -0.1156 -2.1158 -0.4303
+S-4217	hier ist das video .
+T-4217	here is the video .
+H-4217	-0.5437589287757874	here &apos;s the video .
+D-4217	-0.5437589287757874	here &apos;s the video .
+P-4217	-1.2269 -0.8755 -0.3820 -0.2000 -0.4869 -0.0912
+S-4411	man konnte manhattan sehen .
+T-4411	you could see manhattan .
+H-4411	-0.5208549499511719	you could see manhattan .
+D-4411	-0.5208549499511719	you could see manhattan .
+P-4411	-0.3902 -0.4255 -0.9757 -0.3032 -0.8998 -0.1308
+S-4492	sie wussten also alles .
+T-4492	so they know everything .
+H-4492	-1.2312700748443604	so , they knew everything .
+D-4492	-1.2312700748443604	so , they knew everything .
+P-4492	-1.2001 -2.1617 -1.1644 -2.1495 -1.4744 -0.4471 -0.0217
+S-4552	es ist gener@@ isch .
+T-4552	it is gener@@ ic .
+H-4552	-0.7528581619262695	it &apos;s gener@@ ous .
+D-4552	-0.7528581619262695	it &apos;s gener@@ ous .
+P-4552	-0.3058 -0.3962 -1.4522 -1.9862 -0.2295 -0.1472
+S-1043	ja , das geht .
+T-1043	yes , that &apos;s possible .
+H-1043	-0.9158435463905334	yes , that &apos;s what &apos;s going on .
+D-1043	-0.9158435463905334	yes , that &apos;s what &apos;s going on .
+P-1043	-0.7718 -0.0837 -1.7663 -0.4040 -2.1653 -1.9477 -1.4164 -0.5062 -0.0903 -0.0068
+S-2880	aber wissen sie was ?
+T-2880	but you know what ?
+H-2880	-0.4235462546348572	but you know what ?
+D-2880	-0.4235462546348572	but you know what ?
+P-2880	-0.1864 -1.9511 -0.0224 -0.0981 -0.2560 -0.0274
+S-6300	was brauchen diese menschen ?
+T-6300	what will these people want ?
+H-6300	-1.104111909866333	what does this need ?
+D-6300	-1.104111909866333	what does this need ?
+P-6300	-0.5595 -1.8147 -1.1260 -0.5359 -2.4778 -0.1108
+S-6358	irgendwie funktioniert das nicht .
+T-6358	somehow this isn &apos;t working .
+H-6358	-1.1406886577606201	it doesn &apos;t work that way .
+D-6358	-1.1406886577606201	it doesn &apos;t work that way .
+P-6358	-3.1186 -0.9174 -0.0000 -0.1734 -1.8046 -2.2630 -0.8176 -0.0308
+S-5205	wie funktioniert das also ?
+T-5205	so how does it happen ?
+H-5205	-0.620279848575592	so how does this work work ?
+D-5205	-0.620279848575592	so how does this work work ?
+P-5205	-0.2887 -0.6481 -0.5940 -1.2278 -0.2454 -1.4250 -0.4847 -0.0485
+S-5630	sie benutzen ihre hände .
+T-5630	they &apos;re using their hands .
+H-5630	-0.5813513398170471	they &apos;re using their hands .
+D-5630	-0.5813513398170471	they &apos;re using their hands .
+P-5630	-1.2121 -1.2538 -0.4027 -0.9729 -0.0185 -0.1945 -0.0150
+S-5978	ich finde das interessant .
+T-5978	it &apos;s interesting to me .
+H-5978	-0.6779630780220032	i think that &apos;s interesting .
+D-5978	-0.6779630780220032	i think that &apos;s interesting .
+P-5978	-0.5240 -0.8996 -1.8336 -0.7358 -0.5401 -0.1411 -0.0714
+S-6032	ich dachte darüber nach .
+T-6032	and i thought about that .
+H-6032	-0.4568595290184021	i thought about it .
+D-6032	-0.4568595290184021	i thought about it .
+P-6032	-0.4485 -0.2499 -0.6446 -0.7123 -0.6205 -0.0653
+S-6094	ich glaube das nicht .
+T-6094	i don &apos;t believe that .
+H-6094	-0.6477046012878418	i don &apos;t think that .
+D-6094	-0.6477046012878418	i don &apos;t think that .
+P-6094	-0.3165 -1.1992 -0.0000 -0.4641 -0.8529 -1.5826 -0.1186
+S-4644	das wäre okay gewesen .
+T-4644	this would have been fine .
+H-4644	-0.7334762215614319	that would be okay .
+D-4644	-0.7334762215614319	that would be okay .
+P-4644	-1.4588 -1.4574 -0.2687 -0.9317 -0.1920 -0.0923
+S-4563	ich habe eine frage .
+T-4563	i &apos;ve got a question .
+H-4563	-0.5408288240432739	i have a question .
+D-4563	-0.5408288240432739	i have a question .
+P-4563	-0.2328 -1.6036 -0.4831 -0.2099 -0.6149 -0.1006
+S-871	also schauen wir mal .
+T-871	so let &apos;s have a look .
+H-871	-0.8521550893783569	so let &apos;s look at it .
+D-871	-0.8521550893783569	so let &apos;s look at it .
+P-871	-0.1251 -1.5189 -0.0385 -2.1740 -0.3466 -2.2812 -0.2169 -0.1159
+S-2206	sie schle@@ mmen . &quot;
+T-2206	they &apos;re fe@@ ast@@ ing . &quot;
+H-2206	-1.5626790523529053	they &apos;re bad . &quot;
+D-2206	-1.5626790523529053	they &apos;re bad . &quot;
+P-2206	-1.3722 -2.5838 -4.8140 -0.4659 -0.1223 -0.0178
+S-3331	also schaffen sie das .
+T-3331	so , you can do it .
+H-3331	-1.0918954610824585	so you can do that .
+D-3331	-1.0918954610824585	so you can do that .
+P-3331	-0.1241 -2.5087 -1.4373 -1.7522 -1.6253 -0.1509 -0.0448
+S-3378	spieler sitzen nicht herum .
+T-3378	gam@@ ers don &apos;t sit around .
+H-3378	-1.4624531269073486	players don &apos;t sit around .
+D-3378	-1.4624531269073486	players don &apos;t sit around .
+P-3378	-4.3590 -1.3312 -0.0000 -2.5372 -1.1711 -0.8126 -0.0262
+S-4297	ich stand ihm gegenüber .
+T-4297	i was ex@@ posed to him .
+H-4297	-1.5890463590621948	i was going to give him to him .
+D-4297	-1.5890463590621948	i was going to give him to him .
+P-4297	-0.4603 -2.1154 -4.6825 -0.0253 -4.7420 -0.3783 -2.4641 -0.9696 -0.0448 -0.0082
+S-5181	wie interessiert sie sind .
+T-5181	how enga@@ ged you are .
+H-5181	-1.4046359062194824	how do you care about it .
+D-5181	-1.4046359062194824	how do you care about it .
+P-5181	-2.3305 -2.7161 -0.9328 -2.5755 -1.3810 -1.1736 -0.1119 -0.0156
+S-2743	klingt vertraut , was ?
+T-2743	sound familiar ? right .
+H-2743	-1.3326677083969116	sounds familiar with what ?
+D-2743	-1.3326677083969116	sounds familiar with what ?
+P-2743	-2.1053 -3.5624 -0.7230 -1.4599 -0.1282 -0.0172
+S-2889	passiert nicht sehr oft .
+T-2889	doesn &apos;t happen very much .
+H-2889	-1.0974270105361938	it doesn &apos;t happen to be very often .
+D-2889	-1.0974270105361938	it doesn &apos;t happen to be very often .
+P-2889	-3.8440 -0.5470 0.0000 -0.7974 -2.1120 -1.8681 -0.8398 -0.2140 -0.7488 -0.0032
+S-2973	warum tun wir das ?
+T-2973	why do we do that ?
+H-2973	-0.32969704270362854	why do we do that ?
+D-2973	-0.32969704270362854	why do we do that ?
+P-2973	-0.2245 -0.7169 -0.2997 -0.1695 -0.8033 -0.0267 -0.0672
+S-1484	nicht schul@@ d@@ management .
+T-1484	not gu@@ il@@ t management .
+H-1484	-1.643255352973938	not a high school management .
+D-1484	-1.643255352973938	not a high school management .
+P-1484	-0.8641 -3.0005 -4.5561 -0.1838 -1.4555 -1.4140 -0.0289
+S-2115	nennen wir ihn don .
+T-2115	let &apos;s call him don .
+H-2115	-1.457663655281067	let &apos;s call him it .
+D-2115	-1.457663655281067	let &apos;s call him it .
+P-2115	-2.2196 -0.3686 -1.9662 -0.9569 -3.7998 -0.6260 -0.2666
+S-2352	und ich war künstler .
+T-2352	and i was an artist .
+H-2352	-0.5275726318359375	and i was an artist .
+D-2352	-0.5275726318359375	and i was an artist .
+P-2352	-0.0961 -0.0748 -0.3293 -2.4640 -0.3519 -0.3068 -0.0701
+S-2635	das ist ein wunsch .
+T-2635	so this is a wish .
+H-2635	-0.5835098624229431	this is a wish .
+D-2635	-0.5835098624229431	this is a wish .
+P-2635	-1.5463 -0.0510 -0.4937 -0.7633 -0.6290 -0.0179
+S-2716	b@@ g : danke .
+T-2716	b@@ g : thank you .
+H-2716	-0.16421552002429962	b@@ g : thank you .
+D-2716	-0.16421552002429962	b@@ g : thank you .
+P-2716	-0.5230 -0.5687 -0.0017 -0.0195 -0.0079 -0.0247 -0.0039
+S-1435	und der muss zurück .
+T-1435	and it must go back .
+H-1435	-1.1274267435073853	and that has to be back .
+D-1435	-1.1274267435073853	and that has to be back .
+P-1435	-0.1906 -2.2315 -1.9461 -0.7056 -2.4891 -0.4377 -1.0058 -0.0131
+S-4256	sie können hinein@@ gehen .
+T-4256	you can enter inside it .
+H-4256	-1.1342065334320068	you can go to this .
+D-4256	-1.1342065334320068	you can go to this .
+P-4256	-1.0841 -0.1367 -0.9113 -2.4652 -2.7365 -0.5600 -0.0456
+S-2983	sie ist kein land .
+T-2983	it &apos;s not a country .
+H-2983	-0.5923404693603516	it &apos;s not a country .
+D-2983	-0.5923404693603516	it &apos;s not a country .
+P-2983	-1.6232 -0.3132 -0.8002 -0.7583 -0.4223 -0.2059 -0.0233
+S-3005	denn wissen sie was ?
+T-3005	because , you know something ?
+H-3005	-0.4703030586242676	because you know what ?
+D-3005	-0.4703030586242676	because you know what ?
+P-3005	-0.5169 -1.9886 -0.0942 -0.0900 -0.1071 -0.0249
+S-3162	woher wissen wir das ?
+T-3162	how do we know that ?
+H-3162	-0.5773021578788757	how do we know that ?
+D-3162	-0.5773021578788757	how do we know that ?
+P-3162	-2.0346 -0.9319 -0.3408 -0.0973 -0.5728 -0.0307 -0.0330
+S-3763	es ist also wahr .
+T-3763	so this is for real .
+H-3763	-0.3932415544986725	so it &apos;s true .
+D-3763	-0.3932415544986725	so it &apos;s true .
+P-3763	-0.5867 -0.9059 -0.2807 -0.1860 -0.2949 -0.1052
+S-4010	wohin gehen wir also ?
+T-4010	so where do we go ?
+H-4010	-0.9691383242607117	so , where are we going to go ?
+D-4010	-0.9691383242607117	so , where are we going to go ?
+P-4010	-0.9380 -1.8416 -0.4024 -2.1655 -0.7006 -0.2206 -0.0883 -1.5356 -1.7824 -0.0165
+S-2903	ziemlich gut , nicht ?
+T-2903	pretty good , right ?
+H-2903	-0.7133666276931763	pretty good , not ?
+D-2903	-0.7133666276931763	pretty good , not ?
+P-2903	-1.2105 -0.2821 -0.4415 -0.5354 -1.7769 -0.0337
+S-5509	okay . vielen dank .
+T-5509	okay . thank you very much .
+H-5509	-0.12120993435382843	okay . thank you .
+D-5509	-0.12120993435382843	okay . thank you .
+P-5509	-0.2990 -0.0846 -0.1803 -0.0274 -0.1036 -0.0324
+S-2766	was war das ergebnis ?
+T-2766	what was the result ?
+H-2766	-0.6585342288017273	what was the result ?
+D-2766	-0.6585342288017273	what was the result ?
+P-2766	-0.3975 -0.6958 -0.3892 -1.4584 -0.9201 -0.0902
+S-2142	das bin ich sogar .
+T-2142	i actually am .
+H-2142	-1.255895972251892	this is me even .
+D-2142	-1.255895972251892	this is me even .
+P-2142	-2.7560 -0.3019 -2.0375 -1.7512 -0.6207 -0.0682
+S-2742	es ist eine krise .
+T-2742	it &apos;s a crisis .
+H-2742	-0.3240719437599182	it &apos;s a crisis .
+D-2742	-0.3240719437599182	it &apos;s a crisis .
+P-2742	-0.3236 -0.3149 -0.8539 -0.1644 -0.2594 -0.0282
+S-396	danke ihnen viel@@ mals .
+T-396	thank you very much .
+H-396	-0.3874051570892334	thank you very much .
+D-396	-0.3874051570892334	thank you very much .
+P-396	-0.0540 -0.0044 -1.9166 -0.0519 -0.2015 -0.0960
+S-2110	nicht sehr nachhal@@ tig .
+T-2110	not very sustainable .
+H-2110	-0.6249400973320007	not very sustainable .
+D-2110	-0.6249400973320007	not very sustainable .
+P-2110	-0.5363 -1.9365 -0.5224 -0.1007 -0.0288
+S-5516	also treffen sie al .
+T-5516	so meet al .
+H-5516	-1.304970145225525	so , they &apos;re going to make it .
+D-5516	-1.304970145225525	so , they &apos;re going to make it .
+P-5516	-0.2511 -1.6415 -1.7761 -1.6891 -2.7342 -0.1303 -2.3857 -0.9880 -1.4395 -0.0142
+S-3874	sondern essen@@ ti@@ ell .
+T-3874	play &apos;s essential .
+H-3874	-1.1535053253173828	but it &apos;s essential .
+D-3874	-1.1535053253173828	but it &apos;s essential .
+P-3874	-1.0328 -2.4318 -1.1587 -1.4705 -0.7022 -0.1250
+S-3814	sie sind alle wichtig .
+T-3814	they all matter .
+H-3814	-0.3811163008213043	they &apos;re all important .
+D-3814	-0.3811163008213043	they &apos;re all important .
+P-3814	-0.7708 -0.4668 -0.2085 -0.4947 -0.2697 -0.0761
+S-3222	sehr unterschied@@ licher begriff .
+T-3222	very different notion .
+H-3222	-1.3589855432510376	very , very different term .
+D-3222	-1.3589855432510376	very , very different term .
+P-3222	-1.0926 -2.8695 -0.5751 -0.9069 -3.3399 -0.7160 -0.0129
+S-2468	unge@@ heu@@ er aufregend .
+T-2468	tremend@@ ously exciting .
+H-2468	-1.9122081995010376	so , it &apos;s exciting .
+D-2468	-1.9122081995010376	so , it &apos;s exciting .
+P-2468	-4.4811 -1.6526 -2.6368 -0.6357 -2.9623 -0.9221 -0.0948
+S-6449	und sie tat es .
+T-6449	and they did .
+H-6449	-0.48627060651779175	and she did it .
+D-6449	-0.48627060651779175	and she did it .
+P-6449	-0.0940 -1.1375 -0.9626 -0.4378 -0.1987 -0.0870
+S-887	ja , guten tag .
+T-887	yes , hell@@ o .
+H-887	-0.25260239839553833	yes , good day .
+D-887	-0.25260239839553833	yes , good day .
+P-887	-0.7272 -0.0753 -0.3315 -0.2190 -0.1059 -0.0566
+S-2095	was für ein fisch .
+T-2095	what a fish .
+H-2095	-1.1841411590576172	what &apos;s a fish .
+D-2095	-1.1841411590576172	what &apos;s a fish .
+P-2095	-0.7081 -2.6594 -1.8620 -0.3610 -1.4770 -0.0373
+S-1874	da passiert überhaupt nichts .
+T-1874	nothing will happen .
+H-1874	-1.2409154176712036	there &apos;s nothing about nothing .
+D-1874	-1.2409154176712036	there &apos;s nothing about nothing .
+P-1874	-1.8270 -0.5250 -0.6200 -3.9600 -1.4250 -0.2888 -0.0406
+S-1467	das ist effizi@@ ent .
+T-1467	that &apos;s efficient .
+H-1467	-0.7555299401283264	this is more efficient .
+D-1467	-0.7555299401283264	this is more efficient .
+P-1467	-1.7567 -0.0358 -2.3143 -0.2452 -0.1071 -0.0740
+S-1466	wunderbar , &apos; ne ?
+T-1466	wonderful , right ?
+H-1466	-1.6069269180297852	wonderful , it &apos;s wonderful ?
+D-1466	-1.6069269180297852	wonderful , it &apos;s wonderful ?
+P-1466	-3.4753 -0.2130 -3.8365 -0.3551 -2.5391 -0.7152 -0.1144
+S-1452	völlig in@@ effizi@@ ent .
+T-1452	totally in@@ efficient .
+H-1452	-1.2035070657730103	completely in@@ efficient .
+D-1452	-1.2035070657730103	completely in@@ efficient .
+P-1452	-3.8562 -0.9147 -0.6162 -0.5791 -0.0513
+S-1008	das war &apos; s .
+T-1008	that was all .
+H-1008	-1.3402825593948364	that was it .
+D-1008	-1.3402825593948364	that was it .
+P-1008	-1.4625 -0.8955 -3.4705 -0.6520 -0.2209
+S-217	haben sie vielen dank .
+T-217	thanks so much .
+H-217	-0.812705397605896	thank you .
+D-217	-0.812705397605896	thank you .
+P-217	-2.5895 -0.0078 -0.4902 -0.1633
+S-540	dies war das ergebnis .
+T-540	this was the result .
+H-540	-0.7052529454231262	this was the result .
+D-540	-0.7052529454231262	this was the result .
+P-540	-0.6582 -0.5571 -0.3201 -2.2762 -0.3292 -0.0907
+S-4835	stö@@ ber@@ n sie .
+T-4835	explore .
+H-4835	-2.3002986907958984	and it &apos;s called it .
+D-4835	-2.3002986907958984	and it &apos;s called it .
+P-4835	-2.7117 -3.7795 -1.0111 -5.3608 -2.5347 -0.6683 -0.0359
+S-858	gute arbeit ! ja !
+T-858	good job ! yeah !
+H-858	-0.468861848115921	good work ! yes ! yes !
+D-858	-0.468861848115921	good work ! yes ! yes !
+P-858	-0.4925 -0.3101 -0.0610 -0.3402 -0.4088 -1.4564 -0.5250 -0.1567
+S-1966	das geht doch schon .
+T-1966	that is do@@ able .
+H-1966	-1.437105417251587	that &apos;s what &apos;s going on .
+D-1966	-1.437105417251587	that &apos;s what &apos;s going on .
+P-1966	-2.3659 -0.2969 -2.3213 -2.3388 -1.9946 -0.7626 -1.2195 -0.1973
+S-1902	ja , guten tag .
+T-1902	yes , hell@@ o .
+H-1902	-0.25260239839553833	yes , good day .
+D-1902	-0.25260239839553833	yes , good day .
+P-1902	-0.7272 -0.0753 -0.3315 -0.2190 -0.1059 -0.0566
+S-2624	das ist super wichtig .
+T-2624	that &apos;s super important .
+H-2624	-1.0003299713134766	this is great important .
+D-2624	-1.0003299713134766	this is great important .
+P-2624	-1.7108 -0.0377 -2.8625 -1.1151 -0.2279 -0.0481
+S-2445	das war faszinier@@ end .
+T-2445	and this was fascinating .
+H-2445	-0.826014518737793	that was fascinating .
+D-2445	-0.826014518737793	that was fascinating .
+P-2445	-1.5213 -0.4921 -1.7897 -0.1009 -0.2261
+S-2258	darf ich ehrlich sein ?
+T-2258	can i be honest ?
+H-2258	-1.1968417167663574	can i be honest ?
+D-2258	-1.1968417167663574	can i be honest ?
+P-2258	-2.8767 -0.7035 -1.5542 -0.3284 -1.5674 -0.1509
+S-2174	die farm ist unglaublich .
+T-2174	the farm &apos;s incredible .
+H-2174	-0.8114602565765381	the farm is incredible .
+D-2174	-0.8114602565765381	the farm is incredible .
+P-2174	-1.3373 -1.2356 -0.2551 -1.9365 -0.0937 -0.0106
+S-2168	was haben sie gemacht ?
+T-2168	what did they do ?
+H-2168	-0.8536386489868164	what did you do ?
+D-2168	-0.8536386489868164	what did you do ?
+P-2168	-0.5497 -1.8507 -0.7768 -1.2072 -0.6902 -0.0472
+S-2088	robert gu@@ p@@ ta .
+T-2088	robert gu@@ p@@ ta .
+H-2088	-0.7567530870437622	robert gu@@ p@@ ta .
+D-2088	-0.7567530870437622	robert gu@@ p@@ ta .
+P-2088	-0.2637 -1.8390 -0.7494 -1.4986 -0.1416 -0.0481
+S-2016	das ist das system .
+T-2016	that &apos;s the system .
+H-2016	-0.4133206605911255	this is the system .
+D-2016	-0.4133206605911255	this is the system .
+P-2016	-1.5516 -0.0413 -0.2504 -0.3048 -0.2986 -0.0333
+S-713	mache einfach deinen job .
+T-713	just do your job .
+H-713	-1.3071424961090088	you just do your job .
+D-713	-1.3071424961090088	you just do your job .
+P-713	-4.1471 -0.6403 -2.0143 -1.5434 -0.3287 -0.4331 -0.0430
+S-1063	die haben ähnliche prinzipien .
+T-1063	they have similar principles .
+H-1063	-1.1965082883834839	they have similar principles .
+D-1063	-1.1965082883834839	they have similar principles .
+P-1063	-3.6546 -1.0114 -1.7532 -0.2831 -0.4009 -0.0759
+S-1654	len@@ to , langsam .
+T-1654	len@@ to , slow .
+H-1654	-1.177521824836731	len@@ to , slowly .
+D-1654	-1.177521824836731	len@@ to , slowly .
+P-1654	-2.8714 -0.8420 -0.3928 -2.2146 -0.6162 -0.1281
+S-1593	das alles interessiert mich .
+T-1593	all that interests me .
+H-1593	-1.3644599914550781	it &apos;s all interested in it .
+D-1593	-1.3644599914550781	it &apos;s all interested in it .
+P-1593	-3.0367 -0.8624 -1.5039 -2.1237 -0.5360 -2.4940 -0.3121 -0.0470
+S-1553	das können wir machen .
+T-1553	we can do that .
+H-1553	-0.9185378551483154	that &apos;s what we can do .
+D-1553	-0.9185378551483154	that &apos;s what we can do .
+P-1553	-2.1945 -1.1126 -1.8277 -0.1154 -1.0444 -0.2147 -0.8194 -0.0197
+S-1488	was sagen sie dann ?
+T-1488	what would you say ?
+H-1488	-0.7755477428436279	what do you say ?
+D-1488	-0.7755477428436279	what do you say ?
+P-1488	-0.7996 -2.2225 -0.3436 -0.4246 -0.7831 -0.0799
+S-1472	die ganze umwelt@@ diskussion .
+T-1472	the whole environmental discussion .
+H-1472	-2.151195764541626	the whole thing is called the whole environmental discussion .
+D-1472	-2.151195764541626	the whole thing is called the whole environmental discussion .
+P-1472	-1.1475 -1.0319 -3.3488 -2.8562 -3.0246 -1.8993 -2.2865 -3.4260 -4.3345 -0.3005 -0.0073
+S-1243	ja , milli@@ sekunden .
+T-1243	yes , milli@@ seconds .
+H-1243	-0.7264377474784851	yes , milli@@ seconds .
+D-1243	-0.7264377474784851	yes , milli@@ seconds .
+P-1243	-0.7602 -0.0599 -3.1385 -0.1436 -0.1848 -0.0717
+S-1237	das ist unsere gegenwart .
+T-1237	that &apos;s our present .
+H-1237	-0.7258709073066711	this is our present .
+D-1237	-0.7258709073066711	this is our present .
+P-1237	-1.7790 -0.0486 -1.1565 -0.8924 -0.4436 -0.0351
+S-5311	nach hause wohin ?
+T-5311	go home to where ?
+H-5311	-1.6941109895706177	so , at home , right ?
+D-5311	-1.6941109895706177	so , at home , right ?
+P-5311	-3.2146 -1.5004 -3.0723 -0.4828 -1.1410 -3.8421 -0.2915 -0.0081
+S-5261	was bedeutet das ?
+T-5261	what does this mean ?
+H-5261	-0.4645962417125702	what does that mean ?
+D-5261	-0.4645962417125702	what does that mean ?
+P-5261	-0.5258 -0.3051 -1.5384 -0.2388 -0.1248 -0.0548
+S-5807	wir heben ab .
+T-5807	we &apos;re taking off .
+H-5807	-1.5122824907302856	we &apos;re going to pick up .
+D-5807	-1.5122824907302856	we &apos;re going to pick up .
+P-5807	-0.5362 -1.5468 -3.0409 -0.2715 -4.2681 -0.7392 -1.6854 -0.0103
+S-5263	was bedeutet das ?
+T-5263	what does it mean ?
+H-5263	-0.4645962417125702	what does that mean ?
+D-5263	-0.4645962417125702	what does that mean ?
+P-5263	-0.5258 -0.3051 -1.5384 -0.2388 -0.1248 -0.0548
+S-6187	oh mein gott .
+T-6187	oh , my god .
+H-6187	-0.4954203963279724	oh my god .
+D-6187	-0.4954203963279724	oh my god .
+P-6187	-0.7068 -1.3147 -0.1414 -0.1983 -0.1159
+S-5209	oh mein gott !
+T-5209	oh , my god !
+H-5209	-0.5569835901260376	oh my god !
+D-5209	-0.5569835901260376	oh my god !
+P-5209	-0.6426 -1.6998 -0.1255 -0.1344 -0.1826
+S-5184	wir verlieren sie .
+T-5184	we &apos;re losing them .
+H-5184	-0.4402662515640259	we lose them .
+D-5184	-0.4402662515640259	we lose them .
+P-5184	-0.3283 -1.1444 -0.4501 -0.2437 -0.0349
+S-4700	ich weiß nicht .
+T-4700	i don &apos;t know .
+H-4700	-0.2643609642982483	i don &apos;t know .
+D-4700	-0.2643609642982483	i don &apos;t know .
+P-4700	-0.2538 -0.5101 -0.0000 -0.0866 -0.6679 -0.0678
+S-4624	ich kann helfen .
+T-4624	i can help you .
+H-4624	-0.6773027777671814	i can help help .
+D-4624	-0.6773027777671814	i can help help .
+P-4624	-0.3150 -0.3872 -0.2699 -2.4348 -0.6367 -0.0202
+S-4586	eine ganze menge .
+T-4586	it &apos;s a lot .
+H-4586	-1.0958540439605713	a whole lot of a lot .
+D-4586	-1.0958540439605713	a whole lot of a lot .
+P-4586	-1.5153 -0.7316 -1.4856 -0.6213 -3.2114 -0.3358 -0.8610 -0.0048
+S-6042	wir lieben unterhaltung .
+T-6042	we love entertain@@ ment .
+H-6042	-0.6019335389137268	we love entertain@@ ment .
+D-6042	-0.6019335389137268	we love entertain@@ ment .
+P-6042	-0.2795 -0.3898 -2.5428 -0.0846 -0.2759 -0.0390
+S-4075	klingt das gut ?
+T-4075	does that sound good ?
+H-4075	-1.4939756393432617	sounds that good ?
+D-4075	-1.4939756393432617	sounds that good ?
+P-4075	-3.3646 -1.8905 -2.1210 -0.0455 -0.0483
+S-6345	drei aus 10 .
+T-6345	three times out of 10 .
+H-6345	-0.7495075464248657	three of 10 .
+D-6345	-0.7495075464248657	three of 10 .
+P-6345	-0.1510 -1.6611 -1.5229 -0.3851 -0.0274
+S-2651	danke . danke !
+T-2651	thank you . thank you .
+H-2651	-0.03697057068347931	thank you . thank you .
+D-2651	-0.03697057068347931	thank you . thank you .
+P-2651	-0.0317 -0.0099 -0.0627 -0.0558 -0.0101 -0.0545 -0.0341
+S-4334	auch kein krankenhaus .
+T-4334	there &apos;s no hospital that can say &quot; no . &quot;
+H-4334	-1.1313602924346924	also no hospital .
+D-4334	-1.1313602924346924	also no hospital .
+P-4334	-3.3035 -0.9465 -1.0486 -0.3156 -0.0426
+S-4806	vielen dank euch .
+T-4806	thank you very much , guys .
+H-4806	-0.10681498050689697	thank you .
+D-4806	-0.10681498050689697	thank you .
+P-4806	-0.1960 -0.0063 -0.1673 -0.0577
+S-6641	ste@@ phen watt .
+T-6641	this is ste@@ phen watt .
+H-6641	-0.8040239810943604	ste@@ phen wat@@ ts .
+D-6641	-0.8040239810943604	ste@@ phen wat@@ ts .
+P-6641	-2.0496 -0.2992 -1.5348 -0.1837 -0.7271 -0.0297
+S-855	die sonne geht auf
+T-855	the sun is ris@@ ing .
+H-855	-0.840804398059845	the sun goes on .
+D-855	-0.840804398059845	the sun goes on .
+P-855	-0.8238 -0.0970 -2.4919 -0.9731 -0.6286 -0.0306
+S-4323	das war unglaublich .
+T-4323	which was a@@ wes@@ ome .
+H-4323	-0.715675950050354	that was incredible .
+D-4323	-0.715675950050354	that was incredible .
+P-4323	-1.5188 -0.4513 -1.5336 -0.0432 -0.0316
+S-1032	fantastisch , oder ?
+T-1032	fantastic , isn &apos;t it ?
+H-1032	-1.1151907444000244	fantastic , right ?
+D-1032	-1.1151907444000244	fantastic , right ?
+P-1032	-2.0402 -0.3425 -3.1283 -0.0263 -0.0386
+S-1551	ja , sozusagen .
+T-1551	yes , so to speak .
+H-1551	-1.6299067735671997	yes , i just like .
+D-1551	-1.6299067735671997	yes , i just like .
+P-1551	-0.9204 -0.1619 -4.0522 -3.0206 -1.3719 -1.6698 -0.2125
+S-1374	die einzige chance .
+T-1374	that &apos;s your only chance .
+H-1374	-0.8778737187385559	the only chance .
+D-1374	-0.8778737187385559	the only chance .
+P-1374	-0.6755 -0.3828 -1.6574 -1.6458 -0.0279
+S-1236	lang , ja .
+T-1236	a long time , yes .
+H-1236	-1.4119441509246826	well , yes , yes .
+D-1236	-1.4119441509246826	well , yes , yes .
+P-1236	-4.1864 -0.2243 -2.1097 -1.9950 -1.2921 -0.0578 -0.0183
+  4%|██                                                     | 2/53 [00:00<00:22,  2.26it/s, wps=1768]
+T-2884	it &apos;s horri@@ ble .
+H-2884	-0.8266646862030029	it &apos;s horri@@ ble .
+D-2884	-0.8266646862030029	it &apos;s horri@@ ble .
+P-2884	-0.3766 -0.3152 -3.5538 -0.5109 -0.1449 -0.0585
+S-5262	o@@ h@@ h@@ h@@ h .
+T-5262	o@@ h@@ h@@ h@@ h .
+H-5262	-0.24022191762924194	o@@ h@@ h@@ h .
+D-5262	-0.24022191762924194	o@@ h@@ h@@ h .
+P-5262	-0.4391 -0.2558 -0.1305 -0.4597 -0.1028 -0.0535
+S-5280	er ist mein groß@@ vater .
+T-5280	he is my grand@@ father .
+H-5280	-0.4527803957462311	he &apos;s my grand@@ father .
+D-5280	-0.4527803957462311	he &apos;s my grand@@ father .
+P-5280	-0.6486 -0.5807 -1.1056 -0.3991 -0.1141 -0.2633 -0.0580
+S-4884	die antwort darauf ist nein .
+T-4884	and the answer is no .
+H-4884	-0.5423190593719482	the answer is no .
+D-4884	-0.5423190593719482	the answer is no .
+P-4884	-1.1297 -0.0838 -1.2719 -0.2393 -0.4777 -0.0515
+S-5160	okay , ein paar mehr .
+T-5160	okay , a bit more .
+H-5160	-0.5083491206169128	okay , a few more .
+D-5160	-0.5083491206169128	okay , a few more .
+P-5160	-0.2194 -0.0399 -1.8876 -0.7843 -0.0447 -0.5567 -0.0259
+S-5191	lassen sie mich zusammen@@ fassen .
+T-5191	so let me rec@@ ap .
+H-5191	-0.8646959662437439	let me put it together .
+D-5191	-0.8646959662437439	let me put it together .
+P-5191	-0.7228 -0.0068 -3.0855 -1.4347 -0.4473 -0.2794 -0.0764
+S-5247	es gab re@@ mix@@ e .
+T-5247	there were re@@ mix@@ es .
+H-5247	-0.7920027375221252	there was re@@ mix@@ ing .
+D-5247	-0.7920027375221252	there was re@@ mix@@ ing .
+P-5247	-1.3664 -0.5914 -0.4662 -1.7369 -0.3203 -1.0344 -0.0285
+S-5249	und dann wurde es international .
+T-5249	and then it went international .
+H-5249	-1.0034335851669312	and then it was international .
+D-5249	-1.0034335851669312	and then it was international .
+P-5249	-0.0872 -0.3143 -0.8171 -1.1429 -3.9213 -0.6800 -0.0613
+S-4810	mein name ist am@@ it .
+T-4810	my name is am@@ it .
+H-4810	-0.5843909978866577	my name is am@@ it .
+D-4810	-0.5843909978866577	my name is am@@ it .
+P-4810	-0.9397 -0.0220 -0.0613 -0.1707 -2.2193 -0.6133 -0.0645
+S-4808	das ist eine großartige frage .
+T-4808	that is a fantastic question .
+H-4808	-0.4823234975337982	this is a great question .
+D-4808	-0.4823234975337982	this is a great question .
+P-4808	-1.3680 -0.0399 -0.4284 -0.9615 -0.1403 -0.3435 -0.0947
+S-5388	ist es überhaupt fotogra@@ fie ?
+T-5388	or is it photograph@@ y ?
+H-5388	-1.6011544466018677	is it all the photogra@@ pher@@ y ?
+D-5388	-1.6011544466018677	is it all the photogra@@ pher@@ y ?
+P-5388	-1.3577 -1.0137 -3.7234 -3.3467 -1.2562 -2.1484 -0.3619 -1.1647 -0.0377
+S-5431	hier ist ein anderes beispiel .
+T-5431	so here &apos;s another example .
+H-5431	-0.4538789689540863	here &apos;s another example .
+D-5431	-0.4538789689540863	here &apos;s another example .
+P-5431	-1.3912 -0.6526 -0.0855 -0.1005 -0.4356 -0.0578
+S-5461	es gibt aber noch etwas .
+T-5461	but there &apos;s another thing .
+H-5461	-1.1026650667190552	but there &apos;s another thing .
+D-5461	-1.1026650667190552	but there &apos;s another thing .
+P-5461	-2.5609 -0.6079 -1.0170 -1.8560 -0.8843 -0.7428 -0.0497
+S-5616	habt ihr diese jungs gesehen ?
+T-5616	have you seen these guys ?
+H-5616	-1.3188972473144531	did you see these guys ?
+D-5616	-1.3188972473144531	did you see these guys ?
+P-5616	-2.9367 -0.1739 -1.9280 -1.4970 -0.1667 -2.4406 -0.0893
+S-5763	es hat milliarden von denen .
+T-5763	there are billions of them .
+H-5763	-0.7967787384986877	it has billions of them .
+D-5763	-0.7967787384986877	it has billions of them .
+P-5763	-0.5841 -0.4676 -1.2800 -0.0402 -2.6786 -0.4861 -0.0407
+S-4834	nur weiter . viel spaß .
+T-4834	keep going . have fun .
+H-4834	-1.0729742050170898	just further . a lot of fun .
+D-4834	-1.0729742050170898	just further . a lot of fun .
+P-4834	-1.3769 -2.9889 -0.2657 -3.3864 -0.3723 -0.5555 -0.0364 -0.4853 -0.1894
+S-5927	ich werde das nie vergessen .
+T-5927	i will never forget it .
+H-5927	-0.724108099937439	i &apos;ll never forget that .
+D-5927	-0.724108099937439	i &apos;ll never forget that .
+P-5927	-0.1801 -1.9489 -0.6864 -0.6372 -0.5998 -0.9784 -0.0379
+S-4149	hier sehen sie die stadt .
+T-4149	here you see the city .
+H-4149	-0.6467956900596619	here you see the city .
+D-4149	-0.6467956900596619	here you see the city .
+P-4149	-2.0331 -0.7167 -0.8397 -0.3377 -0.2233 -0.3181 -0.0591
+S-4194	es hat ihm sehr gefallen .
+T-4194	he liked it very much .
+H-4194	-1.5724321603775024	it has a lot of them .
+D-4194	-1.5724321603775024	it has a lot of them .
+P-4194	-0.4440 -1.0842 -2.1348 -4.6809 -0.5655 -2.4139 -1.1755 -0.0808
+S-3566	ich denke , eher nicht .
+T-3566	i don &apos;t think so .
+H-3566	-1.044305443763733	i think , rather than not .
+D-3566	-1.044305443763733	i think , rather than not .
+P-3566	-0.3802 -0.1384 -2.1823 -2.6107 -1.3669 -1.1730 -0.4742 -0.0287
+S-3649	einige sind gekommen und gegangen .
+T-3649	some have come and gone .
+H-3649	-1.3547953367233276	some of them have come and went .
+D-3649	-1.3547953367233276	some of them have come and went .
+P-3649	-0.4465 -1.4431 -1.1068 -2.6530 -0.8257 -0.5920 -2.5829 -2.5211 -0.0221
+S-4059	o@@ oh , danke schön .
+T-4059	aw@@ w , thank you .
+H-4059	-0.1405772566795349	o@@ oh , thank you .
+D-4059	-0.1405772566795349	o@@ oh , thank you .
+P-4059	-0.7138 -0.0226 -0.1177 -0.0275 -0.0129 -0.0527 -0.0369
+S-4064	werde ich die farbe mögen ?
+T-4064	will i like the color ?
+H-4064	-0.9713408946990967	i &apos;m going to like the color ?
+D-4064	-0.9713408946990967	i &apos;m going to like the color ?
+P-4064	-2.9407 -0.9071 -0.1430 -0.0096 -0.8946 -1.9299 -0.7109 -1.1681 -0.0382
+S-4111	guten tag , alle zusammen .
+T-4111	good after@@ noon , everybody .
+H-4111	-0.45424866676330566	good day , all together .
+D-4111	-0.45424866676330566	good day , all together .
+P-4111	-0.4797 -0.2304 -0.4104 -1.1532 -0.5504 -0.2682 -0.0874
+S-5977	wir haben den kontakt verloren .
+T-5977	we &apos;ve been dis@@ connected .
+H-5977	-0.7934906482696533	we &apos;ve lost the contact .
+D-5977	-0.7934906482696533	we &apos;ve lost the contact .
+P-5977	-0.1398 -2.1314 -0.7098 -0.7259 -1.1071 -0.7021 -0.0383
+S-4691	es hält dich fr@@ isch .
+T-4691	it kee@@ ps you fresh .
+H-4691	-1.4111847877502441	it &apos;s going to be happy .
+D-4691	-1.4111847877502441	it &apos;s going to be happy .
+P-4691	-0.7719 -1.4213 -4.5349 -0.0417 -0.9946 -2.9808 -0.4964 -0.0478
+S-4383	das tat sie hei@@ mlich ,
+T-4383	she did it in secret .
+H-4383	-1.8065520524978638	so , that &apos;s what they did .
+D-4383	-1.8065520524978638	so , that &apos;s what they did .
+P-4383	-2.4997 -1.2853 -2.8856 -1.7190 -1.4563 -1.9765 -2.5335 -1.8246 -0.0784
+S-4516	und es wurde noch besser .
+T-4516	and it even got better .
+H-4516	-0.9810677170753479	and it was better .
+D-4516	-0.9810677170753479	and it was better .
+P-4516	-0.1333 -0.4772 -1.1222 -2.6147 -1.4618 -0.0773
+S-4519	eine fast identi@@ sche struktur .
+T-4519	an almost iden@@ tical structure .
+H-4519	-1.0493240356445312	a almost iden@@ tical structure .
+D-4519	-1.0493240356445312	a almost iden@@ tical structure .
+P-4519	-2.1868 -1.4188 -2.5850 -0.0209 -0.7835 -0.3226 -0.0277
+S-4565	ist das auch deine meinung ?
+T-4565	is that your opini@@ on ?
+H-4565	-1.2004674673080444	is that your opini@@ on ?
+D-4565	-1.2004674673080444	is that your opini@@ on ?
+P-4565	-1.3754 -0.8830 -3.6093 -1.8446 -0.0554 -0.4950 -0.1406
+S-4686	das ist eine großartige frage .
+T-4686	that &apos;s a great question .
+H-4686	-0.4823234975337982	this is a great question .
+D-4686	-0.4823234975337982	this is a great question .
+P-4686	-1.3680 -0.0399 -0.4284 -0.9615 -0.1403 -0.3435 -0.0947
+S-5920	ich werde es nie vergessen .
+T-5920	i never will forget it .
+H-5920	-0.597563624382019	i &apos;ll never forget it .
+D-5920	-0.597563624382019	i &apos;ll never forget it .
+P-5920	-0.1665 -1.8912 -0.4154 -0.7775 -0.5405 -0.3323 -0.0596
+S-3147	es gibt eine alte studie .
+T-3147	this is an old study .
+H-3147	-0.6385039687156677	there &apos;s an old study .
+D-3147	-0.6385039687156677	there &apos;s an old study .
+P-3147	-0.7033 -0.9350 -1.2485 -0.1991 -0.3343 -0.9949 -0.0544
+S-2194	aber was essen deine fische ?
+T-2194	but what are your fish eating ?
+H-2194	-0.7790639400482178	but what do you eat your fish ?
+D-2194	-0.7790639400482178	but what do you eat your fish ?
+
