@@ -1,7 +1,0 @@
-#spacy==1.9.0  # required version for errant
-spacy
-hunspell
-nltk
-sentencepiece
-tqdm
-gdown
