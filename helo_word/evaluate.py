@@ -40,7 +40,8 @@ def main(args):
         output_dir = track.get_output_dir(args.ckpt_fpath)
 
     if not args.find_best:
-        # (NOTE) Evals all checkpoints. (checkpoint1.pt, checkpoint2.pt, ... )
+        # (NOTE) Evals all checkpoints for `ckpt_dir` (checkpoint1.pt, checkpoint2.pt, ... ),
+        # or the checkpoint file for `ckpt_fpath`.
         for ckpt in tqdm(ckpt_files):
             run_ckpt(databin_path, ckpt, output_dir, scorer_type,
                      gold_m2, ori_path, ori_bpe_path, gen_subset,

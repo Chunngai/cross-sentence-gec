@@ -16,6 +16,7 @@ ERROR_TYPES = ['M:ADJ', 'M:ADV', 'M:CONJ', 'M:CONTR', 'M:DET', 'M:NOUN', 'M:NOUN
 def parse(report):
     # get summary
     text = open(report, 'r').read()
+    # (NOTE) "Span-Based Correction" in the *.report file.
     srch = re.search("(?s)\nTP[^\n]+F0\.5\n([^\n]+)", text)
     if srch is None:
         raise ValueError("There is no summary")
@@ -25,7 +26,7 @@ def parse(report):
     # get edits
     error_type2scores = dict()
     for line in text.splitlines():
-        if line[:2] in ("U:", "M:", "R:"):
+        if line[:2] in ("U:", "M:", "R:"):  # (NOTE) "Span-Based Correction" in the *.report file.
             error_type, tp, fp, fn, _, _, _ = line.strip().split()
             error_type2scores[error_type] = int(tp), int(fp), int(fn)
 
@@ -87,7 +88,7 @@ if __name__ == "__main__":
             best = dropped_error_types
 
     print(f"Best results after {hp.n_simulations} times of simulation")
-    print(f"dropped error types: {best}")
+    print(f"dropped error types: {best}")  # (NOTE) A subset of `ERROR_TYPES`.
     print(f"TP: {TP} -> {_TP}")
     print(f"FP: {FP} -> {_FP}")
     print(f"FN: {FN} -> {_FN}")
