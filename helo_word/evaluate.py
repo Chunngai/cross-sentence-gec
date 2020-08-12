@@ -145,7 +145,7 @@ if __name__ == '__main__':
     parser.add_argument("--remove-error-type-lst", type=str, nargs="+", default=[], help="error types to be removed (e.g.. R:OTHER)")
     parser.add_argument("--apply-rerank", action="store_true", help="do the lm score rerank")
     parser.add_argument("--preserve-spell", action="store_true", help="preserve spelling correction during the lm rerank")
-    parser.add_argument("--max_edits", type=int, default=None, help="max edit distance during the lm rerank")
+    parser.add_argument("--max-edits", type=int, default=None, help="max edit distance during the lm rerank")  # (MODIFIED) max_edits -> max-edits
 
     parser.add_argument("--find-best", action="store_true")
 

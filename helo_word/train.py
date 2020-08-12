@@ -45,7 +45,9 @@ def train(databin_path, model_config, ckpt_dir, restore_ckpt, ngpu):
 
     # (NOTE) If a restore checkpoint is provided, appends it to the command (that is, `prompt`) to be executed.
     if restore_ckpt is not None:
-        finetune_ckpt = os.path.basename(util.change_ckpt_dir(restore_ckpt, ckpt_dir))
+        # (MODIFIED) #5
+        # finetune_ckpt = os.path.basename(util.change_ckpt_dir(restore_ckpt, ckpt_dir))
+        finetune_ckpt = util.change_ckpt_dir(restore_ckpt, ckpt_dir)
 
         # (NOTE) Makes it checkpoint1.pt.
         logging.info(f"[Train] copy the ckpt {restore_ckpt} into {finetune_ckpt}")
