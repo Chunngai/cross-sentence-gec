@@ -137,7 +137,7 @@ if __name__ == "__main__":
         [
             f"{maybe_download_('wi+locness_v2.1.bea19.tar.gz', 'wget https://www.cl.cam.ac.uk/research/nl/bea2019st/data/wi+locness_v2.1.bea19.tar.gz')}",
             f"tar -C {fp.bea19} -xvzf wi+locness_v2.1.bea19.tar.gz",
-            f"cp {fp.wi}/test/ABCN.test.bea19.orig {fp.WI_TEST_ORI}"
+            f"cp {fp.wi}/test/ABCN.test.bea19.orig {fp.WI_TEST_ORI}",
             f"rm wi+locness_v2.1.bea19.tar.gz"
         ]
     )
