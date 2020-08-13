@@ -655,4 +655,14 @@ parser.add_argument("--max-edits", type=int, default=None, help="max edit distan
 ```
 一个typo。
 
-&emsp;&emsp;修改这两个地方之后按照文档的步骤训练模型就行了。
+&emsp;&emsp;(三)：将`gec/filepath.py`的第26行：
+```python
+m2scorer = f"{root}/data/conll2014/m2scorer/m2scorer.py"
+```
+改为
+```python
+m2scorer = f"{root}/data/conll2013/release2.3.1/m2scorer/m2scorer"
+```
+否则无法找到m2scorer路径。
+
+&emsp;&emsp;修改这三个地方之后按照文档的步骤训练模型就行了。
