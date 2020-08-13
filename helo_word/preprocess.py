@@ -207,7 +207,8 @@ if __name__ == "__main__":
             f"tar -xvf wiki103_fconv_lm.tar.bz2",
             f"mv wiki103.pt {filepath.Path.lm_path}",
             f"mv dict.txt {filepath.Path.lm_dict}",
-            f"rm wiki103_fconv_lm.tar.bz2"
+            f"rm wiki103_fconv_lm.tar.bz2",
+            f"rm README.md"
         ]
     )
 

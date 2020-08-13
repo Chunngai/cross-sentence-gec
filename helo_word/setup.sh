@@ -11,7 +11,7 @@ case `python -V` in
 		exit
 esac
 
-# [NEW] Uses the src of tuna to speed up the doenload.
+# [NEW] Uses the src of tuna to speed up the download.
 INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple/
 # INDEX_URL=https://mirrors.aliyun.com/pypi/simple/
 # [NEW] Adds timeout.
