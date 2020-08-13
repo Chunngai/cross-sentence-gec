@@ -16,8 +16,7 @@ ERROR_TYPES = ['M:ADJ', 'M:ADV', 'M:CONJ', 'M:CONTR', 'M:DET', 'M:NOUN', 'M:NOUN
 def parse(report):
     # get summary
     text = open(report, 'r').read()
-    # (NOTE) "Span-Based Correction" in the *.report file.
-    srch = re.search("(?s)\nTP[^\n]+F0\.5\n([^\n]+)", text)
+    srch = re.search("(?s)\nTP[^\n]+F0\.5\n([^\n]+)", text)  # (NOTE) "Span-Based Correction" in the *.report file.
     if srch is None:
         raise ValueError("There is no summary")
     TP, FP, FN, Prec, Rec, Fscore = srch.group(1).split()

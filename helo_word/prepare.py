@@ -7,25 +7,6 @@ from gec import util
 logging.getLogger().setLevel(logging.INFO)
 
 
-def main(args):
-    # (NOTE)
-    # 1: Restricted
-    # 3: Low resource
-    # 0: CONLL
-    track = choice_track(args.track)
-
-    print_log("------ ------ ------")
-    print_log(f"[Prepare] 1. prepare for the text data of track {track.TRACK_NUM}")  # (MODIFIED)
-    prepare_text(track)
-
-    print_log("------ ------ ------")
-    print_log(f"[Prepare] 2. create binary data")
-    for train_mode in track.train_modes:
-        databin_path = track.get_databin_path(train_mode)
-        trainpref, validpref = track.get_pref(train_mode)
-        prepare_binary(databin_path, trainpref, validpref, track.fp.BPE_VOCAB)
-
-
 # (NEW)
 def print_log(log_info):
     """
@@ -33,6 +14,22 @@ def print_log(log_info):
     """
     print()
     logging.info(log_info)
+
+
+def main(args):
+    # (NOTE) 0: CONLL.
+    # (NOTE) 1: Restricted.
+    # (NOTE) 3: Low resource.
+    track = choice_track(args.track)
+
+    print_log(f"[Prepare] 1. prepare for the text data of track {track.TRACK_NUM}")  # (MODIFIED)
+    prepare_text(track)
+
+    print_log(f"[Prepare] 2. create binary data")
+    for train_mode in track.train_modes:
+        databin_path = track.get_databin_path(train_mode)
+        trainpref, validpref = track.get_pref(train_mode)
+        prepare_binary(databin_path, trainpref, validpref, track.fp.BPE_VOCAB)
 
 
 def prepare_text(track):

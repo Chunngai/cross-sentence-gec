@@ -59,8 +59,9 @@ def train(databin_path, model_config, ckpt_dir, restore_ckpt, ngpu):
     prompt += f" | tee -a {os.path.join(ckpt_dir, 'train.log')}"
 
     # (NOTE) Runs the command.
-    os.system(prompt)  # (NOTE) The checkpoint of each epoch is saved,
-                       # along with checkpoint_best.pt and checkpoint_last.pt.
+    # (NOTE) The checkpoint of each epoch is saved,
+    # (NOTE) along with checkpoint_best.pt and checkpoint_last.pt.
+    os.system(prompt)
 
 
 def find_restore(prev_model_output_dir, ori_path, scorer_type):

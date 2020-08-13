@@ -18,7 +18,6 @@ def maybe_download(dir, cmd):
     if os.listdir(dir) != []:
         logging.info(f"skip this step as {dir} is NOT empty")
     else:
-        # print(cmd)  (MODIFIED)
         # (MODIFIED)
         for sub_cmd in cmd:
             print(f"+ {sub_cmd}")  # (NEW)
@@ -76,7 +75,6 @@ if __name__ == "__main__":
     fp.make_dirs()
 
     """ DOWNLOAD DATA """
-    print_log("------ ------ ------")
     print_log("###### STEP 0. Download data")
 
     print_log("###### STEP 0-1. Download Gutenberg Text")
@@ -84,11 +82,8 @@ if __name__ == "__main__":
         fp.gutenberg,
 
         [
-            # f"gdown https://drive.google.com/uc?id=0B2Mzhc7popBga2RkcWZNcjlRTGM & "
             f"{maybe_download_('Gutenberg.zip', 'gdown https://drive.google.com/uc?id=0B2Mzhc7popBga2RkcWZNcjlRTGM')}",
-
             f"unzip Gutenberg.zip -d {fp.gutenberg}",
-
             f"rm Gutenberg.zip"
         ]
     )
@@ -98,11 +93,8 @@ if __name__ == "__main__":
         fp.tatoeba,
 
         [
-            # f"wget http://downloads.tatoeba.org/exports/sentences.tar.bz2 & "
             f"{maybe_download_('sentences.tar.bz2', 'wget http://downloads.tatoeba.org/exports/sentences.tar.bz2')}",
-
             f"tar -C {fp.tatoeba} -xvjf sentences.tar.bz2",
-
             f"rm sentences.tar.bz2"
         ]
     )
@@ -112,15 +104,9 @@ if __name__ == "__main__":
         fp.wiki103,
 
         [
-            # f"wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip & "
             f"{maybe_download_('wikitext-103-v1.zip', 'wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip')}",
-
-            #f"sleep 10s",
-
             f"unzip wikitext-103-v1.zip -d {fp.wiki103}",
-
             f"mv {fp.wiki103}/wikitext-103/wiki.train.tokens {fp.wiki103}/wiki.train.tokens",
-
             f"rm wikitext-103-v1.zip"
         ]
     )
@@ -138,11 +124,8 @@ if __name__ == "__main__":
         f"{fp.bea19}/fce",
 
         [
-            # f"wget https://www.cl.cam.ac.uk/research/nl/bea2019st/data/fce_v2.1.bea19.tar.gz & "
             f"{maybe_download_('fce_v2.1.bea19.tar.gz', 'wget https://www.cl.cam.ac.uk/research/nl/bea2019st/data/fce_v2.1.bea19.tar.gz')}",
-
             f"tar -C {fp.bea19} -xvzf fce_v2.1.bea19.tar.gz",
-
             f"rm fce_v2.1.bea19.tar.gz"
         ]
     )
@@ -152,23 +135,13 @@ if __name__ == "__main__":
         f"{fp.bea19}/wi+locness",
 
         [
-            # f"wget https://www.cl.cam.ac.uk/research/nl/bea2019st/data/wi+locness_v2.1.bea19.tar.gz & "
             f"{maybe_download_('wi+locness_v2.1.bea19.tar.gz', 'wget https://www.cl.cam.ac.uk/research/nl/bea2019st/data/wi+locness_v2.1.bea19.tar.gz')}",
-
             f"tar -C {fp.bea19} -xvzf wi+locness_v2.1.bea19.tar.gz",
-         
-            f"rm wi+locness_v2.1.bea19.tar.gz"
-
-            # f"wget https://www.cl.cam.ac.uk/research/nl/bea2019st/data/ABCN.bea19.test.orig & "
-            
-            # f"mv ABCN.bea19.test.orig {fp.WI_TEST_ORI}",
             f"cp {fp.wi}/test/ABCN.test.bea19.orig {fp.WI_TEST_ORI}"
+            f"rm wi+locness_v2.1.bea19.tar.gz"
         ]
     )
 
-    # print_log("###### STEP 0-6. Download LANG8")
-    # logging.info(f"NO PUBLIC DATA AVAILABLE.\n "
-    #              f"Please visit 'https://www.cl.cam.ac.uk/research/nl/bea2019st/' to obtain data and extract file to {fp.nucle_m2}/*m2")
     print_log("###### STEP 0-6.1. Download LANG8")
     try:
         os.mkdir(f"{fp.bea19}/lang8.bea19")  # (NOTE) `f"{fp.bea19}/lang8.bea19"` should be an attr of `fp`.
@@ -179,7 +152,6 @@ if __name__ == "__main__":
 
         [
             f"tar -C {fp.bea19}/lang8.bea19 -xvzf lang8.bea19.tar.gz",
-
             f"rm lang8.bea19.tar.gz"
         ]
     )
@@ -194,12 +166,10 @@ if __name__ == "__main__":
 
         [
             f"tar -C {fp.bea19} -xvjf release3.3.tar.bz2",
-
             # (NOTE) The following 2 statements are for fixing the name of `fp.nucle3.3`.
             # (NOTE) It should be "release3.3.tar.bz2" actually.
             f"rm -rf {fp.bea19}/nucle3.3",
             f"mv {os.path.join(fp.bea19, 'release3.3')} {os.path.join(fp.bea19, 'nucle3.3')}",
-
             f"rm release3.3.tar.bz2"
         ]
     )
@@ -209,11 +179,8 @@ if __name__ == "__main__":
         fp.conll2013,
 
         [
-            # f"wget https://www.comp.nus.edu.sg/~nlp/conll13st/release2.3.1.tar.gz & "
             f"{maybe_download_('release2.3.1.tar.gz', 'wget https://www.comp.nus.edu.sg/~nlp/conll13st/release2.3.1.tar.gz')}",
-
             f"tar -C {fp.conll2013} -xvzf release2.3.1.tar.gz",
-
             f"rm release2.3.1.tar.gz"
         ]
     )
@@ -222,11 +189,8 @@ if __name__ == "__main__":
         fp.conll2014,
 
         [
-            # f"wget https://www.comp.nus.edu.sg/~nlp/conll14st/conll14st-test-data.tar.gz & "
             f"{maybe_download_('conll14st-test-data.tar.gz', 'wget https://www.comp.nus.edu.sg/~nlp/conll14st/conll14st-test-data.tar.gz')}",
-
             f"tar -C {fp.conll2014} -xvzf conll14st-test-data.tar.gz",
-
             f"rm conll14st-test-data.tar.gz"
         ]
     )
@@ -235,19 +199,14 @@ if __name__ == "__main__":
 
     os.makedirs(os.path.dirname(filepath.Path.lm_path), exist_ok=True)
     os.makedirs(os.path.dirname(filepath.Path.lm_dict), exist_ok=True)
-
     maybe_download(
         filepath.Path.lm_databin,
 
         [
-            # f"wget https://dl.fbaipublicfiles.com/fairseq/models/wiki103_fconv_lm.tar.bz2 & "
             f"{maybe_download_('wiki103_fconv_lm.tar.bz2', 'wget https://dl.fbaipublicfiles.com/fairseq/models/wiki103_fconv_lm.tar.bz2')}",
-
             f"tar -xvf wiki103_fconv_lm.tar.bz2",
-
             f"mv wiki103.pt {filepath.Path.lm_path}",
             f"mv dict.txt {filepath.Path.lm_dict}",
-
             f"rm wiki103_fconv_lm.tar.bz2"
         ]
     )
@@ -257,7 +216,6 @@ if __name__ == "__main__":
     # maybe_download(fp.errant, "git clone https://github.com/chrisjbryant/errant.git")
 
     """ TOKENIZE DATA FOR PRETRAINING """
-    print_log("------ ------ ------")
     print_log("STEP 1. Word-tokenize the original files and merge them")
 
     print_log("STEP 1-1. gutenberg")
@@ -276,14 +234,12 @@ if __name__ == "__main__":
              (fpath, fp.WIKI103_TXT, args.max_tokens))
 
     """ TRAIN BPE MODEL """
-    print_log("------ ------ ------")
     print_log("STEP 2. Train bpe model")
 
     maybe_do(fp.BPE_MODEL, bpe.train,
              (fp.GUTENBERG_TXT, fp.BPE_MODEL.replace(".model", ""), args.vocab_size, 1.0, 'bpe'))
 
     """ wi.dev -> wi.dev.3k, wi.dev.1k """
-    print_log("------ ------ ------")
     print_log("STEP 3. Split wi.dev into wi.dev.3k and wi.dev.1k")
 
     fpaths = sorted(glob(f'{fp.wi_m2}/*.dev.gold.bea19.m2'))
@@ -294,7 +250,6 @@ if __name__ == "__main__":
 
     """ PERTURB DATA FOR PRETRAINING """
     """ AND MAKE PARALLEL FILES """
-    print_log("------ ------ ------")
     print_log("STEP 4. Perturb and make parallel files")
 
     for track_no in ("1", "3", "0"):
@@ -331,7 +286,6 @@ if __name__ == "__main__":
                   args.word_change_prob, args.type_change_prob))
 
     """ PARALLELIZE DATA FOR TRAIN & DEV & TEST """
-    print_log("------ ------ ------")
     print_log("STEP 5. m2 to parallel")
 
     print_log("STEP 5-1. fce")
@@ -376,7 +330,6 @@ if __name__ == "__main__":
 
     """ STEP I: FIX TOKENIZATION ERRORS """
     """ STEP II: SPELLCHECK """
-    print_log("------ ------ ------")
     print_log("STEP 6. spell-check")
 
     print_log("STEP 6-1. fce")
@@ -410,7 +363,6 @@ if __name__ == "__main__":
     maybe_do(fp.CONLL2014_SP_ORI, spell.check, (fp.CONLL2014_ORI, fp.CONLL2014_SP_ORI))
 
     """ STEP III: BPE """
-    print_log("------ ------ ------")
     print_log("STEP 7. bpe-tokenize")
 
     print_log("STEP 7-1. fce")
