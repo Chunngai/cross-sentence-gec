@@ -58,21 +58,17 @@ cd
 ### 2.2 安装Python2.7 **（针对非18.04的Ubuntu，如20.04。Ubuntu18.04跳过该步骤。其他系统如果python2默认是2.7也跳过该步骤）**  
 终端输入：
 ```bash
-# 添加atom仓库。
-echo "" | wget -qO - https://packagecloud.io/AtomEditor/atom/gpgkey | sudo apt-key add -
-sudo sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/atom.list'
-sudo apt-get update
+sudo apt install -y python2.7
 
-# 安装atom。
-sudo apt-get -y install atom
+cd
 ```
-&emsp;&emsp;以上命令实际上是通过安装atom间接安装python2.7。atom是github的一个文本编辑软件，其依赖包含python2.7。这种安装方式不容易出错。当然也可以通过其他方式安装python2.7，但会比较复杂，**特别是对于Ubuntu20.04**。
 
----
-
-&emsp;&emsp;**非Ubuntu18.04**的系统按照上述操作安装python3和python2之后，在终端输入python3后显示的应该是系统原！本！的！python3版本；在终端输入python2后显示的应该是python2.7。
-
----
+&emsp;&emsp;这一步之后：  
+&emsp;&emsp;在终端输入python：显示未安装；  
+&emsp;&emsp;在终端输入python2：显示未安装；  
+&emsp;&emsp;在终端输入python3：显示python3.8.2；  
+&emsp;&emsp;在终端输入python2.7：显示python2.7.18rc1；  
+&emsp;&emsp;在终端输入python3.6：显示python3.6.11。  
 
 ### 2.3 虚拟环境
 &emsp;&emsp;虚拟环境提供一个与系统隔离的**python环境**。为了避免错误，**论文代码在虚拟环境运行**。
@@ -131,7 +127,7 @@ git clone https://github.com/kakaobrain/helo_word
 unzip helo_word_data.zip
 ```
 
-&emsp;&emsp;将解压后的文件夹内部的所有文件（包括10个压缩包和1个.pickle文件）放到helo_word文件夹的 **根目录**。
+&emsp;&emsp;将解压后的文件夹`helo_word_data`内`datasets`的所有文件（包括10个压缩包和2个.pickle文件）放到刚刚克隆得到的helo_word文件夹的 **根目录**。
 
 # 在helo_word文件夹打开终端，并进入虚拟环境
 &emsp;&emsp;在**helo_word文件夹**打开终端。（在文件夹内右键点击终端就可以打开以该文件夹为当前位置的终端）  
@@ -147,8 +143,8 @@ source [虚拟环境文件夹位置]/bin/activate
 
 &emsp;&emsp;在**已经进入虚拟环境的终端**输入以下命令：
 ```bash
-# [NEW] Uses the src of tuna to speed up the download.
-INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple/
+# [NEW] Uses the src of aliyun to speed up download.
+INDEX_URL=https://mirrors.aliyun.com/pypi/simple/
 # [NEW] Adds timeout.
 TIMEOUT=180
 
@@ -175,10 +171,7 @@ pip install --editable fairseq
 #git clone https://github.com/chrisjbryant/errant
 # [Note] Ver. of errant should be compatible.
 # [MODIFIED] Specifies the bea2019st branch of errant.
-if [ ! -d errant ]
-then
-	git clone https://github.com/chrisjbryant/errant -b bea2019st
-fi
+git clone https://github.com/chrisjbryant/errant -b bea2019st
 
 # pattern3 (see https://www.clips.uantwerpen.be/pages/pattern for any installation issues)
 pip install pattern3 --timeout $TIMEOUT -i $INDEX_URL  # [MODIFIED] Adds -i and --timeout.
@@ -194,9 +187,15 @@ python -c "import site, os; \
 ###### NEW ######
 pip install torch==1.4.0 -i $INDEX_URL --timeout $TIMEOUT
 
-# average_perceptron_tagger.picker is needed in the perturbation step.
-sudo mkdir -p /usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/
-sudo mv averaged_perceptron_tagger.pickle  /usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/
+# average_perceptron_tagger.picker is needed.
+AVERAGE_PERCEPTRON_TAGGER_PICKLE_BASEDIR="/usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/"
+sudo mkdir -p $AVERAGE_PERCEPTRON_TAGGER_PICKLE_BASEDIR
+sudo mv averaged_perceptron_tagger.pickle  $AVERAGE_PERCEPTRON_TAGGER_PICKLE_BASEDIR
+
+# english.pickle is needed.
+ENGLISH_PICKLE_BASEDIR="/usr/local/lib/nltk_data/tokenizers/punkt/PY3/"
+sudo mkdir -p $ENGLISH_PICKLE_BASEDIR
+sudo mv english.pickle $ENGLISH_PICKLE_BASEDIR
 ```
 &emsp;&emsp;修改的地方已在注释给出。其中，`[NEW]`表示新增，`[MODIFIED]`表示修改。`###### NEW ######`后面的内容源代码没有，却是之后的部分代码成功执行必须的。
 
