@@ -22,6 +22,9 @@ sudo apt -y install vim
 终端输入：
 ```bash
 # 安装依赖。
+sudo apt install -y build-essential  # gcc.
+sudo apt install -y zlib1g-dev  # zlib.
+sudo apt install -y libssl-dev  # ssl.
 # 这两个依赖平常使用可能不用安装。但如果这里不安装，运行论文的源码会出错。
 sudo apt install -y libbz2-dev
 sudo apt install -y libsqlite3-dev
@@ -41,7 +44,16 @@ cd Python-3.6.11
 ./configure
 sudo make
 sudo make altinstall  # 与其他python版本共存
+
+cd
 ```
+
+&emsp;&emsp;这一步之后：  
+&emsp;&emsp;在终端输入python：显示未安装；  
+&emsp;&emsp;在终端输入python2：显示未安装；  
+&emsp;&emsp;在终端输入python3：显示python3.8.2；  
+&emsp;&emsp;在终端输入python2.7：显示未安装；  
+&emsp;&emsp;在终端输入python3.6：显示python3.6.11。  
 
 ### 2.2 安装Python2.7 **（针对非18.04的Ubuntu，如20.04。Ubuntu18.04跳过该步骤。其他系统如果python2默认是2.7也跳过该步骤）**  
 终端输入：
