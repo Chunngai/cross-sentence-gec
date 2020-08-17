@@ -65,7 +65,7 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 - [x] P3 R | Where does the gating mechanism come from?  
   Similar to the one in Wang et al. 2017 (the paper read on Aug 2) except that the gating here does not consider the last output. Seems it's a common practice for gating.
 - [x] P3 R | Is the gating mechanism similar to LSTM?  
-- [ ] P4 L | Pretraining decoder: unmathced params?  
+- [ ] P4 L | Pretraining decoder: unmatched params?  
 - [ ] P4 L | Dropping out entire word embeddings of source words: where is the code?  
 - [ ] P4 L | We also rescore the ...  
 - [ ] P4 L | What's the purpose of ensuring the dev set has a high number of err   annotations?  
@@ -102,9 +102,6 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 ---
 
 # Aug 2
-## · Questions ·
-- [ ] Err prop exists in crosentgec?
-- [ ] Less err prop on trg side in gec since less err on trg side?
 
 ## · Papers · | Additional Encoder & Hierarchical RNN | Exploiting Cross-Sentence Context for Neural Machine Translation, Wang et al., 2017   
 ### Contributions  
@@ -120,6 +117,10 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 
 ### Questions
 - [ ] P1 R | Considering target side history: suffers from err prop. Why?
+
+## · Questions ·
+- [ ] Err prop exists in crosentgec?
+- [ ] Less err prop on trg side in gec since less err on trg side?
 
 ---
 
@@ -187,7 +188,12 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 ### Notes
 1. Seems that the code is a mixture of multiple techniques, hard to tell the function of each part.
 
+---
+
+# Aug 5 - 6, 8 - 16
+
 ## · Papers · | GEC & Transformer & Fairseq | A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning
+
 ### Contributions
 1. Realistic noising function.
 2. Transfer learning.
@@ -196,62 +202,23 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 ### Notes
 1. Uses fairseq-0.6.1.
 2. Future work: multi-sentence context.
-3. The code is detailed. The structure is clear and the modified parts in fairseq are explained in a file. Modified code is also marked with triple quotes in code.
+3. The code is detailed. The structure is clear and the modified parts in fairseq are explained in a file. Modified code is also marked with "[MODIFIED]".
 4. The paper is also detailed.
 5. Seems that the paper with its code is an ideal starting-point.
-
----
-
-# Aug 6
-
-## · Papers · | GEC & Transformer & Fairseq | A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning
-
-### Notes
-1. The mixture weight param of the copy aug arch is like the gating param, controlling how much info should be copied and how much be generated.
-2. The type-based nosing approach is similar to the one proposed by us.
-
-### TODOs
-- [x] Learn: Copy-aug.
-
-### Ideas
-1. Noising func + back translation. Can also introduce typo or something.
-2. The W&I+L dataset also contains doc-level errors and can be used to train a gec model considering contexts.
-
-### Questions
-- [ ] P5 R | What's the minor tokenization issues?
-- [ ] P5 R | Error type control.
-
----
-
-# Aug 7
-
-## · Ideas ·
-1. Pre-trained embeddings.
-2. Pre-trained LM models. (Is it ok to use a pre-trained decoder since the model is trained with pseudo data?)
-
----
-
-# Aug 8 - 12
-## · Notes ·
-1. Modified files:
-  1. setup.sh
-  2. gec/util.py  # f"+ {prompt}"
-2. New files:
-  1. setup.sh
-  2. proprocess_clean.sh
-  3. get_datasets.sh
-3. Requirements:
+6. The mixture weight param of the copy aug arch is like the gating param, controlling how much info should be copied and how much be generated.
+7. The type-based nosing approach is similar to the one proposed by us.
+8. Requirements:
   1. errant for bea2019 -> spacy 1.9.0 -> python3.6
   2. Python 2.7
   3. pytorch 1.4.0
-4. Warnings:
-  1. train.py
+9. Warnings & Errors:
+  1. train.py  # Solution: pytorch <= 1.4.0
   > /home/neko/GEC/helo_word-master/fairseq/fairseq/optim/adam.py:121: UserWarning: This overload of add_ is deprecated:  
 	add_(Number alpha, Tensor other)  
 Consider using one of the following signatures instead:  
 	add_(Tensor other, \*, Number alpha) (Triggered internally at  /pytorch/torch/csrc/utils/python_arg_parser.cpp:766.)
-5. Errors:
-  1. evaluate.py
+
+  2. evaluate.py  # Solution: pytorch <= 1.4.0
   > Traceback (most recent call last):                                                                       
   File "/home/neko/.virtualenvs/gec_exp_1/bin/fairseq-generate", line 33, in <module>  
     sys.exit(load_entry_point('fairseq', 'console_scripts', 'fairseq-generate')())  
@@ -270,7 +237,7 @@ Consider using one of the following signatures instead:
 RuntimeError: Integer division of tensors using div or / is no longer supported, and in a future release div will perform true division as in Python 3. Use true_divide or floor_divide (// in Python) instead.
 INFO:root:[Run-ckpt] 2. postprocess into /home/neko/GEC/helo_word-master/track1/outputs/pretrain-base-lr0.0005-dr0.3/checkpoint1.wi.dev.cor
 
-  2. evaluate.py
+  3. evaluate.py  # Solution: spacy==1.9.0
   > Traceback (most recent call last):  
   File "/home/neko/GEC/helo_word-master/errant/parallel_to_m2.py", line 79, in <module>  
     main(args)  
@@ -287,13 +254,117 @@ INFO:root:[Run-ckpt] 2. postprocess into /home/neko/GEC/helo_word-master/track1/
   File "strings.pyx", line 120, in spacy.strings.StringStore.\_\_getitem__  
 TypeError: unhashable type: 'dict'
 
-  3. find_best in evaluate.main.
-  > INFO:root:[Evaluate] highest score on /home/neko/GEC/helo_word-master/data/parallel/raw/wi.dev.ori  
-cannot find highest basename from /home/neko/GEC/helo_word-master/track1/outputs/pretrain-base-lr0.0005-dr0.3
+10. They evals their outputs of wi+locness test set on codalab.
 
-6. They evals their outputs of wi+locness test set on codalab.
+### TODOs
+- [x] Learn: Copy-aug.
+
+### Ideas
+1. Noising func + back translation. Can also introduce typo or something.
+2. The W&I+L dataset also contains doc-level errors and can be used to train a gec model considering contexts.
+
+### Questions
+- [x] P5 R | What's the minor tokenization issues?
+  e.g. "a,b -> a, b"
+- [ ] P5 R | Error type control.
 
 ---
 
-# Aug 13
-Writing index.
+# Aug 7
+
+## · Ideas ·
+1. Pre-trained embeddings.
+2. Pre-trained LM models. (Is it ok to use a pre-trained decoder since the model is trained with pseudo data?)
+
+---
+
+# Papers
+
+- [x] Cross-Sentence Grammatical Error Correction {
+&emsp;&emsp;task: gec,
+&emsp;&emsp;model: conv,
+&emsp;&emsp;author:  Chollampatt et al.,
+&emsp;&emsp;year: 2019,
+&emsp;&emsp;conference: ACL,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;crosent
+&emsp;&emsp;}
+}
+
+- [x] Convolutional Sequence to Sequence Learning {
+&emsp;&emsp;task: mt,
+&emsp;&emsp;model: conv,
+&emsp;&emsp;author: Gehring et al.,
+&emsp;&emsp;year: 2017,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;fairseq
+&emsp;&emsp;}
+}
+
+- [x] Exploiting Cross-Sentence Context for Neural Machine Translation {
+&emsp;&emsp;task: mt,
+&emsp;&emsp;model: rnn,
+&emsp;&emsp;author: Wang et al.,
+&emsp;&emsp;year: 2017,
+&emsp;&emsp;conference: EMNLP,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;document-level,
+&emsp;&emsp;&emsp;&emsp;additional encoder,
+&emsp;&emsp;&emsp;&emsp;hierarchical rnn
+&emsp;&emsp;}
+}
+
+- [x] Context Gates for Neural Machine Translation {
+&emsp;&emsp;task: mt,
+&emsp;&emsp;model: rnn,
+&emsp;&emsp;author: Tu et al.,
+&emsp;&emsp;year: 2017,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;document-level,
+&emsp;&emsp;&emsp;&emsp;gates
+&emsp;&emsp;}
+}
+
+- [x] Toward Making the Most of Context in Neural Machine Translation {
+&emsp;&emsp;task: mt,
+&emsp;&emsp;model: transformer,
+&emsp;&emsp;author: Zheng et al.,
+&emsp;&emsp;year: 2020,
+&emsp;&emsp;conference: IJCAI,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;document-level,
+&emsp;&emsp;}
+}
+
+- [x] Encoder-Decoder Models Can Benefit from Pre-trained Masked Language Models in Grammatical Error Correction {
+&emsp;&emsp;task: gec,
+&emsp;&emsp;model: transformer,
+&emsp;&emsp;author: Kaneko et al.,
+&emsp;&emsp;year: 2020,
+&emsp;&emsp;conference: ACL,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;fairseq
+&emsp;&emsp;}  
+}
+
+- [x] Improving Grammatical Error Correction via Pre-Training a Copy-Augmented Architecture with Unlabeled Data {
+&emsp;&emsp;task: gec,
+&emsp;&emsp;model: transformer,
+&emsp;&emsp;author: Zhao and Wang,
+&emsp;&emsp;year: 2019,
+&emsp;&emsp;conference: NAACL,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;fairseq
+&emsp;&emsp;}  
+}
+
+- [x] A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning {
+&emsp;&emsp;task: gec,
+&emsp;&emsp;model: transformer,
+&emsp;&emsp;author: Choe et al.,
+&emsp;&emsp;year: 2019,
+&emsp;&emsp;conference: ACL,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;fairseq
+&emsp;&emsp;}  
+}
