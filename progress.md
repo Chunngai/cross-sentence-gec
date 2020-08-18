@@ -109,8 +109,10 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 2. 2 strategies: warm-start & auxiliary (with / -out gate)  
 
 ### Methods.
+**Context Source**  
 The method proposed considers the 3 previous sentences in the same doc as context.
 
+**Model the Context**  
 It models the context in a hierarchical way. First it encodes each sentence with a sentence-level RNN, and takes the last hidden state as the sentence-level repr $S_k$ of the whole sentence.
 $$
 S_k = h_{N, k} \\
@@ -125,6 +127,7 @@ h_k = f (h_{k - 1}, S_k)
 $$
 The doc-level repr $D$ is then integrated into the NMT model.
 
+**Integration**  
 The paper proposed 3 strategies to integrate the context $D$ into NMT.
 1. Use $D$ to init the enc, dec or both.
 2. Auxiliary context, without gating.
@@ -322,8 +325,10 @@ TypeError: unhashable type: 'dict'
 1. Doc-level info for mt.
 
 ### Methods
+**Context Source**  
 The paper uses the src sentence immediately before the current src sentence as context.
 
+**Model the Context**  
 It models the context by an additional enc and an additional attn model. The context is encoded in the same manner as the NMT, using bi-LSTM. Output of the additional encoder is $\{h^c_1, ..., h^c_{T_c}\}$, where $h^c_t = [\overrightarrow{h^c_t}; \overleftarrow{h^c_t}]$.
 The attention model is as follows
 $$
@@ -331,6 +336,7 @@ $$
 $$
 where $t$ and $t^{\prime}$ is timestep, $f^c_{att}$ is the additional attn model implemented as a ffn (the same as the NMT attn in the paper) taking the previous trg symbol $\hat{y}_{t^{\prime} - 1}$, the previous dec hid state $z_{t^{\prime} - 1}$, the NMT enc hid state $h^c_t$ and the NMT attn context $s_{t^{\prime}}$. Cmp to the NMT attn, the attn here has a new arg $s_{t^{\prime}}$.
 
+**Integration**  
 The paper integrates the context into the NMT model in an auxiliary way.
 $$
 z_{t^{\prime}} = \phi(\hat{y}_{t^{\prime} - 1}, z_{t^{\prime} - 1}, s_{t^{\prime}}, c_{t^{\prime}})
