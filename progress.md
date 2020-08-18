@@ -108,6 +108,36 @@ A main diff is that in 2.* ver, "a,b" is treated as a token, while in 3.* ver it
 1. A hierarchical way to get context  
 2. 2 strategies: warm-start & auxiliary (with / -out gate)  
 
+### Methods.
+The method proposed considers the 3 previous sentences in the same doc as context.
+
+It models the context in a hierarchical way. First it encodes each sentence with a sentence-level RNN, and takes the last hidden state as the sentence-level repr $S_k$ of the whole sentence.
+$$
+S_k = h_{N, k} \\
+h_{n, k} = f (h_{n-1}, k, x_{n, k})
+$$
+where $S_k$ is the k-th sentence (1 <= k <= 3), $h_{N, k}$ is the last hidden state of sentence $k$. $h_{n, k}$ is the n-th hidden state of a sentence, $f(·)$ is an activation func, and $x_{n, k}$ is the n-th input to the sentence.
+
+Then $\{S_1, ..., S_k, ..., S_K\}$ is fed into a doc-level RNN, which is used to generate the doc-level repr $D$ of the context.
+$$
+D = h_K \\
+h_k = f (h_{k - 1}, S_k)
+$$
+The doc-level repr $D$ is then integrated into the NMT model.
+
+The paper proposed 3 strategies to integrate the context $D$ into NMT.
+1. Use $D$ to init the enc, dec or both.
+2. Auxiliary context, without gating.
+$$
+s_i = f (s_{i - 1}, y_{i - 1}, c_i, D)
+$$
+where $s_i$, $y_{i - 1}$ and $c_i$ repr the dec hid state in the i-th timestep, the latest output, and the context from the NMT attn, respectively.
+3. Gating Auxialiary Context.
+$$
+s_i = f (s_{i - 1}, y_{i - 1}, c_i, z_i \otimes D) \\
+z_i = \sigma (U_z s_{i-1} + W_z y_{i-1} + C_z c_i)
+$$
+
 ### Notes
 1. P3 L | Diff from the crosentgec, the gating here considers the last output of the decoder.  
 2. P3 R | Considers the previous 3 sentences rather than 1.  
@@ -278,8 +308,46 @@ TypeError: unhashable type: 'dict'
 
 ---
 
+# Aug 17
+
+## ·TODOs·
+- [x] Read: Does Neural Machine Translation Benefit from Larger Context?, Jean et al., 2017.
+
+---
+
+# Aug 18
+
+## · Papers · | Additional Encoder, Attention & RNN | Does Neural Machine Translation Benefit from Larger Context?, Jean et al., 2017   
+### Contributions  
+1. Doc-level info for mt.
+
+### Methods
+The paper uses the src sentence immediately before the current src sentence as context.
+
+It models the context by an additional enc and an additional attn model. The context is encoded in the same manner as the NMT, using bi-LSTM. Output of the additional encoder is $\{h^c_1, ..., h^c_{T_c}\}$, where $h^c_t = [\overrightarrow{h^c_t}; \overleftarrow{h^c_t}]$.
+The attention model is as follows
+$$
+\alpha^c_{t, t^{\prime}} \propto exp(f^c_{att}(\hat{y}_{t^{\prime} - 1}, z_{t^{\prime} - 1}, h^c_t, s_{t^{\prime}}))
+$$
+where $t$ and $t^{\prime}$ is timestep, $f^c_{att}$ is the additional attn model implemented as a ffn (the same as the NMT attn in the paper) taking the previous trg symbol $\hat{y}_{t^{\prime} - 1}$, the previous dec hid state $z_{t^{\prime} - 1}$, the NMT enc hid state $h^c_t$ and the NMT attn context $s_{t^{\prime}}$. Cmp to the NMT attn, the attn here has a new arg $s_{t^{\prime}}$.
+
+The paper integrates the context into the NMT model in an auxiliary way.
+$$
+z_{t^{\prime}} = \phi(\hat{y}_{t^{\prime} - 1}, z_{t^{\prime} - 1}, s_{t^{\prime}}, c_{t^{\prime}})
+$$
+where $c_{t^{\prime}}$ is the additional attn context. Cmp to the orig NMT dec, the dec with auxiliary info here has a new arg $c_{t^{\prime}}$.  
+
+### Notes
+1. Code not provided.
+
+### Questions
+- [ ] P2 L | How does the ff attn work?
+
+---
+
 # Papers
 
+## Main
 - [x] Cross-Sentence Grammatical Error Correction {
 &emsp;&emsp;task: gec,
 &emsp;&emsp;model: conv,
@@ -291,6 +359,18 @@ TypeError: unhashable type: 'dict'
 &emsp;&emsp;}
 }
 
+- [x] A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning {
+&emsp;&emsp;task: gec,
+&emsp;&emsp;model: transformer,
+&emsp;&emsp;author: Choe et al.,
+&emsp;&emsp;year: 2019,
+&emsp;&emsp;conference: ACL,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;fairseq
+&emsp;&emsp;}  
+}
+
+## for Understanding Doc-Level Training
 - [x] Convolutional Sequence to Sequence Learning {
 &emsp;&emsp;task: mt,
 &emsp;&emsp;model: conv,
@@ -298,19 +378,6 @@ TypeError: unhashable type: 'dict'
 &emsp;&emsp;year: 2017,
 &emsp;&emsp;labels: {
 &emsp;&emsp;&emsp;&emsp;fairseq
-&emsp;&emsp;}
-}
-
-- [x] Exploiting Cross-Sentence Context for Neural Machine Translation {
-&emsp;&emsp;task: mt,
-&emsp;&emsp;model: rnn,
-&emsp;&emsp;author: Wang et al.,
-&emsp;&emsp;year: 2017,
-&emsp;&emsp;conference: EMNLP,
-&emsp;&emsp;labels: {
-&emsp;&emsp;&emsp;&emsp;document-level,
-&emsp;&emsp;&emsp;&emsp;additional encoder,
-&emsp;&emsp;&emsp;&emsp;hierarchical rnn
 &emsp;&emsp;}
 }
 
@@ -325,6 +392,33 @@ TypeError: unhashable type: 'dict'
 &emsp;&emsp;}
 }
 
+## Context
+### Early Papers
+- [x] Exploiting Cross-Sentence Context for Neural Machine Translation {
+&emsp;&emsp;task: mt,
+&emsp;&emsp;model: rnn,
+&emsp;&emsp;author: Wang et al.,
+&emsp;&emsp;year: 2017,
+&emsp;&emsp;conference: EMNLP,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;document-level,
+&emsp;&emsp;&emsp;&emsp;additional encoder,
+&emsp;&emsp;&emsp;&emsp;hierarchical rnn
+&emsp;&emsp;}
+}
+
+- [x] Does Neural Machine Translation Benefit from Larger Context? {
+&emsp;&emsp;task: mt,
+&emsp;&emsp;model: rnn,
+&emsp;&emsp;author: Jean et al.,
+&emsp;&emsp;year: 2017,
+&emsp;&emsp;labels: {
+&emsp;&emsp;&emsp;&emsp;document-level,
+&emsp;&emsp;&emsp;&emsp;additional encoder & attention,
+&emsp;&emsp;}  
+}
+
+### Transformer-Based
 - [x] Toward Making the Most of Context in Neural Machine Translation {
 &emsp;&emsp;task: mt,
 &emsp;&emsp;model: transformer,
@@ -336,6 +430,8 @@ TypeError: unhashable type: 'dict'
 &emsp;&emsp;}
 }
 
+## GEC
+### Transformer-Based
 - [x] Encoder-Decoder Models Can Benefit from Pre-trained Masked Language Models in Grammatical Error Correction {
 &emsp;&emsp;task: gec,
 &emsp;&emsp;model: transformer,
@@ -353,17 +449,6 @@ TypeError: unhashable type: 'dict'
 &emsp;&emsp;author: Zhao and Wang,
 &emsp;&emsp;year: 2019,
 &emsp;&emsp;conference: NAACL,
-&emsp;&emsp;labels: {
-&emsp;&emsp;&emsp;&emsp;fairseq
-&emsp;&emsp;}  
-}
-
-- [x] A Neural Grammatical Error Correction System Built On Better Pre-training and Sequential Transfer Learning {
-&emsp;&emsp;task: gec,
-&emsp;&emsp;model: transformer,
-&emsp;&emsp;author: Choe et al.,
-&emsp;&emsp;year: 2019,
-&emsp;&emsp;conference: ACL,
 &emsp;&emsp;labels: {
 &emsp;&emsp;&emsp;&emsp;fairseq
 &emsp;&emsp;}  
