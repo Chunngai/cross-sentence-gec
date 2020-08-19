@@ -48,7 +48,7 @@ sudo make altinstall  # 与其他python版本共存
 cd
 ```
 
-&emsp;&emsp;这一步之后：  
+&emsp;&emsp;这一步之后Ubuntu20.04的情况：  
 &emsp;&emsp;在终端输入python：显示未安装；  
 &emsp;&emsp;在终端输入python2：显示未安装；  
 &emsp;&emsp;在终端输入python3：显示python3.8.2；  
@@ -63,7 +63,7 @@ sudo apt install -y python2.7
 cd
 ```
 
-&emsp;&emsp;这一步之后：  
+&emsp;&emsp;这一步之后Ubuntu20.04的情况：  
 &emsp;&emsp;在终端输入python：显示未安装；  
 &emsp;&emsp;在终端输入python2：显示未安装；  
 &emsp;&emsp;在终端输入python3：显示python3.8.2；  
@@ -96,9 +96,9 @@ source gec/bin/activate  # 该命令只有在虚拟环境文件夹（此处为ge
 
 &emsp;&emsp;**注意：激活虚拟环境后，可以切换到任意目录，就像没使用虚拟环境那样。基本上，虚拟环境只用于存储python的安装包。**
 
-**&emsp;&emsp;虚拟环境激活后，在虚拟环境内应满足要求：  
-&emsp;&emsp;1. 在终端输入`python`后，显示python3.6；  
-&emsp;&emsp;2. 在终端输入`python2.7`后，显示python2.7。**
+&emsp;&emsp;**虚拟环境激活后，在虚拟环境内应满足要求：**  
+&emsp;&emsp;**1. 在终端输入`python`后，显示python3.6；**  
+&emsp;&emsp;**2. 在终端输入`python2.7`后，显示python2.7。**
 
 &emsp;&emsp;**如果以上两个要求不满足，运行论文的代码会出现问题！！！**
 
