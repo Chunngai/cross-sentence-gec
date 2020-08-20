@@ -1,4 +1,4 @@
-### ！ **主要针对Ubuntu18.04和Ubuntu20.04**
+### ！ **主要针对Ubuntu20.04**
 
 # 开始之前
 ## 1 基本配置
@@ -18,7 +18,7 @@ sudo apt -y install vim
 ```
 
 ## 2 Python
-### 2.1 安装Python3.6 **（针对非18.04的Ubuntu，如20.04。Ubuntu18.04跳过该步骤。其他系统如果python3默认是3.6也跳过该步骤）**  
+### 2.1 安装Python3.6 **（如果系统有python3.6，跳过该步骤）**  
 终端输入：
 ```bash
 # 安装依赖。
@@ -55,7 +55,7 @@ cd
 &emsp;&emsp;在终端输入python2.7：显示未安装；  
 &emsp;&emsp;在终端输入python3.6：显示python3.6.11。  
 
-### 2.2 安装Python2.7 **（针对非18.04的Ubuntu，如20.04。Ubuntu18.04跳过该步骤。其他系统如果python2默认是2.7也跳过该步骤）**  
+### 2.2 安装Python2.7 **（如果系统有python2.7，跳过该步骤）**  
 终端输入：
 ```bash
 sudo apt install -y python2.7
