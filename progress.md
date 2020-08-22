@@ -548,6 +548,103 @@ Why don't they treat the sentence-level corpora as document-level corpora with n
 ### Source Code
 Provided.
 
+## · Papers · | Hierarchical Attention & RNN | Document-Level Neural Machine Translation with Hierarchical Attention Networks, Miculicich et al., 2018
+### Contributions
+In: 1 Introduction
+> (i) We propose a HAN framework for translation to capture context and inter-sentence connections in a structured and dynamic manner.  
+> (ii) We integrate the HAN in a very competitive NMT architecture (Vaswani et al., 2017) and show significant improvement over two strong baselines on multiple data sets.   
+> (iii) We perform an ablation study of the contribution of each HAN configuration, showing that contextual information obtained from source and target sides are complementary.
+
+### Methods
+**Context Source**  
+The paper experiments with the context sentence length and finds the model performs best with 3 previous sentences. Thus the paper uses 3 previous sentences as context.
+
+**Model the Context**  
+The context is modeled in a hierarchical way.  
+First each context sentence $j$ is summarized into a vector $s^j$ in a word-level abstraction.
+$$
+q_w = f_w(h_t)  \\
+s^j = \mathop{MultiHead}\limits_{i}(q_w, h^j_i)
+$$
+where $h_t$ is the last hidden state of the word to be encoded or decoded at time step t, $f_w(·)$ is a linear transformation function to generate the query $q_w$. $h^j_i$ is the last hidden state of the i-th word in the j-th context sentence.
+Then each $s^j$ is summarized into the contextual information $d_t$ required at time t in a sentence-level abstraction.
+$$
+q_s = f_s(h_t)  \\
+d_t = FFN(\mathop{MultiHead}\limits_{j}(q_s, s^j))
+$$
+where $f_s(·)$ is a linear transformation function to get the query $q_s$.
+
+In: 2.1 Hierarchical Attention Network
+> The context can be used during encoding or decoding a word,  
+and it can be taken from previously encoded source sentences, previously decoded target sentences, or from previous alignment vectors (i.e. context vectors (Bahdanau et al., 2015)).  
+The different configurations will define the input query and values of the attention function.  
+
+> In this work we experiment with five of them: one at encoding time, three at decoding time, and one combining both.
+
+(1)
+> At encoding time the query is a function of the hidden state $h_{x_t}$ of the current word to be encoded $x_t$, and the values are the encoded states of previous sentences $h^j_{x_i}$ (HAN encoder).
+
+> At decoding time, the query is a function of the hidden state $h_{y_t}$ of the current word to be decoded $y_t$ , and the values can be
+
+(2)
+> (a) the encoded states of previous sentences $h^j_{x_i}$ (HAN decoder source),
+
+(3)
+> (b) the decoded states of previous sentences $h^j_{y_i}$ (HAN decoder), and
+
+(4)
+> (c\) the alignment vectors $c^j_i$ (HAN decoder alignment).
+
+(5)
+> Finally, we combine complementary target-source sides of the context by joining HAN encoder and HAN decoder.
+
+**Integration**  
+The context info is integrated with a gating mechanism.
+$$
+\lambda_t = \sigma(W_h h_t + W_d d_t)  \\
+\tilde{h_t} = \lambda h_t + (1 - \lambda_t)d_t
+$$
+where $\tilde{h_t}$ is the last hidden state at time step t., as replacement of $h_t$ during the final classification layer.
+
+### Training
+In: 3.2 Model Configuration and Training
+> Inspired by Tu et al. (2018) we trained the models in two stages. First we optimize the parameters for the NMT without the HAN, then we proceed to optimize the parameters of the whole network.
+
+### Comparison With Other Methods
+1. The model proposed in the paper is similar to the one in Wang et al., 2017. The difference is that Wang et al. model the context with RNNs without attention, while the proposed method here uses the multi-head attention to model context dynamically.
+
+2. In 1: Introduction
+> Most of these methods use an additional encoder (Jean et al., 2017; Wang et al., 2017) to extract contextual information from previous source-side sentences. However, this requires additional parameters and it does not exploit the representations already learned by the NMT encoder.
+
+3. In 1: Introduction
+> The cache-based memory keeps past context as a set of words, where each cell corresponds to one unique word keeping the hidden representations learned by the NMT while translating it. However, in this method, the word representations are stored irrespective of the sentences where they occur, and those vector representations are disconnected from the original NMT network.
+
+### Notes
+1. The model here considers context from both the source side and the target side, which are said complementary.
+
+2. In: 3.2 Model Configuration and Training
+> An important portion of the improvement comes from the HAN encoder, which can be attributed to the fact that the source-side always contains correct information, while the target-side may contain erroneous predictions at testing time.
+
+Using the last hidden state of the context from both the source side and the target side brings better performance for their complementary information, despite the error propagation.
+
+3. The attention of each head in the multi-head attention can be used for analysis, as in the appendix.
+
+### Questions
+- [ ] P1 L | In 1: Introduction
+> Most of these methods use an additional encoder (Jean et al., 2017; Wang et al., 2017) to extract contextual information from previous source-side sentences. However, this requires additional parameters and it does not exploit the representations already learned by the NMT encoder.
+
+But the model here also requires additional parameters?
+
+- [ ] P2 L | Error propagation?
+
+- [ ] P3 R | In: 3.2 Model Configuration and Training
+> Inspired by Tu et al. (2018) we trained the models in two stages. First we optimize the parameters for the NMT without the HAN, then we proceed to optimize the parameters of the whole network.
+
+What's the purpose?
+
+### Source Code
+Provided.
+
 ---
 
 # Papers
@@ -620,6 +717,18 @@ Provided.
 &emsp;&emsp;labels: {  
 &emsp;&emsp;&emsp;&emsp;document-level,  
 &emsp;&emsp;&emsp;&emsp;additional encoder & attention,  
+&emsp;&emsp;}  
+}
+
+### RNN based
+- [x] Document-Level Neural Machine Translation with Hierarchical Attention Networks {  
+&emsp;&emsp;task: mt,  
+&emsp;&emsp;model: rnn,  
+&emsp;&emsp;author: Miculicich et al.,  
+&emsp;&emsp;year: 2018,  
+&emsp;&emsp;labels: {  
+&emsp;&emsp;&emsp;&emsp;document-level,  
+&emsp;&emsp;&emsp;&emsp;hierarchical attention
 &emsp;&emsp;}  
 }
 
