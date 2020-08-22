@@ -244,18 +244,19 @@ $$
 5. Seems that the paper with its code is an ideal starting-point.
 6. The mixture weight param of the copy aug arch is like the gating param, controlling how much info should be copied and how much be generated.
 7. The type-based nosing approach is similar to the one proposed by us.
-8. Requirements:
-  1. errant for bea2019 -> spacy 1.9.0 -> python3.6
-  2. Python 2.7
-  3. pytorch 1.4.0
-9. Warnings & Errors:
-  1. train.py  # Solution: pytorch <= 1.4.0
+8. Requirements:  
+(1) errant for bea2019 -> spacy 1.9.0 -> python3.6 & pip3.6  
+(2) Python 2.7  
+(3) pytorch 1.4.0  
+9. Warnings & Errors:  
+
+(1) train.py  # Solution: pytorch <= 1.4.0
   > /home/neko/GEC/helo_word-master/fairseq/fairseq/optim/adam.py:121: UserWarning: This overload of add_ is deprecated:  
 	add_(Number alpha, Tensor other)  
 Consider using one of the following signatures instead:  
-	add_(Tensor other, \*, Number alpha) (Triggered internally at  /pytorch/torch/csrc/utils/python_arg_parser.cpp:766.)
+	add_(Tensor other, \*, Number alpha) (Triggered internally at  /pytorch/torch/csrc/utils/python_arg_parser.cpp:766.)  
 
-  2. evaluate.py  # Solution: pytorch <= 1.4.0
+(2) evaluate.py  # Solution: pytorch <= 1.4.0
   > Traceback (most recent call last):                                                                       
   File "/home/neko/.virtualenvs/gec_exp_1/bin/fairseq-generate", line 33, in <module>  
     sys.exit(load_entry_point('fairseq', 'console_scripts', 'fairseq-generate')())  
@@ -274,7 +275,7 @@ Consider using one of the following signatures instead:
 RuntimeError: Integer division of tensors using div or / is no longer supported, and in a future release div will perform true division as in Python 3. Use true_divide or floor_divide (// in Python) instead.
 INFO:root:[Run-ckpt] 2. postprocess into /home/neko/GEC/helo_word-master/track1/outputs/pretrain-base-lr0.0005-dr0.3/checkpoint1.wi.dev.cor
 
-  3. evaluate.py  # Solution: spacy==1.9.0
+(3) evaluate.py  # Solution: spacy==1.9.0
   > Traceback (most recent call last):  
   File "/home/neko/GEC/helo_word-master/errant/parallel_to_m2.py", line 79, in <module>  
     main(args)  
@@ -361,9 +362,10 @@ where $c_{t^{\prime}}$ is the additional doc-level attention context. Compared t
 # Aug 19
 ## · Papers · | Additional Encoder & Transformer | Context-Aware Neural Machine Translation Learns Anaphora Resolution, Voita et al., 2018
 ### Contributions
-• we introduce a context-aware neural model, which is effective and has a sufficiently simple and interpretable interface between the context and the rest of the translation model;  
-• we analyze the flow of information from the context and identify pronoun translation as the key phenomenon captured by the model;  
-• by comparing to automatically predicted or human-annotated coreference relations, we observe that the model implicitly captures anaphora.  
+In: 1 Introduction
+>• we introduce a context-aware neural model, which is effective and has a sufficiently simple and interpretable interface between the context and the rest of the translation model;  
+>• we analyze the flow of information from the context and identify pronoun translation as the key phenomenon captured by the model;  
+>• by comparing to automatically predicted or human-annotated coreference relations, we observe that the model implicitly captures anaphora.  
 
 ### Methods
 **Context Source**  
@@ -371,10 +373,6 @@ The proposed model makes use of one previous sentence as context info.
 
 **Model the Context**  
 It models the context using a Transformer encoder with 6 layers, whose structure is identical to the original Transformer. Parameters of the first 5 layers of the context encoder are shared with the source sentence encoder.
-
-> Since major proportion of the context encoder’s parameters are shared with the source encoder, we add a special token (let us denote it \<bos\>) to the beginning of context sentences, but not source sentences, to let the shared layers know whether it is encoding a source or a context sentence.
-
-Note that \<eos\> presents in both the context sentence and the source sentence, while <bos> is only in the context sentence.
 
 **Integration**  
 The source sentence encoder consists of 6 layers, with the first 5 identical to the original Transformer. The output of the 5th source encoder layer is fed into a multi-head attention, which is the same as the previous 5 layers.
@@ -388,23 +386,33 @@ g_i = \sigma (W_g [c^{s-attn}_i, c^{c-attn}_i] + b_g)
 $$
 where $c^{s-attn}_i$ is the output of the source sentence multi-head attention and $c^{c-attn}_i$ the output of the context sentence multi-head attention, after add & norm, respectively.
 
-### Comparison With Other Methods
-1.
-> When compared to simply concatenating input sentences, as proposed by Tiedemann and Scherrer (2017), our architecture appears both more accurate (+0.6 BLEU) and also guarantees that the contextual information cannot bypass the attention layer and hence remain undetected in our analysis.
-
-2.
-> As we will see in Section 4, previous techniques developed for recurrent encoder-decoders do not appear effective for the Transformer.
-
-3.
+### Training
+**Shared encoder parameters**  
+In: 3 Context-aware model architecture
 > In contrast to related work (Jean et al., 2017; Wang et al., 2017), we found in preliminary experiments that using separate encoders does not yield an accurate model. Instead we share the parameters of the first N − 1 layers with the source encoder.
 
-4.
+**Distinguish between the context and the source sentence**  
+In: 3 Context-aware model architecture
+> Since major proportion of the context encoder’s parameters are shared with the source encoder, we add a special token (let us denote it \<bos\>) to the beginning of context sentences, but not source sentences, to let the shared layers know whether it is encoding a source or a context sentence.
+
+Note that \<eos\> presents in both the context sentence and the source sentence, while <bos> is only in the context sentence.
+
+### Comparison With Other Methods
+1. In: 1 Introduction
+> When compared to simply concatenating input sentences, as proposed by Tiedemann and Scherrer (2017), our architecture appears both more accurate (+0.6 BLEU) and also guarantees that the contextual information cannot bypass the attention layer and hence remain undetected in our analysis.
+
+2. In: 3 Context-aware model architecture
+> In contrast to related work (Jean et al., 2017; Wang et al., 2017), we found in preliminary experiments that using separate encoders does not yield an accurate model. Instead we share the parameters of the first N − 1 layers with the source encoder.
+
+Some other papers use additional encoder to model context, whose parameters are shared. Is it possible that using separate encoders yield inaccurate results is because of the structure of the proposed model?
+
+3. In 5.1: Overall performance
 > Tiedemann and Scherrer (2017) only used a special symbol to mark where the context sentence ends and the source sentence begins. This technique performed badly with the non recurrent Transformer architecture in preliminary experiments, resulting in a substantial degradation of performance (over 1 BLEU).
 
 ### Notes
 1. The model preforms well for pronouns in the machine translation task in the paper. In the machine translation task here the tense of sources and targets are not difficult to maintain consistent. But that may not the case for gec tasks. Thus the model may make use of context info to make corrections in gec training, not only be limited to pronouns.
 2. The proposed model integrates the context on the encoder side.
-3.
+3. In 5.1: Overall performance
 > We also notice that, unlike the previous sentence, the next sentence does not appear beneficial. This is a first indicator that discourse phenomena are the main reason for the observed improvement, rather than topic effects.
 
 4. The paper uses random context for experiments to show that the model is not merely better regularized by the context.
@@ -412,14 +420,133 @@ where $c^{s-attn}_i$ is the output of the source sentence multi-head attention a
 6. Encoding the context using a different encoder is still worth a try, despite the preliminary result of the paper.
 
 ### Future work
-1.
-> improving the attention component is likely to boost translation performance.
+1. In: 7 Conclusions
+> Improving the attention component is likely to boost translation performance.
 
 ### Questions
 - [ ] What if exchange the position of $g_i$ and $(1 - g_i)$ in the gating mechanism?
 - [ ] The is a <bos> needed for context sentence?
 - [ ] P2 L | R effective ...
+- [ ] P3 R | In: 3 Context-aware model architecture
+> Since major proportion of the context encoder’s parameters are shared with the source encoder, we add a special token (let us denote it \<bos\>) to the beginning of context sentences, but not source sentences, to let the shared layers know whether it is encoding a source or a context sentence.
+
+Why does the paper distinguish between the context and the source sentence?
+
 - [ ] P4 R | binary flag.
+
+
+### Source Code
+Not provided.
+
+---
+
+# Aug 20
+## · Papers · | Additional Encoder & Transformer | Improving the Transformer Translation Model with Document-Level Context, Zhang et al., 2018
+### Contributions
+In: 1 Introduction
+> 1. Increased capability to capture context: the use of multi-head attention, which significantly reduces the path length between long-range dependencies, helps to improve the capability to capture document-level context;
+> 2. Small computational overhead: as all newly introduced modules are based on highly parallelizable multi-head attention, there is no significant slowdown in both training and decoding;
+> 3. Better use of limited labeled data: our approach is capable of maintaining the superiority over the sentence-level counterpart even when only small-scale document-level parallel corpora are available.
+
+### Methods
+**Context Source**  
+The paper experiments with the length of previous sentences (1, 2, 3) and finds that the model preforms best when the length is 2. Thus they uses the previous 2 sentences as context. The 2 sentences are concatenated directly.
+
+**Model the Context**  
+The proposed method uses an additional Transformer encoder to model the context. The structure of the encoder layer is identical to the original Transformer. After experiments they find that a single encoder sub-layer is enough. Thus the sub-layer number of the additional encoder for modeling context is set to 1.
+
+**Integration**  
+The output of the last layer in the context encoder is used as context info. It's integrated into both the encoder and the decoder.
+
+The Transformer encoder for source sentences in the paper has one more multi-head attention sub-layer than the original Transformer encoder, which is for integrating the context info. The sub-layer is above the self-attention sub-layer and below the feed forward neural network sub-layer. Similar to the enc-dec attention in the Transformer decoder, Q of the context attention sub-layer is from the output of the self-attention below it, and K and V is the context info, i.e. the output of the last layer in the context encoder.
+
+Similar to the encoder mentioned above, the decoder also has one more sub-layer, which is also a multi-head attention sub-layer. It is above the self-attention sub-layer and below the enc-dec attention sub-layer. The source of Q, K, V is identical to those in the encoder, i.e., Q from the output of the self-attention sub-layer below, and K, V from the output of the context encoder.
+
+For filtering context info, the paper replaces the residual connections after the context attention in the encoder and the decoder with a gating mechanism, respectively.
+The original residual connection is
+$$
+Residual(H) = H + SubLayer(H)
+$$
+where H is the input of the sub-layer. Here it is the output (Q) of the self-attention sub-layer below. $SubLayer(·)$ here is actually the context attention.  
+The gating which replaces the residual connection in the context-attention sub-layer is as follows
+$$
+Gating(H) = \lambda H + (1 - \lambda) SubLayer(H)  \\
+\lambda = \sigma (W_i H + W_s SubLayer(H))
+$$
+
+### Training
+**Solving the problem of lack of enough document-level parallel data**  
+In: 2.4 Training
+> Unfortunately, large-scale document-level parallel corpora are usually unavailable, even for resource-rich languages such as English and Chinese. Under small-data training conditions, document level NMT is prone to underperform sentence-level NMT because of poor estimates of low-frequency events. To address this problem, we adopt the idea of freezing some parameters while tuning the re- maining part of the model (Jean et al., 2015; Zoph et al., 2016).
+
+> In the first step, sentence-level parameters $\theta_s$ are estimated on the combined sentence-level parallel corpus $D_s ∪ D_d$. Note that the newly introduced modules (high-lighted in red in Figure 1(b)) are inactivated in this step. $P(y|x; θ_s)$ is identical to the original Transformer model, which is a special case of our model.
+$$
+\hat{\theta_s} = \mathop{argmax}\limits_{\theta_s} \sum_{<x, y> \in D_s \cup D_d} log P(y | x; \theta_s)
+$$
+
+Note that the $x$ and $y$ here are sentences.
+
+> In the second step, document-level parameters $θ_d$ are estimated on the document-level parallel corpus $D_d$ only:
+$$
+\hat{\theta_d} = \mathop{argmax}\limits_{\theta_d} \sum_{<x, y> \in D_d} log P(Y | X; \hat{\theta_s}, \theta_d)
+$$
+
+Note that the $X$ and $Y$ here are documents.
+
+**When no preceding sentence**  
+In: 2.4 Training
+> If there is no preceding sentence, we simply use a single begin-of-sentence token.
+
+### Comparison With Other Methods
+1. In: 4 Related Work
+> Voita et al. (2018) also extended Transformer to model document-level context, but our work is different in modeling and training strategies. The experimental part is also different. While Voita et al. (2018) focus on anaphora resolution, our model is able to improve the overall translation quality by integrating document-level context.
+
+### Notes
+1. In: 1 Introduction
+> To the best of our knowledge, only one existing work has endeavored to model document-level context for the Transformer model
+
+The paper is after Voita et al., 2018 and it seems that Voita et al., 2018 is the first work to model context with Transformer.
+
+2. In: 2.2 Document-level Context Representation
+> As document-level context often includes several sentences, it is important to capture long-range dependencies and identify relevant information.
+
+Thus multi-head attention.
+
+3. The output in the proposed model has a \<bos\> at the beginning. (The original Transformer also does?)
+
+4. In 2.4: Training
+> Under small-data training conditions, document level NMT is prone to underperform sentence-level NMT because of poor estimates of low-frequency events. To address this problem, we adopt the idea of freezing some parameters while tuning the remaining part of the model (Jean et al., 2015; Zoph et al., 2016).
+
+> Our approach is also similar to pre-training which has been widely used in NMT (Shen et al. ,2016; Tu et al., 2018). The major difference is that our approach keeps θ̂ s fixed when estimating $θ_d$ to prevent the model from overfitting on the relatively smaller document-level parallel corpora.
+
+Applicable for gec?
+
+5. In 3.2: Effect of Context Length
+> This confirms the finding of Tu et al. (2018) that long-distance context only has limited influence.
+
+6. In 3.7: Effect of Two-Step Training
+> We find that document-level NMT achieves much worse results than sentence-level NMT (i.e., 36.52 vs. 39.53) when only small-scale document-level parallel corpora are available. Our two-step training method is capable of addressing this problem by exploiting sentence-level corpora.
+
+Corpora of gec is small. Will the performance of the gec model be worse using document-level data than using sentence-level data in the same size?
+
+### Ideas
+1. Generate document-level data for pretraining.
+
+### Questions
+- [ ] P1 R | In: 1 Introduction
+> Since large-scale document-level parallel corpora are usually hard to acquire, we propose to train sentence-level model parameters on sentence-level parallel corpora first and then estimate document-level model parameters on document-level parallel corpora while keeping the learned original sentence-
+level Transformer model parameters fixed.
+
+Why don't they treat the sentence-level corpora as document-level corpora with no preceding context and train the whole model in one shot?
+
+- [ ] P2 L | The translation error propagation problem.
+- [ ] P5 L | In 2.4: Training
+> Under small-data training conditions, document-level NMT is prone to underperform sentence-level NMT because of poor estimates of low-frequency events.
+
+- [ ] P6 L | Length penalty.
+
+### Source Code
+Provided.
 
 ---
 
@@ -501,6 +628,17 @@ where $c^{s-attn}_i$ is the output of the source sentence multi-head attention a
 &emsp;&emsp;task: mt,  
 &emsp;&emsp;model: transformer,  
 &emsp;&emsp;author: Voita et al.,  
+&emsp;&emsp;year: 2018,  
+&emsp;&emsp;conference: ACL,  
+&emsp;&emsp;labels: {  
+&emsp;&emsp;&emsp;&emsp;additional encoder  
+&emsp;&emsp;}  
+}
+
+- [x] Improving the Transformer Translation Model with Document-Level Context {  
+&emsp;&emsp;task: mt,  
+&emsp;&emsp;model: transformer,  
+&emsp;&emsp;author: Zhang et al.,  
 &emsp;&emsp;year: 2018,  
 &emsp;&emsp;conference: ACL,  
 &emsp;&emsp;labels: {  
