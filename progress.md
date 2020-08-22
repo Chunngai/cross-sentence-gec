@@ -672,7 +672,7 @@ Provided.
 &emsp;&emsp;}  
 }
 
-## for Understanding Doc-Level Training
+## Related
 - [x] Convolutional Sequence to Sequence Learning {  
 &emsp;&emsp;task: mt,  
 &emsp;&emsp;model: conv,  
@@ -683,6 +683,8 @@ Provided.
 &emsp;&emsp;}  
 }
 
+## Context
+### Early Papers
 - [x] Context Gates for Neural Machine Translation {  
 &emsp;&emsp;task: mt,  
 &emsp;&emsp;model: rnn,  
@@ -694,8 +696,6 @@ Provided.
 &emsp;&emsp;}  
 }
 
-## Context
-### Early Papers
 - [x] Exploiting Cross-Sentence Context for Neural Machine Translation {  
 &emsp;&emsp;task: mt,  
 &emsp;&emsp;model: rnn,  
