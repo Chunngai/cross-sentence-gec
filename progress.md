@@ -150,10 +150,13 @@ $$
 2. P3 R | Considers the previous 3 sentences rather than 1.  
 3. P5 L | Summarizes the context alone, more flexible.  
 4. P5 L | No attn when getting context info, thus less computational costs. -> is able to consider more previous sentences  
-5. Code provided.
+5. The paper uses a hierarchical way to summarize context info because RNN cannot due with long-term dependencies well?
 
 ### Questions
 - [ ] P1 R | Considering target side history: suffers from err prop. Why?
+
+### Code
+Provided.
 
 ## · Questions ·
 - [ ] Err prop exists in crosentgec?
@@ -647,6 +650,153 @@ Provided.
 
 ---
 
+# Aug 24
+
+## · Papers · | Additional Encoder & Transformer | Selective Attention for Context-aware Neural Machine Translation, Maruf et al., 2019
+### Contributions
+In: 1 Introduction
+> (i) we propose a novel and efficient top-down approach to hierarchical attention for context-aware NMT,  
+> (ii) we compare variants of selective attention with both context-agnostic and context-aware baselines, and  
+> (iii) we run experiments in both online (only past context) and offline (both past and future context) settings on three English-German datasets.  
+
+### Methods
+**Context Source**  
+The proposed model makes use of the whole document to be context.
+
+**Model the Context**  
+The proposed method uses a context layer to model the context, which can be seen as an additional encoder. The context layer is similar to the encoder layer of the Transformer, consisting of 2 sub-layers. The first sub-layer is a multi-head context attention, which contains a hierarchical context attention module or a flat attention module. The second sub-layer is a normal feed forward neural network. Each sub-layer is followed by a layer-norm, but without residual connections, for the reason quoted below.
+
+In: Footnote of 3.1 Document-level Context Layer
+> We do not have residual connections after sub-layers in our Document-level Context Layer as we found them to have a deteriorating effect on the translation scores (also reported by Zhang et al. (2018)).
+
+The paper uses 2 ways to implement the context attention, with a hierarchical context attention module or with a flat attention module.
+
+**(1) Hierarchical context attention**  
+The hierarchical context attention module is extended from the Transformer attention.  
+
+The first step is a sentence-level key matching. Basically the step here evaluates the relative importance of each sentence in the document.
+$$
+\alpha_s = sparsemax(Q_s K^T_s / \sqrt{d_k})
+$$
+where $\alpha_s$ is a sequence containing weights of all sentences in the document. $d_k$ is the dimension of the keys.  
+$sparsemax(·)$ is applied instead of $softmax(·)$ to make the selective attention that focus the attention on the relevant sentences, while ignoring the remaining.  
+$Q_s$ and $K_s$ here are sentence-level, and have different sources depending on the manner of integration (integrating into the encoder OR the decoder).  
+An additive mask is used before $sparsemax(·)$ to mask the current sentence or the current and future sentences, for offline (considering both the previous and the latter) setting and online setting (considering only the previous), respectively.
+
+Except the sentence-level matching there is also a word-level matching. It determines the relative importance of each word in a sentence $j$.
+$$
+\alpha^j_w = sparsemax(Q_w {K^j_w}^T / \sqrt{d_k})
+$$
+where $\alpha^j_w$ is a sequence consisting weights of all words in the sentence.
+$softmax(·)$ is used for comparison in the experiments of the paper.
+
+The third step is re-scaling attention weights. The step here considers both the importance of sentences and words.
+$$
+\alpha^j_{hier} = \alpha_s(j) \alpha^j_w
+$$
+where $\alpha_s(j)$ is the relative importance of the j-th sentence.
+$\alpha^j_{hier}$ is then concatenated
+$$
+\alpha_{hier} = Concat(\alpha^j_{hier})
+$$
+$\alpha_{hier}$ here can be interpreted as that the importance of a word in sentence $j$ and the importance of sentence $j$ in the whole document altogether contribute to the final importance of that word in the document. The length of $\alpha_{hier}$ is identical to the number of words in the document.  
+$Q_w and K_w$ here are word-level, and have different sources depending on the manner of integration (integrating into the encoder OR the decoder).
+
+Finally the value reading assigns the weights to each word.
+$$
+\alpha_{hier} V_w
+$$
+
+Multi-head is also used.
+$$
+\mbox{H-MULTIHEAD}(Q_s, K_s, Q_w, K_w, V_w) = Concat(head_1, ..., head_H) W_O  \\
+head_h = \mbox{H-MULTIHEAD}(Q_s W^{Q_s}_h, Q_w W^{Q_w}_h, K_s W^{K_s}_h, K_w W^{K_w}_h, V_w W^{V_w}_h)
+$$
+
+**(2) Flat attention**  
+It's basically the same as the scaled dot-product attention in the Transformer.
+$$
+Attention(Q, K, V) = softmax(Q K^T / \sqrt{d_k}) V
+$$
+$Q$ and $K$ here can either be sentence-level or word-level.
+
+**Integration**  
+The paper uses 2 integration methods: monolingual and bilingual, to integrate the context into the NMT model.  
+For the monolingual one, the output of the context layer is integrated with the output of the last layer in the encoder. For the bilingual one, the output of the context layer is integrated with the output of the last layer in the decoder. Both use a gating mechanism to filter context info.
+
+$$
+\gamma_i = \sigma (W_r r_i + W_d d_i)  \\
+\tilde{r_i} = \gamma_i \odot r_i + (1 - \gamma_i) \odot d_i
+$$
+where $r_i$ is the output of the last layer in the encoder (monolingual) or decoder (bilingual). $d_i$ is the output of the context layer. $\tilde{r_i}$ is the integrated output of the encoder or decoder.
+
+The source of $Q$, $K$ and $V$ depend on the integration method.  
+For the monolingual one, $Q$ is a linear transformation of the output of the last layer in the encoder. For the bilingual one, $Q$ is a linear transformation of the output of the enc-dec attention in the last layer of the decoder.  
+$K$ and $V$ are from a pre-trained sentence-level NMT model. For the monolingual one, $Q_w$ and $V_w$ are representations of all source words in the document which are from the last layer of the encoder. $Q_s$ and $V_s$ are representations of all sentences in the document, each of which are formed by averaging the word representations in that sentence. For the bilingual one, keys and values are from outputs of the enc-dec attention sub-layer and the self-attention sub-layer in the last layer of the decoder, respectively.
+
+### Training
+In: 2.2 Document-level Machine Translation
+> The first step involves pre-training a standard sentence-level NMT model, and the second step involves optimising the parameters of the whole model, i.e., both the document-level and the sentence-level parameters.
+
+### Decoding
+In: 2.2 Document-level Machine Translation
+> a two-pass Iterative Decoding strategy (Maruf and Haffari, 2018): first, the translation of each sentence is initialised using the sentence-based NMT model; then, each translation is updated using the context-aware NMT model fixing the other sentences’ translations.
+
+In: 4.1 Setup
+> For inference, we use Iterative Decoding only when using the bilingual context. All experiments are run on a single Nvidia P100 GPU with 16GBs of memory.
+
+### Comparison With Other Methods
+1. In: 1 Introduction
+> Only one existing work has endeavoured to consider the full document context (Maruf and Haffari, 2018), thus proposing a more generalised approach to document-level NMT. However, the model is re- strictive as the document-level attention computed is sentence-based and static (computed only once for the sentence being translated).
+
+2. In: 1 Introduction
+> A more recent work (Miculicich et al., 2018) proposes to use a hierarchical attention network (HAN) (Yang et al., 2016) to model the contextual information in a structured manner using word-level and sentencelevel abstractions; yet, it uses a limited number of past source and target sentences as context and is not scalable to entire document.
+
+3. In: 1 Introduction
+> In this work, we propose a selective attention approach to first selectively focus on relevant sentences in the global document-context and then attend to key words in those sentences, while ignoring the rest.
+
+It assumes that not each sentence in the document is equally important. A word is more related to the current querying word if it's more important in that context sentence, and that context sentence is more important in the whole document.
+
+4. In: Footnote of 3.3 Integrated Model
+> We do not integrate context into both encoder and decoder as it would have redundant information from the source (the context incorporated in the decoder is bilingual), in addition to increasing the complexity of the model.
+
+Zhang et al., 2018, however, consider that the context info in both sides is complementary.
+
+4. The sparse attention focuses on words that are really matter, while ignoring the rest, which is unlike the softmax.
+
+### Notes
+1. The paper makes use of the WHOLE document as context, not merely a few previous sentences.
+
+2. The word-level flat attention here is similar to the Transformer attention for modeling context info  in other papers, which takes the concatenation of a few sentences as input, except for that words in each sentence are considered here.
+
+3. The context layer proposed in the paper can be seen as an additional encoder with a single layer. However, the additional encoder here is capable of taking all sentences in the document into account.   
+Modeling the context info in a hierarchical way (sentence-level & word-level) and the sparsemax as the replacement of softmax may be the keys that enable the model to do that. The keys and values for the context-attention provided by a pre-trained sentence-level NMT model may also be a reason.
+
+4. In: 4.2 Main Results
+> This, in our opinion, does not mean that we should never look into the future, but just that NMT models in general are highly subjective to data, and whether context-aware models benefit from future context is also dependent on that.
+
+### Questions
+1. P2 R | In: 2.2 Document-level Machine Translation
+> The first step involves pre-training a standard sentence-level NMT model, and the second step involves optimising the parameters of the whole model, i.e., both the document-level and the sentence-level parameters.
+
+What's the purpose?
+
+2. P2 R | What's the purpose of two-pass iterative decoding?
+
+3. P3 L | In: Footnote of 3.1 Document-level Context Layer
+> We do not have residual connections after sub-layers in our Document-level Context Layer as we found them to have a deteriorating effect on the translation scores (also reported by Zhang et al. (2018)).
+
+It seems that the condition here is not the same as that in Zhang et al. The input and output of the context-attention sub-layer here are both context.
+
+### Source Code
+Provided.
+
+### TODO
+- [ ] Read: Maruf et al., 2018
+- [ ] Learn: Sparse Transformer
+
+---
+
 # Papers
 
 ## Main
@@ -755,6 +905,17 @@ Provided.
 &emsp;&emsp;}  
 }
 
+- [x] Selective Attention for Context-aware Neural Machine Translation {  
+&emsp;&emsp;task: mt,  
+&emsp;&emsp;model: transformer,  
+&emsp;&emsp;author: Maruf et al.,  
+&emsp;&emsp;year: 2019,  
+&emsp;&emsp;conference: NAACL,  
+&emsp;&emsp;labels: {  
+&emsp;&emsp;&emsp;&emsp;additional encoder
+&emsp;&emsp;}  
+}
+
 - [x] Toward Making the Most of Context in Neural Machine Translation {  
 &emsp;&emsp;task: mt,  
 &emsp;&emsp;model: transformer,  
@@ -762,7 +923,7 @@ Provided.
 &emsp;&emsp;year: 2020,  
 &emsp;&emsp;conference: IJCAI,  
 &emsp;&emsp;labels: {  
-&emsp;&emsp;&emsp;&emsp;document-level,  
+&emsp;&emsp;&emsp;&emsp;document-level
 &emsp;&emsp;}  
 }
 
