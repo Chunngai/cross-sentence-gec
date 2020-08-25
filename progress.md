@@ -746,23 +746,25 @@ In: 4.1 Setup
 > For inference, we use Iterative Decoding only when using the bilingual context. All experiments are run on a single Nvidia P100 GPU with 16GBs of memory.
 
 ### Comparison With Other Methods
-1. In: 1 Introduction
-> Only one existing work has endeavoured to consider the full document context (Maruf and Haffari, 2018), thus proposing a more generalised approach to document-level NMT. However, the model is re- strictive as the document-level attention computed is sentence-based and static (computed only once for the sentence being translated).
+1. The paper considers the whole document as context, which is different from other papers considering only a few previous sentences as context.
 
 2. In: 1 Introduction
-> A more recent work (Miculicich et al., 2018) proposes to use a hierarchical attention network (HAN) (Yang et al., 2016) to model the contextual information in a structured manner using word-level and sentencelevel abstractions; yet, it uses a limited number of past source and target sentences as context and is not scalable to entire document.
+> Only one existing work has endeavoured to consider the full document context (Maruf and Haffari, 2018), thus proposing a more generalised approach to document-level NMT. However, the model is re- strictive as the document-level attention computed is sentence-based and static (computed only once for the sentence being translated).
 
 3. In: 1 Introduction
+> A more recent work (Miculicich et al., 2018) proposes to use a hierarchical attention network (HAN) (Yang et al., 2016) to model the contextual information in a structured manner using word-level and sentencelevel abstractions; yet, it uses a limited number of past source and target sentences as context and is not scalable to entire document.
+
+4. In: 1 Introduction
 > In this work, we propose a selective attention approach to first selectively focus on relevant sentences in the global document-context and then attend to key words in those sentences, while ignoring the rest.
 
 It assumes that not each sentence in the document is equally important. A word is more related to the current querying word if it's more important in that context sentence, and that context sentence is more important in the whole document.
 
-4. In: Footnote of 3.3 Integrated Model
+5. In: Footnote of 3.3 Integrated Model
 > We do not integrate context into both encoder and decoder as it would have redundant information from the source (the context incorporated in the decoder is bilingual), in addition to increasing the complexity of the model.
 
 Zhang et al., 2018, however, consider that the context info in both sides is complementary.
 
-4. The sparse attention focuses on words that are really matter, while ignoring the rest, which is unlike the softmax.
+6. The sparse attention focuses on words that are really matter, while ignoring the rest, which is unlike the softmax.
 
 ### Notes
 1. The paper makes use of the WHOLE document as context, not merely a few previous sentences.
@@ -794,6 +796,111 @@ Provided.
 ### TODO
 - [ ] Read: Maruf et al., 2018
 - [ ] Learn: Sparse Transformer
+
+---
+
+# Aug 25
+## · Papers · | Additional Encoder & Transformer | Hierarchical Modeling of Global Context for Document-Level Neural Machine Translation, Tan et al., 2019
+### Contributions
+In: 1 Introduction
+> we propose to improve document-level translation with the aid of global context, which is hierarchically extracted from the entire document with a sentence encoder modeling intra-sentence dependencies and a document encoder modeling document-level inter-sentence context.
+> we propose a novel method to feed back the extracted global document context to each word in a top to-down manner to clarify the translation of words in specific surrounding contexts.
+> We conduct experiments on both the traditional RNNSearch model and the state-of-the-art Transformer model.
+
+### Methods
+**Context Source**  
+The paper considers the whole document as context.
+
+**Model the Context**  
+In the sentence-level, each sentence $S_i$ is encoded using a sentence encoder (Transformer encoder for Transformer) into a sentence representation $H_i$.
+$$
+H_i = SentEnc(S_i)
+$$
+In the document-level, each sentence representation $H_i$ is first fed into a multi-head self-attention. Then the output of the self-attention is summed up on the axis of the sentence length. The summed vector is then encoded by a document encoder (Transformer encoder for Transformer, which shares the same parameters with the sentence encoder as Voita et al., 2018) into $H_i$.
+$$
+h_{S_i} = \mbox{MultiHead-Self}(H_i, H_i, H_i)  \\
+\tilde{h_{S_i}} = \sum_{h \in h_{S_i}} h  \\
+H_S = DocEnc(\tilde{h_S})
+$$
+
+The global context is then back propagated to equip each word with global document context. This is done by one more multi-head attention.
+$$
+\alpha_{i, j} = \mbox{MultiHead-Ctx}(h_{i, j}, h_{i, j}, H_{S_i})  \\
+d_{ctx_{i, j}} = \alpha_{i, j} H_{S_i}
+$$
+where $h_{i, j}$ is the representation of the j-th word in the i-th sentence. $d_{ctx_{i, j}}$ is the corresponding context info distributed in the word.  
+Basically the step here means how much context info contained in $H_{S_i}$ should be assigned to the word $h_{i, j}$. It may be similar to the gating in other papers.
+
+**Integration**  
+In the encoding phase, the context info is integrated via a residual connections.
+$$
+h_{ctx_{i, j}} = h_{i ,j} + \mbox{ResidualDrop}(d_{ctx_{i, j}}, P)
+$$
+where $h_{ctx_{i, j}}$ is the integrated representation of the word. $\mbox{ResidualDrop}(·)$ is the residual connection function and $P$ is the rate of residual dropout.  
+The step here may be in the last layer of the sentence encoder?
+
+In the decoding phase, the context info is integrated via an additional multi-head attention.
+$$
+C = [d_{ctx_1}; d_{ctx_2}; ...; d_{ctx_N}]  \\
+G^{(n)} = \mbox{MultiHead-Attn}(T^{(n)}, C^{(n)}, C^{(n)})
+$$
+where $T^{(n)}$ is the output of the self-attention sub-layer in the decoder.  
+**Note that the $d_{ctx_i}$ of $C$ is $h_{ctx_1}$ in the paper. But it should be $d_{ctx_1}$ according to the description in "2.2 Integrating the HM-GDC model into NMT" of the paper:**
+> we introduce an additional sub-layer into the decoder that performs multi-head attention over the output of the document encoder, which we refer to as DocEnc-Decoder attention (shown in Figure 3). Different from (Vaswani et al., 2017), the keys and values of our DocEnc-Decoder attention come from the output of the document encoder.
+
+$G^{(n)}$ is then added with $E^{(n)}$ which is the output of the enc-dec attention sub-layer to form the final output of the decoder layer.
+$$
+H^{(n)} = E^{(n)} + G^{(n)}
+$$
+
+### Training
+**Shared parameters**  
+For the transformer model, The parameters of the multi-head self-attention in the sentence-level encoder and the document-level encoder are shared, following Voita et al., 2018.
+
+**Two-step training**  
+A two step training strategy is used.  
+First the sentence-level parameters are trained with the union of sentence-level and document-level data.
+$$
+\hat{\theta_s} = \mathop{arg max}\limits_{\theta_s} \sum_{<x, y> \in D_s} log P(y | x; \theta_s)
+$$
+Then the document-level parameters are trained and the sentence-level parameters are fine-tuned with the document-level data.
+$$
+\hat{\theta_d} = \mathop{arg max}\limits_{\theta_d} \sum_{<x, y> \in D_d} log P(y | x; \theta_d, \hat{\theta_s})
+$$
+
+### Comparison With Other Methods
+1. Many NMT models considering context suffer from incomplete document context.
+
+### Notes
+1. In: Abstract
+> With this hierarchical architecture, we feedback the extracted global document context to each word in a top-down fashion to distinguish different translations of a word according to its specific surrounding context.
+
+2. In: 1 Introduction
+> However, when there exists a huge gap between the pre-context and the context after the current sentence $s i$ , the guidance from pre-context is not sufficient for the NMT model to fully disambiguate the sentence $s i$. On the one hand, the translation of the current sentence $s i$ may be inaccurate due to the one-sidedness of partial context. On the other hand, translating the succeeding sentences in the document may much suffer from the semantic bias due to the transmissibility of the improper pre-context.
+
+3. In: 1 Introduction
+> To avoid the issue of translation bias propagation caused by improper pre-context, we propose to extract global context from all sentences of a document once for all.
+
+4. The two-step training is similar to the pretrain-train(-finetune) training method in gec.
+
+5. In: 3.2 Experimental Results
+> using a large-scale corpus with out-of-domain parallel pairs $D_s$ to pre-train the Transformer model results in worse performance due to domain inadaptability (the first and the fourth row in the second group). By contrast, our proposed model can effectively eliminate this domain inadaptability (the third and sixth row in the second group).
+
+### Questions
+- [ ] P3 L | The multi-head self-attention for $H_i$ should be the feature extraction in the sentence-level instead of the document-level? Why does the paper say that it determines the relative importance of different $H_i$?
+
+- [ ] P1 R | In: 1 Introduction
+> On the other hand, translating the succeeding sentences in the document may much suffer from the semantic bias due to the transmissibility of the improper pre-context.
+
+What does it mean?
+
+- [ ] P2 L | In: Introduction
+> thus effectively avoiding the transmissibility of improper pre-context.
+
+Why?
+
+### Source Code
+Not provided.
 
 ---
 
@@ -911,6 +1018,17 @@ Provided.
 &emsp;&emsp;author: Maruf et al.,  
 &emsp;&emsp;year: 2019,  
 &emsp;&emsp;conference: NAACL,  
+&emsp;&emsp;labels: {  
+&emsp;&emsp;&emsp;&emsp;additional encoder
+&emsp;&emsp;}  
+}
+
+- [x] Hierarchical Modeling of Global Context for Document-Level Neural Machine Translation {  
+&emsp;&emsp;task: mt,  
+&emsp;&emsp;model: transformer,  
+&emsp;&emsp;author: Tan et al.,  
+&emsp;&emsp;year: 2019,  
+&emsp;&emsp;conference: IJCNLP,  
 &emsp;&emsp;labels: {  
 &emsp;&emsp;&emsp;&emsp;additional encoder
 &emsp;&emsp;}  
