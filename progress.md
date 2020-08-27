@@ -904,6 +904,153 @@ Not provided.
 
 ---
 
+# Aug26
+## Document-level context -> GEC
+1. Find all available document-level gec datasets.  
+
+(1) bea2019-fce: train
+
+  fce.{train | dev | test}.json
+
+  helo_word-master_restricted/data/bea19/fce/m2/fce.dev.gold.bea19.m2
+  helo_word-master_restricted/data/bea19/fce/m2/fce.test.gold.bea19.m2
+  helo_word-master_restricted/data/bea19/fce/m2/fce.train.gold.bea19.m2
+
+(2) bea2019-wi+locness: train & finetune & dev & test
+
+  {A.{train | dev} | B.{train | dev} | C.{train | dev} | N.dev}.json  
+
+  train:
+  helo_word-master_restricted/data/bea19/wi+locness/m2/A.train.gold.bea19.m2
+  helo_word-master_restricted/data/bea19/wi+locness/m2/ABC.train.gold.bea19.m2
+  helo_word-master_restricted/data/bea19/wi+locness/m2/B.train.gold.bea19.m2
+  helo_word-master_restricted/data/bea19/wi+locness/m2/C.train.gold.bea19.m2
+
+  dev:
+  helo_word-master_restricted/data/bea19/wi+locness/m2/ABCN.dev.gold.bea19.m2
+
+
+
+(3) nucle: train & finetune
+
+  nucle3.2.sgml  
+
+  helo_word-master_restricted/data/bea19/nucle3.3/bea2019/nucle.train.gold.bea19.m2
+
+(4) conll2013: dev
+
+  {original | revised}/data/official.sgml  
+
+  helo_word-master_restricted/data/conll2013/release2.3.1/revised/data/official-preprocessed.m2
+
+(5) conll2014: test
+
+  noalt/official-2014.{0 | 1}.sgml  
+  alt/alternative-team{a | b | c}.sgml
+
+  helo_word-master_restricted/data/conll2014/conll14st-test-data/noalt/official-2014.combined.m2
+
+
+
+(6) lang8-multi: train
+
+  crosentgec/data/tmp/lang-8-20111007-L1-v2.xml
+
+```
+[
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/fce/m2/fce.dev.gold.bea19.m2',
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/fce/m2/fce.test.gold.bea19.m2',
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/fce/m2/fce.train.gold.bea19.m2'
+]
+
+[
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/lang8.bea19/lang8.train.auto.bea19.m2'
+]
+
+[
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/nucle3.3/bea2019/nucle.train.gold.bea19.m2'
+]
+
+[
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/wi+locness/m2/A.train.gold.bea19.m2',
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/wi+locness/m2/ABC.train.gold.bea19.m2',
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/wi+locness/m2/B.train.gold.bea19.m2',
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/wi+locness/m2/C.train.gold.bea19.m2'
+]
+
+[
+    '/home/neko/GEC/helo_word-master_restricted/data/bea19/wi+locness/m2/ABCN.dev.gold.bea19.m2'
+]
+
+[
+    '/home/neko/GEC/helo_word-master_restricted/data/conll2013/release2.3.1/revised/data/official-preprocessed.m2'
+]
+
+[
+    '/home/neko/GEC/helo_word-master_restricted/data/conll2014/conll14st-test-data/noalt/official-2014.combined.m2'
+]
+```
+
+2. Retrieve src, trg, ctx from document-level gec datasets.
+```
+IN: ori_filename, doc_filename, n_prev, n_fol
+OUT: ctx_filename
+
+def get_documents(indices):
+    sentences = oris[indices]
+
+    doc_indices = []
+    for i in len(docs):
+        doc = docs[i]
+        if doc.contains(sentences):  # Uses `ori_sentence` to get the document.
+            doc_indices.append(i)
+
+    return doc_indices
+
+def get_document(ori_sentence_index):
+    for j in 1...10:
+        doc_indices = get_documents(i, i+j)
+        if len(doc_indices) == 1:
+            doc_index = doc_indices[0]
+            return docs[doc_index]
+
+        doc_indices = get_documents(i-j+1, i+1)
+        if len(doc_indices) == 1:
+            doc_index = doc_indices[0]
+            return docs[doc_index]
+
+
+
+
+oris = open(ori_filename, "r").readlines()  # An array consisting all sentences.
+docs = open(doc_filename, "r").readlines()  # A formatted raw file containing documents.
+f_ctx = open(ctx_filename, "w")
+
+# Gets all documents.
+documents = get_documents(doc)  # Depends on the format of `doc_filename` (json / sgml / xml).
+
+# Extracts contexts.
+for i in 0..<oris.len:
+    ori_sentence = oris[i]
+
+    # Gets the document consisting `ori_sentence`
+    doc = get_document(i)
+
+    # Gets the position of `ori_sentence`.
+    index = doc.index_of(ori_sentence)
+
+    # Gets the context.
+    context = doc[index - n_prev : index + n_fol + 1]
+    context -= ori_sentence
+
+    # Writes to file.
+    f_ctx.write(context)
+```
+ori: [FILE_NAME].ori
+doc: [FILE_NAME].[{json | sgml | xml}]
+
+---
+
 # Papers
 
 ## Main
