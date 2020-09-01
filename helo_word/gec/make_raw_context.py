@@ -384,7 +384,7 @@ def make_context(raw_ori_file_path: str, document_file_paths: List[str], m2_file
 
     # Writes documents.
     if save_documents:
-        document_path = f"{splitext(raw_ori_file_path)[0]}.doc"
+        document_path = f"{splitext(raw_ori_file_path)[0]}.doc_"
         with open(f"{document_path}", 'w') as f:
             for i in range(len(documents)):
                 f.write(f"{i}\t")
@@ -400,9 +400,9 @@ def make_context(raw_ori_file_path: str, document_file_paths: List[str], m2_file
     current_document_masked: List[str] = current_document[:]
     previous_raw_ori_sentence = None
     previous_raw_ori_sentence_document_level_index = None
-    with open(raw_ctx_file_path, "w") as context_file:
+    with open(raw_ctx_file_path, "w") as raw_ctx_file:
         for raw_ori_sentence in raw_ori_sentences:
-            raw_ori_sentence = raw_ori_sentence.strip("\n")
+            raw_ori_sentence = raw_ori_sentence.strip()
 
             # There are some sentences that are the same in lang8.ori,
             # which share document level index & context.
@@ -444,8 +444,8 @@ def make_context(raw_ori_file_path: str, document_file_paths: List[str], m2_file
                                   following_sentences_number=following_sentences_number)
 
             # Writes the context to file.
-            context_file.write(context)
-            context_file.write("\n")
+            raw_ctx_file.write(context)
+            raw_ctx_file.write("\n")
 
 
 if __name__ == '__main__':
