@@ -23,7 +23,7 @@ class Path:
 
     # scorer
     errant = f"{root}/errant/compare_m2.py"
-    m2scorer = f"{root}/data/conll2013/release2.3.1/m2scorer/m2scorer"  # (MODIFIED)
+    m2scorer = f"{root}/m2scorer/scripts/m2scorer.py"  # (MODIFIED)
 
 
 class FilePath(object):
