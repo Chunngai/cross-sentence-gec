@@ -7,6 +7,25 @@ from gec import util
 logging.getLogger().setLevel(logging.INFO)
 
 
+def main(args):
+    # (NOTE)
+    # 1: Restricted
+    # 3: Low resource
+    # 0: CONLL
+    track = choice_track(args.track)
+
+    print_log("------ ------ ------")
+    print_log(f"[Prepare] 1. prepare for the text data of track {track.TRACK_NUM}")  # (MODIFIED)
+    prepare_text(track)
+
+    print_log("------ ------ ------")
+    print_log(f"[Prepare] 2. create binary data")
+    for train_mode in track.train_modes:
+        databin_path = track.get_databin_path(train_mode)
+        trainpref, validpref = track.get_pref(train_mode)
+        prepare_binary(databin_path, trainpref, validpref, track.fp.BPE_VOCAB)
+
+
 # (NEW)
 def print_log(log_info):
     """
@@ -14,22 +33,6 @@ def print_log(log_info):
     """
     print()
     logging.info(log_info)
-
-
-def main(args):
-    # (NOTE) 0: CONLL.
-    # (NOTE) 1: Restricted.
-    # (NOTE) 3: Low resource.
-    track = choice_track(args.track)
-
-    print_log(f"[Prepare] 1. prepare for the text data of track {track.TRACK_NUM}")  # (MODIFIED)
-    prepare_text(track)
-
-    print_log(f"[Prepare] 2. create binary data")
-    for train_mode in track.train_modes:
-        databin_path = track.get_databin_path(train_mode)
-        trainpref, validpref = track.get_pref(train_mode)
-        prepare_binary(databin_path, trainpref, validpref, track.fp.BPE_VOCAB)
 
 
 def prepare_text(track):
@@ -43,14 +46,17 @@ def prepare_text(track):
         print_log("[Prepare] 1-2. train")
         util.maybe_prompt(fp.TRAIN_ORI0, f"cat {fp.FCE_TOK_ORI} {fp.LANG8_TOK_ORI} {fp.NUCLE_TOK_ORI} > {fp.TRAIN_ORI0}")
         util.maybe_prompt(fp.TRAIN_COR0, f"cat {fp.FCE_TOK_COR} {fp.LANG8_TOK_COR} {fp.NUCLE_TOK_COR} > {fp.TRAIN_COR0}")
+        util.maybe_prompt(fp.TRAIN_CTX0, f"cat {fp.FCE_TOK_CTX} {fp.LANG8_TOK_CTX} {fp.NUCLE_TOK_CTX} > {fp.TRAIN_CTX0}")  # [CONTEXT]
 
         print_log("[Prepare] 1-3. finetune")
         util.maybe_prompt(fp.FINETUNE_ORI0, f"cp {fp.NUCLE_TOK_ORI} {fp.FINETUNE_ORI0}")
         util.maybe_prompt(fp.FINETUNE_COR0, f"cp {fp.NUCLE_TOK_COR} {fp.FINETUNE_COR0}")
+        util.maybe_prompt(fp.FINETUNE_CTX0, f"cp {fp.NUCLE_TOK_CTX} {fp.FINETUNE_CTX0}")  # [CONTEXT]
 
         print_log("[Prepare] 1-4. valid")
         util.maybe_prompt(fp.VALID_ORI0, f"cp {fp.CONLL2013_TOK_ORI} {fp.VALID_ORI0}")
         util.maybe_prompt(fp.VALID_COR0, f"cp {fp.CONLL2013_TOK_COR} {fp.VALID_COR0}")
+        util.maybe_prompt(fp.VALID_CTX0, f"cp {fp.CONLL2013_TOK_CTX} {fp.VALID_CTX0}")  # [CONTEXT]
 
     elif track.TRACK_NUM == 1:  # Restricted.
         print_log("[Prepare] 1-1. pretrain")

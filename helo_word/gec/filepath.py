@@ -219,10 +219,13 @@ class FilePath(object):
         self.DAE_COR0 = f"{self.root}/track0/parallel/dae.cor"
         self.TRAIN_ORI0 = f"{self.root}/track0/parallel/train.ori"
         self.TRAIN_COR0 = f"{self.root}/track0/parallel/train.cor"
+        self.TRAIN_CTX0 = f"{self.root}/track0/parallel/train.ctx"  # [CONTEXT]
         self.FINETUNE_ORI0 = f"{self.root}/track0/parallel/finetune.ori"
         self.FINETUNE_COR0 = f"{self.root}/track0/parallel/finetune.cor"
+        self.FINETUNE_CTX0 = f"{self.root}/track0/parallel/finetune.ctx"  # [CONTEXT]
         self.VALID_ORI0 = f"{self.root}/track0/parallel/valid.ori"
         self.VALID_COR0 = f"{self.root}/track0/parallel/valid.cor"
+        self.VALID_CTX0 = f"{self.root}/track0/parallel/valid.ctx"  # [CONTEXT]
         self.TEST_ORI0 = f"{self.root}/track0/parallel/test.ori"
         self.TEST_COR0 = f"{self.root}/track0/parallel/test.cor"
         self.TEST_ORI_JFLEG0 = f"{self.root}/track0/parallel/test_jfleg.ori"
