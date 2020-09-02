@@ -2,7 +2,8 @@ import logging
 import os
 from glob import glob
 import argparse
-from gec import filepath, word_tokenize, bpe, perturb, m2, spell
+from gec import filepath, word_tokenize, bpe, perturb, m2, spell, \
+    make_sp_context  # [CONTEXT]
 
 logging.basicConfig(level=logging.INFO)
 
@@ -152,7 +153,11 @@ if __name__ == "__main__":
 
         [
             f"tar -C {fp.bea19}/lang8.bea19 -xvzf lang8.bea19.tar.gz",
-            f"rm lang8.bea19.tar.gz"
+            f"rm lang8.bea19.tar.gz",
+
+            # [CONTEXT]
+            f"unzip lang-8-en-1.0.zip -d {fp.bea19}/lang8.bea19",
+            f"rm lang-8-en-1.0.zip"
         ]
     )
 
@@ -312,7 +317,7 @@ if __name__ == "__main__":
     # logging.info("STEP 5-6. wi test")
     # if os.path.exists(WI_TEST_ORI): logging.info(f"skip this step as {WI_TEST_ORI} already exists.")
     # else: m2.m2_to_parallel(glob(f'{wi_m2}/*test*m2'), WI_TEST_ORI, WI_TEST_COR, False, True)
-
+    """
     print_log("STEP 5-7. wi dev 3k. For track 3 only.")
     maybe_do(fp.WI_DEV_3K_ORI, m2.m2_to_parallel,
              (sorted(glob(f'{fp.wi_m2}/ABCN.dev.gold.bea19.3k.m2')), fp.WI_DEV_3K_ORI, fp.WI_DEV_3K_COR, False, False))
@@ -320,7 +325,7 @@ if __name__ == "__main__":
     print_log("STEP 5-8. wi dev 1k. For track 3 only.")
     maybe_do(fp.WI_DEV_1K_ORI, m2.m2_to_parallel,
              (sorted(glob(f'{fp.wi_m2}/ABCN.dev.gold.bea19.1k.m2')), fp.WI_DEV_1K_ORI, fp.WI_DEV_1K_COR, False, False))
-
+    """
     print_log("STEP 5-9. conll2013. For track 0 only.")
     maybe_do(fp.CONLL2013_ORI, m2.m2_to_parallel,
              (sorted(glob(f'{fp.conll2013_m2}/official-preprocessed.m2')), fp.CONLL2013_ORI, fp.CONLL2013_COR, False, False))
@@ -347,7 +352,7 @@ if __name__ == "__main__":
 
     print_log("STEP 6-5. wi dev")
     maybe_do(fp.WI_DEV_SP_ORI, spell.check, (fp.WI_DEV_ORI, fp.WI_DEV_SP_ORI))
-
+    """
     print_log("STEP 6-6. wi test")
     maybe_do(fp.WI_TEST_SP_ORI, spell.check, (fp.WI_TEST_ORI, fp.WI_TEST_SP_ORI))
 
@@ -356,12 +361,52 @@ if __name__ == "__main__":
 
     print_log("STEP 6-8. wi dev 1k")
     maybe_do(fp.WI_DEV_1K_SP_ORI, spell.check, (fp.WI_DEV_1K_ORI, fp.WI_DEV_1K_SP_ORI))
-
+    """
     print_log("STEP 6-9. conll 2013")
     maybe_do(fp.CONLL2013_SP_ORI, spell.check, (fp.CONLL2013_ORI, fp.CONLL2013_SP_ORI))
 
     print_log("STEP 6-10. conll 2014")
     maybe_do(fp.CONLL2014_SP_ORI, spell.check, (fp.CONLL2014_ORI, fp.CONLL2014_SP_ORI))
+
+    # [CONTEXT]
+    print_log("STEP 6.5 make context")
+
+    print_log("STEP 6.5-1. fce")
+    maybe_do(fp.FCE_SP_CTX, make_sp_context.make_context, (fp.FCE_ORI, fp.FCE_SP_ORI,
+                                                           fp.fce_docs, sorted(glob(f'{fp.fce_m2}/*m2')), 3, 3))
+
+    print_log("STEP 6.5-2. lang8")
+    maybe_do(fp.LANG8_SP_CTX, make_sp_context.make_context, (fp.LANG8_ORI, fp.LANG8_SP_ORI,
+                                                             fp.lang8_docs, None, 3, 3))
+
+    print_log("STEP 6.5-3. nucle")
+    maybe_do(fp.NUCLE_SP_CTX, make_sp_context.make_context, (fp.NUCLE_ORI, fp.NUCLE_SP_ORI,
+                                                             fp.nucle_docs, sorted(glob(f'{fp.nucle_m2}/*m2')), 3, 3))
+
+    print_log("STEP 6.5-4. wi train")
+    maybe_do(fp.WI_TRAIN_SP_CTX, make_sp_context.make_context, (fp.WI_TRAIN_ORI, fp.WI_TRAIN_SP_ORI,
+                                                                fp.wi_train_docs, sorted(glob(f'{fp.wi_m2}/*train*m2')), 3, 3))
+
+    print_log("STEP 6.5-5. wi dev")
+    maybe_do(fp.WI_DEV_SP_CTX, make_sp_context.make_context, (fp.WI_DEV_ORI, fp.WI_DEV_SP_ORI,
+                                                              fp.wi_dev_docs, sorted(glob(f'{fp.wi_m2}/ABCN.dev.gold.bea19.m2')), 3, 3))
+    """
+    print_log("STEP 6.5-6. wi test")
+    maybe_do(fp.WI_TEST_SP_CTX, make_sp_context.make_context, (fp.WI_TEST_ORI, fp.WI_TEST_SP_ORI))
+
+    print_log("STEP 6.5-7. wi dev 3k")
+    maybe_do(fp.WI_DEV_3K_SP_CTX, make_sp_context.make_context, (fp.WI_DEV_3K_ORI, fp.WI_DEV_3K_SP_ORI))
+
+    print_log("STEP 6.5-8. wi dev 1k")
+    maybe_do(fp.WI_DEV_1K_SP_CTX, make_sp_context.make_context, (fp.WI_DEV_1K_ORI, fp.WI_DEV_1K_SP_ORI))
+    """
+    print_log("STEP 6.5-9. conll 2013")
+    maybe_do(fp.CONLL2013_SP_CTX, make_sp_context.make_context, (fp.CONLL2013_ORI, fp.CONLL2013_SP_ORI,
+                                                                 fp.conll2013_docs, sorted(glob(f'{fp.conll2013_m2}/official-preprocessed.m2')), 3, 3))
+
+    print_log("STEP 6.5-10. conll 2014")
+    maybe_do(fp.CONLL2014_SP_CTX, make_sp_context.make_context, (fp.CONLL2014_ORI, fp.CONLL2014_SP_ORI,
+                                                                 fp.conll2014_docs, sorted(glob(f'{fp.conll2014_m2}/official-2014.combined.m2')), 3, 3))
 
     """ STEP III: BPE """
     print_log("STEP 7. bpe-tokenize")
@@ -369,23 +414,29 @@ if __name__ == "__main__":
     print_log("STEP 7-1. fce")
     maybe_do(fp.FCE_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.FCE_SP_ORI, fp.FCE_TOK_ORI))
     maybe_do(fp.FCE_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.FCE_COR, fp.FCE_TOK_COR))
+    maybe_do(fp.FCE_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.FCE_SP_CTX, fp.FCE_TOK_CTX))  # [CONTEXT]
 
     print_log("STEP 7-2. lang8")
     maybe_do(fp.LANG8_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.LANG8_SP_ORI, fp.LANG8_TOK_ORI))
     maybe_do(fp.LANG8_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.LANG8_COR, fp.LANG8_TOK_COR))
+    maybe_do(fp.LANG8_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.LANG8_SP_CTX, fp.LANG8_TOK_CTX))  # [CONTEXT]
 
     print_log("STEP 7-3. nucle")
     maybe_do(fp.NUCLE_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.NUCLE_SP_ORI, fp.NUCLE_TOK_ORI))
     maybe_do(fp.NUCLE_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.NUCLE_COR, fp.NUCLE_TOK_COR))
+    maybe_do(fp.NUCLE_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.NUCLE_SP_CTX, fp.NUCLE_TOK_CTX))  # [CONTEXT]
 
     print_log("STEP 7-4. wi train")
     maybe_do(fp.WI_TRAIN_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_TRAIN_SP_ORI, fp.WI_TRAIN_TOK_ORI))
     maybe_do(fp.WI_TRAIN_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_TRAIN_COR, fp.WI_TRAIN_TOK_COR))
+    maybe_do(fp.WI_TRAIN_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_TRAIN_SP_CTX, fp.WI_TRAIN_TOK_CTX))  # [CONTEXT]
 
     print_log("STEP 7-5. wi dev")
     maybe_do(fp.WI_DEV_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_SP_ORI, fp.WI_DEV_TOK_ORI))
     maybe_do(fp.WI_DEV_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_COR, fp.WI_DEV_TOK_COR))
+    maybe_do(fp.WI_DEV_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_SP_CTX, fp.WI_DEV_TOK_CTX))  # [CONTEXT]
 
+    """
     print_log("STEP 7-6. wi test")
     maybe_do(fp.WI_TEST_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_TEST_SP_ORI, fp.WI_TEST_TOK_ORI))
     # maybe_do(fp.WI_TEST_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_TEST_COR, fp.WI_TEST_TOK_COR))
@@ -393,17 +444,22 @@ if __name__ == "__main__":
     print_log("STEP 7-7. wi dev 3k")
     maybe_do(fp.WI_DEV_3K_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_3K_SP_ORI, fp.WI_DEV_3K_TOK_ORI))
     maybe_do(fp.WI_DEV_3K_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_3K_COR, fp.WI_DEV_3K_TOK_COR))
+    maybe_do(fp.WI_DEV_3K_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_3K_SP_CTX, fp.WI_DEV_3K_TOK_CTX))
 
     print_log("STEP 7-8. wi dev 1k")
     maybe_do(fp.WI_DEV_1K_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_1K_SP_ORI, fp.WI_DEV_1K_TOK_ORI))
     maybe_do(fp.WI_DEV_1K_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_1K_COR, fp.WI_DEV_1K_TOK_COR))
+    maybe_do(fp.WI_DEV_1K_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.WI_DEV_1K_SP_CTX, fp.WI_DEV_1K_TOK_CTX))
+    """
 
     print_log("STEP 7-9. conll2013")
     maybe_do(fp.CONLL2013_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2013_SP_ORI, fp.CONLL2013_TOK_ORI))
     maybe_do(fp.CONLL2013_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2013_COR, fp.CONLL2013_TOK_COR))
+    maybe_do(fp.CONLL2013_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2013_SP_CTX, fp.CONLL2013_TOK_CTX))  # [CONTEXT]
 
     print_log("STEP 7-10. conll2014")
     maybe_do(fp.CONLL2014_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2014_SP_ORI, fp.CONLL2014_TOK_ORI))
     maybe_do(fp.CONLL2014_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2014_COR, fp.CONLL2014_TOK_COR))
+    maybe_do(fp.CONLL2014_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2014_SP_CTX, fp.CONLL2014_TOK_CTX))  # [CONTEXT]
 
 

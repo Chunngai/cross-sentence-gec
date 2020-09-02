@@ -469,13 +469,13 @@ def make_context(raw_ori_file_path: str, sp_ori_file_path: str,
                                                raw_ori_file_path=raw_ori_file_path, sp_ori_file_path=sp_ori_file_path)
 
     # Saves documents.
-    if save_documents:
-        document_path = f"{splitext(sp_ori_file_path)[0]}.doc_"
-        with open(f"{document_path}", 'w') as f:
-            for i in range(len(documents)):
-                f.write(f"{i}\t")
-                f.write(str(documents[i]))
-                f.write("\n\n")
+    # if save_documents:
+    #     document_path = f"{splitext(sp_ori_file_path)[0]}.doc_"
+    #     with open(f"{document_path}", 'w') as f:
+    #         for i in range(len(documents)):
+    #             f.write(f"{i}\t")
+    #             f.write(str(documents[i]))
+    #             f.write("\n\n")
 
     # Gets the path of the context file.
     sp_ori_file_path_without_extension = splitext(sp_ori_file_path)[0]

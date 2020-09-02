@@ -112,42 +112,83 @@ class FilePath(object):
 
         # sp
         self.FCE_SP_ORI = f"{self.parallel}/sp/fce.sp.ori"
+        self.FCE_SP_CTX = f"{self.parallel}/sp/fce.sp.ctx"  # [CONTEXT]
         self.LANG8_SP_ORI = f"{self.parallel}/sp/lang8.sp.ori"
+        self.LANG8_SP_CTX = f"{self.parallel}/sp/lang8.sp.ctx"  # [CONTEXT]
         self.NUCLE_SP_ORI = f"{self.parallel}/sp/nucle.sp.ori"
+        self.NUCLE_SP_CTX = f"{self.parallel}/sp/nucle.sp.ctx"  # [CONTEXT]
         self.WI_TRAIN_SP_ORI = f"{self.parallel}/sp/wi.train.sp.ori"
+        self.WI_TRAIN_SP_CTX = f"{self.parallel}/sp/wi.train.sp.ctx"  # [CONTEXT]
         self.WI_DEV_SP_ORI = f"{self.parallel}/sp/wi.dev.sp.ori"
+        self.WI_DEV_SP_CTX = f"{self.parallel}/sp/wi.dev.sp.ctx"  # [CONTEXT]
         self.WI_TEST_SP_ORI = f"{self.parallel}/sp/wi.test.sp.ori"
+        self.WI_TEST_SP_CTX = f"{self.parallel}/sp/wi.test.sp.ctx"  # [CONTEXT]
 
         self.WI_DEV_3K_SP_ORI = f"{self.parallel}/sp/wi.dev.3k.sp.ori"
+        self.WI_DEV_3K_SP_CTX = f"{self.parallel}/sp/wi.dev.3k.sp.ctx"  # [CONTEXT]
         self.WI_DEV_1K_SP_ORI = f"{self.parallel}/sp/wi.dev.1k.sp.ori"
+        self.WI_DEV_1K_SP_CTX = f"{self.parallel}/sp/wi.dev.1k.sp.ctx"  # [CONTEXT]
 
         self.CONLL2013_SP_ORI = f"{self.parallel}/sp/conll2013.sp.ori"
+        self.CONLL2013_SP_CTX = f"{self.parallel}/sp/conll2013.sp.ctx"  # [CONTEXT]
         self.CONLL2014_SP_ORI = f"{self.parallel}/sp/conll2014.sp.ori"
+        self.CONLL2014_SP_CTX = f"{self.parallel}/sp/conll2014.sp.ctx"  # [CONTEXT]
         self.JFLEG_SP_ORI = f"{self.parallel}/sp/jfleg.sp.ori"
+
+        # [CONTEXT]
+        # docs
+        from glob import glob
+
+        self.fce_docs = sorted(glob(f"{self.fce}/json/fce.*.json"))
+        self.wi_train_docs = [
+            f"{self.wi}/json/A.train.json",
+            f"{self.wi}/json/A.train.json",
+            f"{self.wi}/json/B.train.json",
+            f"{self.wi}/json/C.train.json",
+            f"{self.wi}/json/B.train.json",
+            f"{self.wi}/json/C.train.json",
+        ]
+        self.wi_dev_docs = sorted(glob(f"{self.wi}/json/*.dev.json"))
+        self.conll2013_docs = sorted(
+            glob(f"{self.conll2013}/release2.3.1/revised/data/official.sgml"))
+        self.conll2014_docs = sorted(
+            glob(f"{self.conll2014}/conll14st-test-data/noalt/official-2014.0.sgml"))
+        self.nucle_docs = sorted(glob(f"{self.bea19}/nucle3.3/data/nucle3.2.sgml"))
+        self.lang8_docs = sorted(glob(f"{self.bea19}/lang8.bea19/lang-8-en-1.0/entries.train"))
 
         # tok
         self.FCE_TOK_ORI = f"{self.parallel}/tok/fce.tok.ori"
         self.FCE_TOK_COR = f"{self.parallel}/tok/fce.tok.cor"
+        self.FCE_TOK_CTX = f"{self.parallel}/tok/fce.tok.ctx"  # [CONTEXT]
         self.LANG8_TOK_ORI = f"{self.parallel}/tok/lang8.tok.ori"
         self.LANG8_TOK_COR = f"{self.parallel}/tok/lang8.tok.cor"
+        self.LANG8_TOK_CTX = f"{self.parallel}/tok/lang8.tok.ctx"  # [CONTEXT]
         self.NUCLE_TOK_ORI = f"{self.parallel}/tok/nucle.tok.ori"
         self.NUCLE_TOK_COR = f"{self.parallel}/tok/nucle.tok.cor"
+        self.NUCLE_TOK_CTX = f"{self.parallel}/tok/nucle.tok.ctx"  # [CONTEXT]
         self.WI_TRAIN_TOK_ORI = f"{self.parallel}/tok/wi.train.tok.ori"
         self.WI_TRAIN_TOK_COR = f"{self.parallel}/tok/wi.train.tok.cor"
+        self.WI_TRAIN_TOK_CTX = f"{self.parallel}/tok/wi.train.tok.ctx"  # [CONTEXT]
         self.WI_DEV_TOK_ORI = f"{self.parallel}/tok/wi.dev.tok.ori"
         self.WI_DEV_TOK_COR = f"{self.parallel}/tok/wi.dev.tok.cor"
+        self.WI_DEV_TOK_CTX = f"{self.parallel}/tok/wi.dev.tok.ctx"  # [CONTEXT]
         self.WI_TEST_TOK_ORI = f"{self.parallel}/tok/wi.test.tok.ori"
         # self.WI_TEST_TOK_COR = f"{self.parallel}/tok/wi.test.tok.cor"
+        self.WI_TEST_TOK_CTX = f"{self.parallel}/tok/wi.test.tok.ctx"  # [CONTEXT]
 
         self.WI_DEV_3K_TOK_ORI = f"{self.parallel}/tok/wi.dev.3k.tok.ori"
         self.WI_DEV_3K_TOK_COR = f"{self.parallel}/tok/wi.dev.3k.tok.cor"
+        self.WI_DEV_3K_TOK_CTX = f"{self.parallel}/tok/wi.dev.3k.tok.ctx"  # [CONTEXT]
         self.WI_DEV_1K_TOK_ORI = f"{self.parallel}/tok/wi.dev.1k.tok.ori"
         self.WI_DEV_1K_TOK_COR = f"{self.parallel}/tok/wi.dev.1k.tok.cor"
+        self.WI_DEV_1K_TOK_CTX = f"{self.parallel}/tok/wi.dev.1k.tok.ctx"  # [CONTEXT]
 
         self.CONLL2013_TOK_ORI = f"{self.parallel}/tok/conll2013.tok.ori"
         self.CONLL2013_TOK_COR = f"{self.parallel}/tok/conll2013.tok.cor"
+        self.CONLL2013_TOK_CTX = f"{self.parallel}/tok/conll2013.tok.ctx"  # [CONTEXT]
         self.CONLL2014_TOK_ORI = f"{self.parallel}/tok/conll2014.tok.ori"
         self.CONLL2014_TOK_COR = f"{self.parallel}/tok/conll2014.tok.cor"
+        self.CONLL2014_TOK_CTX = f"{self.parallel}/tok/conll2014.tok.ctx"  # [CONTEXT]
         self.JFLEG_TOK_ORI = f"{self.parallel}/tok/jfleg.tok.ori"
         # self.JFLEG_TOK_COR = f"{self.parallel}/tok/jfleg.tok.cor"
 
