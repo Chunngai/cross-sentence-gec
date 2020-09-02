@@ -651,37 +651,34 @@ python preprocess.py
 # 训练 & 验证 & 测试模型（以[论文github](https://github.com/kakaobrain/helo_word)的Restricted Track为例）
 &emsp;&emsp;训练模型之前，需要修改源代码的一些地方。  
 
-~~&emsp;&emsp;(一)：将`train.py`的第41行：~~
-<!-- ```python
-finetune_ckpt = os.path.basename(util.change_ckpt_dir(restore_ckpt, ckpt_dir))
-``` -->
-~~改为~~
-<!-- ```python
-finetune_ckpt = util.change_ckpt_dir(restore_ckpt, ckpt_dir)
-``` -->
-~~原因见[issues#5](https://github.com/kakaobrain/helo_word/issues/5)。~~
+&emsp;&emsp;(一) `train.py` 第43行
+```python
+# 修改前。
+# os.system(f"cp {restore_ckpt} {finetune_ckpt}")
 
-&emsp;&emsp;（二）将`evaluate.py`的第129行：
-```python
-parser.add_argument("--max_edits", type=int, default=None, help="max edit distance during the lm rerank")
+# 修改后。
+os.system(f"cp {restore_ckpt} {util.change_ckpt_dir(restore_ckpt, ckpt_dir)}")
 ```
-改为
-```python
-parser.add_argument("--max-edits", type=int, default=None, help="max edit distance during the lm rerank")
-```
-一个typo。
+&emsp;&emsp;否则无法加载预训练的最优模型。
 
-&emsp;&emsp;(三)：将`gec/filepath.py`的第26行：
+&emsp;&emsp;(二)  `evaluate.py` 第129行：
 ```python
-m2scorer = f"{root}/data/conll2014/m2scorer/m2scorer.py"
+# 修改前。
+# parser.add_argument("--max_edits", type=int, default=None, help="max edit distance during the lm
+
+# 修改后。
+parser.add_argument("--max-edits", type=int, default=None, help="max edit distance during the lm rerank") rerank")
 ```
-改为
-<!--```python
-m2scorer = f"{root}/data/conll2013/release2.3.1/m2scorer/m2scorer"
-```-->
+&emsp;&emsp;一个typo。
+
+&emsp;&emsp;(三) 将`gec/filepath.py`的第26行：
 ```python
+# 修改前。
+# m2scorer = f"{root}/data/conll2014/m2scorer/m2scorer.py"
+
+# 修改后。
 m2scorer = f"{root}/m2scorer/scripts/m2scorer.py"
 ```
-否则无法找到m2scorer路径。
+&emsp;&emsp;否则无法找到m2scorer路径。
 
-&emsp;&emsp;修改这~~三~~两个地方之后按照文档的步骤训练模型就行了。
+&emsp;&emsp;修改这三个地方之后按照文档的步骤训练模型就行了。
