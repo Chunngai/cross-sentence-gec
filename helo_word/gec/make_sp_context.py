@@ -26,14 +26,15 @@ def sentence_in_raw_document(sentence: str, raw_document: str) -> bool:
     """Check if the sentence is in the document.
 
     Args:
-        sentence: The sentence to be evaluated.
-        raw_document: The document to be evaluated.
+        sentence: A sentence that may be in the raw document.
+        raw_document: A raw document that may contain the sentence.
 
-    Returns: True if the sentence is in the document, else False.
+    Returns: True if the sentence is in the raw document, else False.
 
-    `sentence` is from a .m2 file and tokenized, while `document` is from a .json or .sgml file
-    whose sentences are not tokenized. Spaces in both the sentence and the document are removed
-    to avoid the differences resulted from tokenization.
+    `sentence` is from a .m2 file or a .sp.ori file and tokenized,
+    while `raw_document` is from a .json or .sgml file whose sentences are not tokenized.
+    Spaces in both the sentence and the document are removed
+    to avoid differences resulted from tokenization.
     """
 
     return remove_spaces(sentence) in remove_spaces(raw_document)
@@ -67,12 +68,17 @@ def get_documents_from_json(document_file_paths: List[str], m2_file_paths: List[
     Args:
         document_file_paths: Paths of .json files containing documents.
         m2_file_paths: Paths of .m2 files containing tokenized sentences.
+        raw_ori_file_path: The path of raw/{fce | wi.train | wi.dev}.ori.
+        sp_ori_file_path: The path of sp/{fce | wi.train | wi.dev}.sp.ori.
 
     Returns: A list containing all documents, whose sentences are tokenized.
 
-    The .json files contain sentences in document-level. Sentences in the .json files are not tokenized,
-    thus the corresponding .m2 files are used to get the tokenized version of the sentences
+    The .json files contain sentences in document-level, but the sentences are not tokenized.
+    Thus the corresponding .m2 files and the .sp.ori file are used to get the tokenized version of the sentences
     and to construct documents with tokenized sentences.
+    Tokenized sentences for constructing the document are first searched in the .sp.ori file.
+    If the .sp.ori file does not contain the sentence, the sentence will be extracted from the .m2 files.
+    Using the spell-checked version of the tokenized sentences can avoid checking spellings of the generated .ctx file.
     """
 
     def _normalize(text: str) -> str:
@@ -120,6 +126,7 @@ def get_documents_from_json(document_file_paths: List[str], m2_file_paths: List[
     with open(raw_ori_file_path) as raw_ori_file, open(sp_ori_file_path) as sp_ori_file:
         raw_ori_sentence = raw_ori_file.readline().strip()
         sp_ori_sentence = sp_ori_file.readline().strip()
+
         for document_file_path in document_file_paths:
             with open(document_file_path) as document_file:
                 # Each line in the document file is a json object.
@@ -132,17 +139,22 @@ def get_documents_from_json(document_file_paths: List[str], m2_file_paths: List[
                     raw_document: str = json_object["text"]
                     normalized_raw_document: str = _normalize(raw_document)
 
+                    # Constructs a document.
                     document: List[str] = []
                     partial_normalized_raw_document_spaces_removed = remove_spaces(normalized_raw_document)
                     while sentence_in_raw_document(sentence=current_tokenized_sentence,
                                                    raw_document=partial_normalized_raw_document_spaces_removed):
 
-                        if current_tokenized_sentence != raw_ori_sentence:
-                            document_sentence = current_tokenized_sentence
-                        else:
+                        # The current sentence is in .ori, thus it is in .sp.ori.
+                        # Takes the spell-checked version to construct the document.
+                        if current_tokenized_sentence == raw_ori_sentence:
                             document_sentence = sp_ori_sentence
                             raw_ori_sentence = raw_ori_file.readline().strip()
                             sp_ori_sentence = sp_ori_file.readline().strip()
+                        # The current sentence is not in .ori, thus not in .sp.ori.
+                        # Uses it which is from a .m2 file to construct the document.
+                        else:
+                            document_sentence = current_tokenized_sentence
 
                         document.append(document_sentence)
 
@@ -174,13 +186,18 @@ def get_documents_from_sgml(document_file_paths: List[str], m2_file_paths: List[
     Args:
         document_file_paths: Paths of .sgml files containing documents.
         m2_file_paths: Paths of .m2 files containing tokenized sentences.
+        raw_ori_file_path: The path of raw/{conll2013 | conll2014 | nucle}.ori.
+        sp_ori_file_path: The path of sp/{conll2013 | conll2014 | nucle}.sp.ori.
         dataset_name: The name of the dataset. (conll2013 / conll2014 / nucle)
 
     Returns: A list containing all documents, whose sentences are tokenized.
 
-    The .sgml files contain sentences in document-level. Sentences in the .sgml files are not tokenized,
-    thus the corresponding .m2 files are used to get the tokenized version of the sentences
+    The .sgml files contain sentences in document-level, but the sentences are not tokenized.
+    Thus the corresponding .m2 files and the .sp.ori file are used to get the tokenized version of the sentences
     and to construct documents with tokenized sentences.
+    Tokenized sentences for constructing the document are first searched in the .sp.ori file.
+    If the .sp.ori file does not contain the sentence, the sentence will be extracted from the .m2 files.
+    Using the spell-checked version of the tokenized sentences can avoid checking spellings of the generated .ctx file.
     """
 
     # Extracts tokenized sentences.
@@ -193,6 +210,7 @@ def get_documents_from_sgml(document_file_paths: List[str], m2_file_paths: List[
     with open(raw_ori_file_path) as raw_ori_file, open(sp_ori_file_path) as sp_ori_file:
         raw_ori_sentence = raw_ori_file.readline().strip()
         sp_ori_sentence = sp_ori_file.readline().strip()
+
         for document_file_path in document_file_paths:
             with open(document_file_path) as document_file:
                 raw_sgml: str = document_file.read()
@@ -207,8 +225,8 @@ def get_documents_from_sgml(document_file_paths: List[str], m2_file_paths: List[
                 doc_pattern = re.compile(r"<DOC.+?/DOC>", flags=re.DOTALL)
                 docs = doc_pattern.findall(raw_sgml)
                 for doc in docs:
-                    #                 nid_pattern = re.compile(r'<DOC nid="(\d+)">')
-                    #                 nid = nid_pattern.search(doc).group(1)
+                    # nid_pattern = re.compile(r'<DOC nid="(\d+)">')
+                    # nid = nid_pattern.search(doc).group(1)
 
                     partial_raw_document: str = ""
 
@@ -231,16 +249,21 @@ def get_documents_from_sgml(document_file_paths: List[str], m2_file_paths: List[
 
                     partial_raw_document_spaces_removed = remove_spaces(partial_raw_document)
 
+                    # Constructs a document.
                     document: List[str] = []
                     while sentence_in_raw_document(sentence=current_tokenized_sentence,
                                                    raw_document=partial_raw_document_spaces_removed):
 
-                        if current_tokenized_sentence != raw_ori_sentence:
-                            document_sentence = current_tokenized_sentence
-                        else:
+                        # The current sentence is in .ori, thus it is in .sp.ori.
+                        # Takes the spell-checked version to construct the document.
+                        if current_tokenized_sentence == raw_ori_sentence:
                             document_sentence = sp_ori_sentence
                             raw_ori_sentence = raw_ori_file.readline().strip()
                             sp_ori_sentence = sp_ori_file.readline().strip()
+                        # The current sentence is not in .ori, thus not in .sp.ori.
+                        # Uses it which is from a .m2 file to construct the document.
+                        else:
+                            document_sentence = current_tokenized_sentence
 
                         document.append(document_sentence)
 
@@ -267,11 +290,16 @@ def get_documents_from_lang8_entries_train(document_file_paths: List[str],
     """Get documents from the training set of lang8-english "entries.train".
 
     Args:
-        document_file_paths: The path of "entries.train".
+        document_file_paths: Contains a single path which is the path of "entries.train".
+        raw_ori_file_path: The path of raw/lang8.ori.
+        sp_ori_file_path: The path of sp/lang8.sp.ori.
 
     Returns: A list containing all documents, whose sentences are tokenized.
 
     Sentences in "entries.train" are well tokenized, thus .m2 files are not needed to get tokenized sentences.
+    Tokenized sentences for constructing the document are first searched in the .sp.ori file.
+    If the .sp.ori file does not contain the sentence, the sentence will be extracted from "entries.train".
+    Using the spell-checked version of the tokenized sentences can avoid checking spellings of the generated .ctx file.
     """
 
     # Extracts documents.
@@ -279,18 +307,23 @@ def get_documents_from_lang8_entries_train(document_file_paths: List[str],
     with open(raw_ori_file_path) as raw_ori_file, open(sp_ori_file_path) as sp_ori_file:
         raw_ori_sentence = raw_ori_file.readline().strip()
         sp_ori_sentence = sp_ori_file.readline().strip()
+
         for document_file_path in document_file_paths:
             with open(document_file_path) as document_file:
                 lines: List[str] = document_file.readlines()
 
+                # Constructs a document.
                 document: List[str] = []
                 for line in lines:
                     try:
                         document_sentence = line.split("\t")[4].strip()
 
+                        # The current sentence is in .ori, thus it is in .sp.ori.
+                        # Takes the spell-checked version to construct the document.
                         if document_sentence == raw_ori_sentence:
                             document_sentence = sp_ori_sentence
 
+                            # Skips the identical sentence in .ori & .sp.ori.
                             previous_sp_ori_sentence = sp_ori_sentence
                             while True:
                                 raw_ori_sentence = raw_ori_file.readline().strip()
@@ -314,7 +347,8 @@ def get_documents(document_file_paths: List[str], m2_file_paths: List[str],
     Args:
         document_file_paths: Paths of files containing documents. (.json / .sgml / "entries.train")
         m2_file_paths: Paths of .m2 files containing tokenized sentences.
-        raw_ori_file_path: The path of {DATASET_NAME}.ori.
+        raw_ori_file_path: The path of raw/{DATASET_NAME}.ori.
+        sp_ori_file_path: The path of sp/{DATASET_NAME}.sp.ori.
 
     Returns: A list of documents with all sentences tokenized.
 
@@ -336,7 +370,8 @@ def get_documents(document_file_paths: List[str], m2_file_paths: List[str],
 
 
 def get_context(document_level_index: int, document: List[str],
-                previous_sentences_number: int, following_sentences_number: int) -> str:
+                previous_sentences_number: int, following_sentences_number: int,
+                previous_context_tag: str, following_context_tag: str) -> str:
     """Get the context of the sentence.
 
     Args:
@@ -344,9 +379,11 @@ def get_context(document_level_index: int, document: List[str],
         document: The document containing the sentence.
         previous_sentences_number: The number of previous context sentences.
         following_sentences_number: The number of following context sentences.
+        following_context_tag: The tag for indicating a previous context sentence.
+        previous_context_tag: The tag for indicating a following context sentence.
 
     Returns: The concatenation of context sentences, separated by tags
-    ("<prev>" for previous context sentences and "<fol>" for following context sentences.
+    (`previous_context_tag` for previous context sentences and `following_context_tag` for following context sentences.
 
     E.g.
     If `document` is [
@@ -365,7 +402,7 @@ def get_context(document_level_index: int, document: List[str],
     and the document boundary cannot be crossed),
     and its following context should be the forth, fifth and sixth sentences.
     And context to be returned is:
-    "<prev>Guten Tag !<prev>Guten Tag !<fol>Gut . Und dir ?<fol>Gut .<fol>Einen schoenen Tag noch !".
+    "<prev> Guten Tag ! <prev> Guten Tag ! <fol> Gut . Und dir ? <fol> Gut . <fol> Einen schoenen Tag noch !".
     """
 
     def _is_valid_document_level_index(document_level_index: int, document: List[str]) -> bool:
@@ -389,7 +426,8 @@ def get_context(document_level_index: int, document: List[str],
                                                  document_level_index):
         if _is_valid_document_level_index(document_level_index=previous_context_sentence_index, document=document):
             previous_context_sentence = document[previous_context_sentence_index]
-            previous_context_sentences = previous_context_sentences + "<prev>" + previous_context_sentence
+            previous_context_sentences = f"{previous_context_sentences} "\
+                                         f"{previous_context_tag} {previous_context_sentence}"
 
     # Gets following context.
     following_context_sentences = ""
@@ -397,7 +435,8 @@ def get_context(document_level_index: int, document: List[str],
                                                   document_level_index + following_sentences_number + 1):
         if _is_valid_document_level_index(document_level_index=following_context_sentence_index, document=document):
             following_context_sentence = document[following_context_sentence_index]
-            following_context_sentences = following_context_sentences + "<fol>" + following_context_sentence
+            following_context_sentences = f"{following_context_sentences} "\
+                                          f"{following_context_tag} {following_context_sentence}"
 
     context = previous_context_sentences + following_context_sentences
 
@@ -406,18 +445,22 @@ def get_context(document_level_index: int, document: List[str],
 
 def make_context(raw_ori_file_path: str, sp_ori_file_path: str,
                  document_file_paths: List[str], m2_file_paths: List[str],
-                 previous_sentences_number: int = 1, following_sentences_number: int = 0):
+                 previous_sentences_number: int = 1, following_sentences_number: int = 0,
+                 previous_context_tag: str = "<prev>", following_context_tag: str = "<fol>"):
     """Create a context file for a dataset.
 
     Args:
-        raw_ori_file_path: The path of the source file {DATASET_NAME}.ori.
+        raw_ori_file_path: The path of {DATASET_NAME}.ori.
+        sp_ori_file_path: The path of {DATASET_NAME}.sp.ori.
         document_file_paths: Paths of files containing documents. (.json / .sgml / "entries.train")
         m2_file_paths: Paths of .m2 files containing tokenized sentences.
         previous_sentences_number: The number of previous context sentences, 1 by default.
         following_sentences_number: The number of following context sentences, 0 by default.
+        previous_context_tag: The tag indicating a previous context sentence, <prev> by default.
+        following_context_tag: The tag indicating a following context sentence, <fol> by default.
     """
 
-    # Gets all source sentences from `ori_path`.
+    # Gets all sentences from `sp_ori_file_path`.
     with open(sp_ori_file_path) as sp_ori_file:
         sp_ori_sentences = sp_ori_file.readlines()
 
@@ -425,7 +468,7 @@ def make_context(raw_ori_file_path: str, sp_ori_file_path: str,
     documents: List[List[str]] = get_documents(document_file_paths=document_file_paths, m2_file_paths=m2_file_paths,
                                                raw_ori_file_path=raw_ori_file_path, sp_ori_file_path=sp_ori_file_path)
 
-    # Writes documents.
+    # Saves documents.
     if save_documents:
         document_path = f"{splitext(sp_ori_file_path)[0]}.doc_"
         with open(f"{document_path}", 'w') as f:
@@ -438,6 +481,7 @@ def make_context(raw_ori_file_path: str, sp_ori_file_path: str,
     sp_ori_file_path_without_extension = splitext(sp_ori_file_path)[0]
     sp_ctx_file_path = f"{sp_ori_file_path_without_extension}.ctx"
 
+    # Gets context for each sentence in .sp.ori.
     current_document_index = 0
     current_document: List[str] = documents[current_document_index]
     current_document_masked: List[str] = current_document[:]
@@ -447,9 +491,9 @@ def make_context(raw_ori_file_path: str, sp_ori_file_path: str,
         for sp_ori_sentence in sp_ori_sentences:
             sp_ori_sentence = sp_ori_sentence.strip()
 
-            # There are some sentences that are the same in lang8.ori,
+            # There are some sentences that are the same in lang8.sp.ori,
             # which share document level index & context.
-            # There is also a sentence pair in wi.train.ori and a pair in wi.dev.ori
+            # There is also a sentence pair in wi.train.sp.ori and a pair in wi.dev.sp.ori
             # which are the same and adjacent.
             # They also share document level index & context.
             if sp_ori_sentence != previous_sp_ori_sentence:
@@ -457,19 +501,19 @@ def make_context(raw_ori_file_path: str, sp_ori_file_path: str,
                 # But for nucle the loop may be executed twice
                 # when no sentence is wrong in a document in nucle
                 # since correct sentences in the m2 file of nucle
-                # are ignored when creating nucle.ori.
+                # are ignored when creating nucle.sp.ori.
                 while sp_ori_sentence not in current_document_masked:
                     current_document_index += 1
                     current_document = documents[current_document_index]
                     current_document_masked: List[str] = current_document[:]
 
-                # Gets the document-level index of the source sentence.
+                # Gets the document-level index of the sentence.
                 try:
                     document_level_index = current_document_masked.index(sp_ori_sentence)
                 except ValueError:
-                    print(sp_ori_sentence)
-                    print(remove_spaces(sp_ori_sentence))
-                    print(current_document_masked)
+                    # print(sp_ori_sentence)
+                    # print(remove_spaces(sp_ori_sentence))
+                    # print(current_document_masked)
                     raise
             else:
                 document_level_index = previous_sp_ori_sentence_document_level_index
@@ -481,10 +525,12 @@ def make_context(raw_ori_file_path: str, sp_ori_file_path: str,
             # E.g. a sentence exists in 2 consecutive documents.
             current_document_masked[document_level_index] = ""
 
-            # Gets the context of the current source sentence.
+            # Gets the context of the current sentence.
             context = get_context(document_level_index=document_level_index, document=current_document,
                                   previous_sentences_number=previous_sentences_number,
-                                  following_sentences_number=following_sentences_number)
+                                  following_sentences_number=following_sentences_number,
+                                  previous_context_tag=previous_context_tag,
+                                  following_context_tag=following_context_tag)
 
             # Writes the context to file.
             sp_ctx_file.write(context)
@@ -563,13 +609,13 @@ if __name__ == '__main__':
 
     # Batch testing.
     correct_ver = {
-        "fce": 1,
-        "wi.train": 1,
-        "wi.dev": 1,
-        "conll2013": 1,
-        "conll2014": 1,
-        "nucle": 1,
-        "lang8": 1
+        "fce": 2,
+        "wi.train": 2,
+        "wi.dev": 2,
+        "conll2013": 2,
+        "conll2014": 2,
+        "nucle": 2,
+        "lang8": 2
     }
 
     for dataset in [
@@ -583,9 +629,8 @@ if __name__ == '__main__':
                      eval(f"{dataset}_m2_paths"),
                      n_prev, n_fol)
 
-        dataset = ".".join(dataset.split("_"))
-
-        with open(f"/home/neko/GEC/helo_word-master_restricted/data/parallel/sp/{dataset}.sp.ctx") as f_ctx, \
-                open(f'/home/neko/GEC/helo_word-master_restricted/data/parallel/sp/{dataset}.sp.'
-                     f'ctx_v{correct_ver[dataset]}_correct') as f_ctx_correct:
-            print(f"{dataset}: {f_ctx.read() == f_ctx_correct.read()}")
+        # dataset = ".".join(dataset.split("_"))
+        # with open(f"/home/neko/GEC/helo_word-master_restricted/data/parallel/sp/{dataset}.sp.ctx") as f_ctx, \
+        #         open(f'/home/neko/GEC/helo_word-master_restricted/data/parallel/sp/{dataset}.sp.'
+        #              f'ctx_v{correct_ver[dataset]}_correct') as f_ctx_correct:
+        #     print(f"{dataset}: {f_ctx.read() == f_ctx_correct.read()}")
