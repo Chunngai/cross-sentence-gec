@@ -68,3 +68,7 @@ mv LICENSE repo_info
 sudo mkdir -p /usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/
 sudo mv averaged_perceptron_tagger.pickle  /usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/
 
+# m2scorer.
+wget https://www.comp.nus.edu.sg/~nlp/sw/m2scorer.tar.gz
+tar xzvf m2scorer.tar.gz
+rm m2scorer.tar.gz

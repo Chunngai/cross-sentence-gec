@@ -196,6 +196,11 @@ sudo mv averaged_perceptron_tagger.pickle  $AVERAGE_PERCEPTRON_TAGGER_PICKLE_BAS
 ENGLISH_PICKLE_BASEDIR="/usr/local/lib/nltk_data/tokenizers/punkt/PY3/"
 sudo mkdir -p $ENGLISH_PICKLE_BASEDIR
 sudo mv english.pickle $ENGLISH_PICKLE_BASEDIR
+
+# m2scorer.
+wget https://www.comp.nus.edu.sg/~nlp/sw/m2scorer.tar.gz
+tar xzvf m2scorer.tar.gz
+rm m2scorer.tar.gz
 ```
 &emsp;&emsp;修改的地方已在注释给出。其中，`[NEW]`表示新增，`[MODIFIED]`表示修改。`###### NEW ######`后面的内容源代码没有，却是之后的部分代码成功执行必须的。
 
@@ -671,8 +676,11 @@ parser.add_argument("--max-edits", type=int, default=None, help="max edit distan
 m2scorer = f"{root}/data/conll2014/m2scorer/m2scorer.py"
 ```
 改为
-```python
+<!--```python
 m2scorer = f"{root}/data/conll2013/release2.3.1/m2scorer/m2scorer"
+```-->
+```python
+m2scorer = f"{root}/m2scorer/scripts/m2scorer.py"
 ```
 否则无法找到m2scorer路径。
 
