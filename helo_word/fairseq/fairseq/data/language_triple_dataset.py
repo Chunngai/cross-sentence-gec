@@ -232,10 +232,10 @@ class LanguageTripleDataset(FairseqDataset):
         #     max_positions,
         #     (self.max_source_positions, self.max_target_positions),
         # )
-        src_len, tgt_len, ctx_len = utils.resolve_max_positions(
-            (src_len, tgt_len, ctx_len),
+        ctx_len, src_len, tgt_len = utils.resolve_max_positions(
+            (ctx_len, src_len, tgt_len),
             max_positions,
-            (self.max_source_positions, self.max_target_positions, self.max_context_positions),
+            (self.max_context_positions, self.max_source_positions, self.max_target_positions),
         )
         bsz = max(num_tokens // max(src_len, tgt_len), 1)
         return self.collater([
