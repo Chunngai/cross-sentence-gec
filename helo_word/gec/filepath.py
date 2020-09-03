@@ -1,3 +1,7 @@
+"""
+Code for supporting context is marked with [CONTEXT].
+"""
+
 import os
 
 
