@@ -99,7 +99,8 @@ def prepare_binary(databin_path, trainpref, validpref, vocab):
     print_log(f"[Prepare] 2. create binary data on {databin_path}")
     prompt = f"fairseq-preprocess --source-lang ori --target-lang cor " \
              f"--trainpref {trainpref} --validpref {validpref} " \
-             f"--srcdict {vocab} --tgtdict {vocab} --destdir {databin_path}"
+             f"--srcdict {vocab} --tgtdict {vocab} --destdir {databin_path} " \
+             f"--task translation_ctx"  # [CONTEXT]
 
     util.maybe_prompt(databin_path, prompt)
 
