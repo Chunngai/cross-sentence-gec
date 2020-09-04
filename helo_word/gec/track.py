@@ -88,8 +88,10 @@ class Track:
     def get_model_config(model, lr, dropout, max_epoch, seed, reset=False):
         assert model in ['base', 'copy', 't2t']
         if model == 'base':
-            model_config = f"--arch transformer --share-all-embeddings " \
-                 f"--optimizer adam --lr {lr} --label-smoothing 0.1 --dropout {dropout} " \
+            # [CONTEXT]
+            # model_config = f"--arch transformer --share-all-embeddings " \
+            model_config = f"--arch document_level_transformer --share-all-embeddings " \
+                           f"--optimizer adam --lr {lr} --label-smoothing 0.1 --dropout {dropout} " \
                  f"--max-tokens 4000 --min-lr '1e-09' --lr-scheduler inverse_sqrt " \
                  f"--weight-decay 0.0001 --criterion label_smoothed_cross_entropy " \
                  f"--max-epoch {max_epoch} --warmup-updates 4000 --warmup-init-lr '1e-07' --max-tokens 4000 " \
