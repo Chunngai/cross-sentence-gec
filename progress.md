@@ -904,9 +904,10 @@ Not provided.
 
 ---
 
-# Aug26
+# Aug 26 - Sep 2
+
 ## Document-level context -> GEC
-1. Find all available document-level gec datasets.  
+1. - [x] Find all available document-level gec datasets.  
 
 (1) bea2019-fce: train
 
@@ -929,8 +930,6 @@ Not provided.
   dev:
   helo_word-master_restricted/data/bea19/wi+locness/m2/ABCN.dev.gold.bea19.m2
 
-
-
 (3) nucle: train & finetune
 
   nucle3.2.sgml  
@@ -949,8 +948,6 @@ Not provided.
   alt/alternative-team{a | b | c}.sgml
 
   helo_word-master_restricted/data/conll2014/conll14st-test-data/noalt/official-2014.combined.m2
-
-
 
 (6) lang8-multi: train
 
@@ -1048,6 +1045,17 @@ for i in 0..<oris.len:
 ```
 ori: [FILE_NAME].ori
 doc: [FILE_NAME].[{json | sgml | xml}]
+
+---
+
+Sep 2 - Sep 4
+Extend fairseq to support context.
+
+---
+
+Sep 5
+
+Extend fairseq.
 
 ---
 
