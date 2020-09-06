@@ -1053,9 +1053,15 @@ Extend fairseq to support context.
 
 ---
 
-Sep 5
+# Sep 5
 
-Extend fairseq.
+Ready to extend fairseq.
+
+---
+
+# Sep 6
+
+Download data.
 
 ---
 
