@@ -667,7 +667,7 @@ os.system(f"cp {restore_ckpt} {util.change_ckpt_dir(restore_ckpt, ckpt_dir)}")
 # parser.add_argument("--max_edits", type=int, default=None, help="max edit distance during the lm
 
 # 修改后。
-parser.add_argument("--max-edits", type=int, default=None, help="max edit distance during the lm rerank") rerank")
+parser.add_argument("--max-edits", type=int, default=None, help="max edit distance during the lm rerank")
 ```
 &emsp;&emsp;一个typo。
 
