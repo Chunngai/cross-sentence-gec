@@ -3,13 +3,15 @@ prepare.py
 
 gec/filepath.py
 gec/track.py
-gec/make_sp_context.py
+[NEW] gec/make_sp_context.py
 
 fairseq/fairseq/data/__init__.py
-fairseq/fairseq/data/language_triple_dataset.py
+[EXTEND] fairseq/fairseq/data/language_triple_dataset.py FROM */language_pair_dataset.py
+
 fairseq/fairseq/models/__init__.py
 fairseq/fairseq/models/fairseq_model.py
-fairseq/fairseq/models/document_level_transformer.py
-fairseq/fairseq/tasks/translation_ctx.py
+[EXTEND] fairseq/fairseq/models/document_level_transformer.py FROM */transformer.py
+
+[EXTEND] fairseq/fairseq/tasks/translation_ctx.py FROM */translation.py
 
 fairseq/fairseq_cli/preprocess.py
