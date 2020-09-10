@@ -277,12 +277,12 @@ class LanguageTripleDataset(FairseqDataset):
     @property
     def supports_prefetch(self):
         return (
-            getattr(self.src, 'supports_prefetch', False)
+            getattr(self.ctx, 'supports_prefetch', False)  # [CONTEXT]/
+            and getattr(self.src, 'supports_prefetch', False)
             and getattr(self.tgt, 'supports_prefetch', False)
-            and getattr(self.ctx, 'supports_prefetch', False)  # [CONTEXT]/
         )
 
     def prefetch(self, indices):
+        self.ctx.prefetch(indices)  # [CONTEXT]/
         self.src.prefetch(indices)
         self.tgt.prefetch(indices)
-        self.ctx.prefetch(indices)  # [CONTEXT]/
