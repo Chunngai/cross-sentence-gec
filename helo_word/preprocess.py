@@ -67,6 +67,13 @@ if __name__ == "__main__":
     parser.add_argument("--n_epochs", type=int, nargs="+", default=[1, 12, 5],
                         help="list of n_epochs of gutenberg, tatoeba, and wiki103")
 
+    # [CONTEXT]
+    # 4. context
+    parser.add_argument("--previous_sentence_number", type=int, default=1)
+    parser.add_argument("--following_sentence_number", type=int, default=0)
+    parser.add_argument("--previous_context_label", type=str, default="<prev>")
+    parser.add_argument("--following_context_label", type=str, default="<fol>")
+
     args = parser.parse_args()
 
     """ MAKE DIRS """
@@ -377,23 +384,33 @@ if __name__ == "__main__":
 
     print_log("STEP 6.5-1. fce")
     maybe_do(fp.FCE_SP_CTX, make_sp_context.make_context, (fp.FCE_ORI, fp.FCE_SP_ORI,
-                                                           fp.fce_docs, sorted(glob(f'{fp.fce_m2}/*m2')), 3, 3))
+                                                           fp.fce_docs, sorted(glob(f'{fp.fce_m2}/*m2')),
+                                                           args.previous_sentence_number, args.following_sentence_number,
+                                                           args.previous_context_label, args.following_context_label))
 
     print_log("STEP 6.5-2. lang8")
     maybe_do(fp.LANG8_SP_CTX, make_sp_context.make_context, (fp.LANG8_ORI, fp.LANG8_SP_ORI,
-                                                             fp.lang8_docs, None, 3, 3))
+                                                             fp.lang8_docs, None,
+                                                             args.previous_sentence_number, args.following_sentence_number,
+                                                             args.previous_context_label, args.following_context_label))
 
     print_log("STEP 6.5-3. nucle")
     maybe_do(fp.NUCLE_SP_CTX, make_sp_context.make_context, (fp.NUCLE_ORI, fp.NUCLE_SP_ORI,
-                                                             fp.nucle_docs, sorted(glob(f'{fp.nucle_m2}/*m2')), 3, 3))
+                                                             fp.nucle_docs, sorted(glob(f'{fp.nucle_m2}/*m2')),
+                                                             args.previous_sentence_number, args.following_sentence_number,
+                                                             args.previous_context_label, args.following_context_label))
 
     print_log("STEP 6.5-4. wi train")
     maybe_do(fp.WI_TRAIN_SP_CTX, make_sp_context.make_context, (fp.WI_TRAIN_ORI, fp.WI_TRAIN_SP_ORI,
-                                                                fp.wi_train_docs, sorted(glob(f'{fp.wi_m2}/*train*m2')), 3, 3))
+                                                                fp.wi_train_docs, sorted(glob(f'{fp.wi_m2}/*train*m2')),
+                                                                args.previous_sentence_number, args.following_sentence_number,
+                                                                args.previous_context_label, args.following_context_label))
 
     print_log("STEP 6.5-5. wi dev")
     maybe_do(fp.WI_DEV_SP_CTX, make_sp_context.make_context, (fp.WI_DEV_ORI, fp.WI_DEV_SP_ORI,
-                                                              fp.wi_dev_docs, sorted(glob(f'{fp.wi_m2}/ABCN.dev.gold.bea19.m2')), 3, 3))
+                                                              fp.wi_dev_docs, sorted(glob(f'{fp.wi_m2}/ABCN.dev.gold.bea19.m2')),
+                                                              args.previous_sentence_number, args.following_sentence_number,
+                                                              args.previous_context_label, args.following_context_label))
     """
     print_log("STEP 6.5-6. wi test")
     maybe_do(fp.WI_TEST_SP_CTX, make_sp_context.make_context, (fp.WI_TEST_ORI, fp.WI_TEST_SP_ORI))
@@ -406,11 +423,15 @@ if __name__ == "__main__":
     """
     print_log("STEP 6.5-9. conll 2013")
     maybe_do(fp.CONLL2013_SP_CTX, make_sp_context.make_context, (fp.CONLL2013_ORI, fp.CONLL2013_SP_ORI,
-                                                                 fp.conll2013_docs, sorted(glob(f'{fp.conll2013_m2}/official-preprocessed.m2')), 3, 3))
+                                                                 fp.conll2013_docs, sorted(glob(f'{fp.conll2013_m2}/official-preprocessed.m2')),
+                                                                 args.previous_sentence_number, args.following_sentence_number,
+                                                                 args.previous_context_label, args.following_context_label))
 
     print_log("STEP 6.5-10. conll 2014")
     maybe_do(fp.CONLL2014_SP_CTX, make_sp_context.make_context, (fp.CONLL2014_ORI, fp.CONLL2014_SP_ORI,
-                                                                 fp.conll2014_docs, sorted(glob(f'{fp.conll2014_m2}/official-2014.combined.m2')), 3, 3))
+                                                                 fp.conll2014_docs, sorted(glob(f'{fp.conll2014_m2}/official-2014.combined.m2')),
+                                                                 args.previous_sentence_number, args.following_sentence_number,
+                                                                 args.previous_context_label, args.following_context_label))
 
     """ STEP III: BPE """
     print_log("STEP 7. bpe-tokenize")
