@@ -424,19 +424,21 @@ def get_context(document_level_index: int, document: List[str],
     previous_context_sentences = ""
     for previous_context_sentence_index in range(document_level_index - previous_sentences_number,
                                                  document_level_index):
+        previous_context_sentence = ""
         if _is_valid_document_level_index(document_level_index=previous_context_sentence_index, document=document):
             previous_context_sentence = document[previous_context_sentence_index]
-            previous_context_sentences = f"{previous_context_sentences} "\
-                                         f"{previous_context_tag} {previous_context_sentence}"
+        previous_context_sentences = f"{previous_context_sentences} "\
+                                     f"{previous_context_tag} {previous_context_sentence}"
 
     # Gets following context.
     following_context_sentences = ""
     for following_context_sentence_index in range(document_level_index + 1,
                                                   document_level_index + following_sentences_number + 1):
+        following_context_sentence = ""
         if _is_valid_document_level_index(document_level_index=following_context_sentence_index, document=document):
             following_context_sentence = document[following_context_sentence_index]
-            following_context_sentences = f"{following_context_sentences} "\
-                                          f"{following_context_tag} {following_context_sentence}"
+        following_context_sentences = f"{following_context_sentences} "\
+                                      f"{following_context_tag} {following_context_sentence}"
 
     context = previous_context_sentences + following_context_sentences
 
