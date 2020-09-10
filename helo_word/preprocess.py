@@ -46,6 +46,15 @@ def print_log(log_info):
     logging.info(log_info)
 
 
+# [CONTEXT]
+def make_pretrain_context(ori_file_path, ctx_file_path):
+    with open(ori_file_path) as ori_file, open(ctx_file_path, 'w') as ctx_file:
+        for line in ori_file:
+            ctx_file.write(f'{(" " + args.previous_context_label + " ") * int(args.previous_sentence_number)}'
+                           f'{(" " + args.following_context_label + " ") * int(args.following_sentence_number)}'
+                           f'\n')
+
+
 if __name__ == "__main__":
 
     """ PARSE OPTS """
@@ -290,17 +299,30 @@ if __name__ == "__main__":
                   eval(f"fp.GUTENBERG_ORI{track_no}"), eval(f"fp.GUTENBERG_COR{track_no}"), args.n_epochs[0],
                   args.word_change_prob, args.type_change_prob))
 
+        # [CONTEXT]
+        maybe_do(eval(f"fp.GUTENBERG_CTX{track_no}"), make_pretrain_context,
+                 (eval(f"fp.GUTENBERG_ORI{track_no}"), eval(f"fp.GUTENBERG_CTX{track_no}")))
+
         print_log("STEP 4-3. tatoeba")
         maybe_do(eval(f"fp.TATOEBA_ORI{track_no}"), perturb.do,
                  (word2ptbs, fp.BPE_MODEL, fp.TATOEBA_TXT,
                   eval(f"fp.TATOEBA_ORI{track_no}"), eval(f"fp.TATOEBA_COR{track_no}"), args.n_epochs[1],
                   args.word_change_prob, args.type_change_prob))
 
+        # [CONTEXT]
+        maybe_do(eval(f"fp.TATOEBA_CTX{track_no}"), make_pretrain_context,
+                 (eval(f"fp.TATOEBA_ORI{track_no}"), eval(f"fp.TATOEBA_CTX{track_no}")))
+
         print_log("STEP 4-4. wiki103")
         maybe_do(eval(f"fp.WIKI103_ORI{track_no}"), perturb.do,
                  (word2ptbs, fp.BPE_MODEL, fp.WIKI103_TXT,
                   eval(f"fp.WIKI103_ORI{track_no}"), eval(f"fp.WIKI103_COR{track_no}"), args.n_epochs[2],
                   args.word_change_prob, args.type_change_prob))
+
+
+        # [CONTEXT]
+        maybe_do(eval(f"fp.WIKI103_CTX{track_no}"), make_pretrain_context,
+                 (eval(f"fp.WIKI103_ORI{track_no}"), eval(f"fp.WIKI103_CTX{track_no}")))
 
     """ PARALLELIZE DATA FOR TRAIN & DEV & TEST """
     print_log("STEP 5. m2 to parallel")

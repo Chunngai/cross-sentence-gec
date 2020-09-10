@@ -70,24 +70,33 @@ class FilePath(object):
         # dae tok
         self.GUTENBERG_ORI1 = f"{self.parallel}/tok/gutenberg.tok.wi.train.ori"
         self.GUTENBERG_COR1 = f"{self.parallel}/tok/gutenberg.tok.wi.train.cor"
+        self.GUTENBERG_CTX1 = f"{self.parallel}/tok/gutenberg.tok.wi.train.ctx"  # [CONTEXT]
         self.TATOEBA_ORI1 = f"{self.parallel}/tok//tatoeba.tok.wi.train.ori"
         self.TATOEBA_COR1 = f"{self.parallel}/tok/tatoeba.tok.wi.train.cor"
+        self.TATOEBA_CTX1 = f"{self.parallel}/tok/tatoeba.tok.wi.train.ctx"  # [CONTEXT]
         self.WIKI103_ORI1 = f"{self.parallel}/tok/wiki103.tok.wi.train.ori"
         self.WIKI103_COR1 = f"{self.parallel}/tok/wiki103.tok.wi.train.cor"
+        self.WIKI103_CTX1 = f"{self.parallel}/tok/wiki103.tok.wi.train.ctx"  # [CONTEXT]
 
         self.GUTENBERG_ORI3 = f"{self.parallel}/tok/gutenberg.tok.wi.dev.3k.ori"
         self.GUTENBERG_COR3 = f"{self.parallel}/tok/gutenberg.tok.wi.dev.3k.cor"
+        self.GUTENBERG_CTX3 = f"{self.parallel}/tok/gutenberg.tok.wi.dev.3k.ctx"  # [CONTEXT]
         self.TATOEBA_ORI3 = f"{self.parallel}/tok/tatoeba.tok.wi.dev.3k.ori"
         self.TATOEBA_COR3 = f"{self.parallel}/tok/tatoeba.tok.wi.dev.3k.cor"
+        self.TATOEBA_CTX3 = f"{self.parallel}/tok/tatoeba.tok.wi.dev.3k.ctx"  # [CONTEXT]
         self.WIKI103_ORI3 = f"{self.parallel}/tok/wiki103.tok.wi.dev.3k.ori"
         self.WIKI103_COR3 = f"{self.parallel}/tok/wiki103.tok.wi.dev.3k.cor"
+        self.WIKI103_CTX3 = f"{self.parallel}/tok/wiki103.tok.wi.dev.3k.ctx"  # [CONTEXT]
 
         self.GUTENBERG_ORI0 = f"{self.parallel}/tok/gutenberg.tok.nucle.ori"
         self.GUTENBERG_COR0 = f"{self.parallel}/tok/gutenberg.tok.nucle.cor"
+        self.GUTENBERG_CTX0 = f"{self.parallel}/tok/gutenberg.tok.nucle.ctx"  # [CONTEXT]
         self.TATOEBA_ORI0 = f"{self.parallel}/tok/tatoeba.tok.nucle.ori"
         self.TATOEBA_COR0 = f"{self.parallel}/tok/tatoeba.tok.nucle.cor"
+        self.TATOEBA_CTX0 = f"{self.parallel}/tok/tatoeba.tok.nucle.ctx"  # [CONTEXT]
         self.WIKI103_ORI0 = f"{self.parallel}/tok/wiki103.tok.nucle.ori"
         self.WIKI103_COR0 = f"{self.parallel}/tok/wiki103.tok.nucle.cor"
+        self.WIKI103_CTX0 = f"{self.parallel}/tok/wiki103.tok.nucle.ctx"  # [CONTEXT]
 
         # raw
         self.FCE_ORI = f"{self.parallel}/raw/fce.ori"
@@ -221,6 +230,7 @@ class FilePath(object):
         # track0
         self.DAE_ORI0 = f"{self.root}/track0/parallel/dae.ori"
         self.DAE_COR0 = f"{self.root}/track0/parallel/dae.cor"
+        self.DAE_CTX0 = f"{self.root}/track0/parallel/dae.ctx"
         self.TRAIN_ORI0 = f"{self.root}/track0/parallel/train.ori"
         self.TRAIN_COR0 = f"{self.root}/track0/parallel/train.cor"
         self.TRAIN_CTX0 = f"{self.root}/track0/parallel/train.ctx"  # [CONTEXT]

@@ -31,6 +31,7 @@ def prepare_text(track):
         logging.info("[Prepare] 1-1. pretrain")
         util.maybe_prompt(fp.DAE_ORI0, f"cat {fp.GUTENBERG_ORI0} {fp.TATOEBA_ORI0} {fp.WIKI103_ORI0} > {fp.DAE_ORI0}")
         util.maybe_prompt(fp.DAE_COR0, f"cat {fp.GUTENBERG_COR0} {fp.TATOEBA_COR0} {fp.WIKI103_COR0} > {fp.DAE_COR0}")
+        util.maybe_prompt(fp.DAE_CTX0, f"cat {fp.GUTENBERG_CTX0} {fp.TATOEBA_CTX0} {fp.WIKI103_CTX0} > {fp.DAE_CTX0}")  # [CONTEXT]
 
         logging.info("[Prepare] 1-2. train")
         util.maybe_prompt(fp.TRAIN_ORI0, f"cat {fp.FCE_TOK_ORI} {fp.LANG8_TOK_ORI} {fp.NUCLE_TOK_ORI} > {fp.TRAIN_ORI0}")
