@@ -19,13 +19,21 @@ def generate(data_path, ckpt, system_out, ori_path=None, gen_subset=None, beam=1
     """
 
     if ori_path is not None:
+        # [CONTEXT]
+        # generate = f"fairseq-interactive {data_path} --path {ckpt} --input {ori_path} " \
+        #            f"--beam {beam} --max-tokens {max_tokens} --buffer-size {buffer_size} > {system_out} "
         generate = f"fairseq-interactive {data_path} --path {ckpt} --input {ori_path} " \
-                   f"--beam {beam} --max-tokens {max_tokens} --buffer-size {buffer_size} > {system_out} " \
-                   f"--task translation_ctx"  # [CONTEXT]
+                   f"--task translation_ctx " \
+                   f"--beam {beam} --max-tokens {max_tokens} --buffer-size {buffer_size} " \
+                   f"> {system_out} "
         os.system(generate)
 
     elif gen_subset is not None:
+        # [CONTEXT]
+        # generate = f"fairseq-generate {data_path} --path {ckpt} --gen-subset {gen_subset} " \
+        #            f"--beam {beam} --max-tokens {max_tokens} --print-alignment > {system_out} "
         generate = f"fairseq-generate {data_path} --path {ckpt} --gen-subset {gen_subset} " \
-                   f"--beam {beam} --max-tokens {max_tokens} --print-alignment > {system_out} " \
-                   f"--task translation_ctx"  # [CONTEXT]
+                   f"--task translation_ctx " \
+                   f"--beam {beam} --max-tokens {max_tokens} --print-alignment " \
+                   f"> {system_out} "
         os.system(generate)

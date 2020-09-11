@@ -5,10 +5,6 @@
 # the root directory of this source tree. An additional grant of patent rights
 # can be found in the PATENTS file in the same directory.
 
-"""
-Code for supporting context is marked with [CONTEXT].
-"""
-
 import math
 
 import torch
@@ -17,9 +13,7 @@ from fairseq import search, utils
 from fairseq.models import FairseqIncrementalDecoder
 
 
-# [CONTEXT]
-# class SequenceGenerator(object):
-class MultiInputSequenceGenerator(object):
+class SequenceGenerator(object):
     def __init__(
         self,
         tgt_dict,
@@ -126,29 +120,14 @@ class MultiInputSequenceGenerator(object):
 
         # model.forward normally channels prev_output_tokens into the decoder
         # separately, but SequenceGenerator directly calls model.encoder
-        # [CONTEXT]
-        # encoder_input = {
-        #     k: v for k, v in sample['net_input'].items()
-        #     if k != 'prev_output_tokens'
-        # }
         encoder_input = {
             k: v for k, v in sample['net_input'].items()
-            if 'src' in k
-        }
-        auxencoder_input = {
-            k: v for k, v in sample['net_input'].items()
-            if 'ctx' in k
+            if k != 'prev_output_tokens'
         }
 
         src_tokens = encoder_input['src_tokens']
         src_lengths = (src_tokens.ne(self.eos) & src_tokens.ne(self.pad)).long().sum(dim=1)
-
-        # [CONTEXT]
-        ctx_tokens = auxencoder_input['ctx_tokens']
-        ctx_lengths = (ctx_tokens.ne(self.eos) & ctx_tokens.ne(self.pad)).long().sum(dim=1)
-
         bsz, src_len = src_tokens.size()
-        _, ctx_len = ctx_tokens.size()  # [CONTEXT]
         beam_size = self.beam_size
 
         if self.match_source_len:
@@ -165,15 +144,6 @@ class MultiInputSequenceGenerator(object):
         new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
         new_order = new_order.to(src_tokens.device).long()
         encoder_outs = model.reorder_encoder_out(encoder_outs, new_order)
-
-        # [CONTEXT]
-        if model.has_auxencoder():
-            auxencoder_outs = model.forward_auxencoder(auxencoder_input)
-            new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
-            new_order = new_order.to(ctx_tokens.device).long()
-            auxencoder_outs = model.reorder_auxencoder_out(auxencoder_outs, new_order)
-        else:
-            auxencoder_outs = None
 
         # initialize buffers
         scores = src_tokens.new(bsz * beam_size, max_len + 1).float().fill_(0)
@@ -330,13 +300,8 @@ class MultiInputSequenceGenerator(object):
                     reorder_state.view(-1, beam_size).add_(corr.unsqueeze(-1) * beam_size)
                 model.reorder_incremental_state(reorder_state)
                 model.reorder_encoder_out(encoder_outs, reorder_state)
-                # [CONTEXT]
-                if model.has_auxencoder():
-                    model.reorder_auxencoder_out(auxencoder_outs, reorder_state)
 
-            # [CONTEXT}
-            # lprobs, avg_attn_scores = model.forward_decoder(tokens[:, :step + 1], encoder_outs)
-            lprobs, avg_attn_scores = model.forward_decoder(tokens[:, :step + 1], encoder_outs, auxencoder_outs)
+            lprobs, avg_attn_scores = model.forward_decoder(tokens[:, :step + 1], encoder_outs)
 
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
@@ -566,22 +531,11 @@ class EnsembleModel(torch.nn.Module):
         if all(isinstance(m.decoder, FairseqIncrementalDecoder) for m in models):
             self.incremental_states = {m: {} for m in models}
 
-    # [CONTEXT]
-    def has_auxencoder(self):
-        return hasattr(self.models[0], 'auxencoder')
-
     def has_encoder(self):
         return hasattr(self.models[0], 'encoder')
 
     def max_decoder_positions(self):
         return min(m.max_decoder_positions() for m in self.models)
-
-    # [CONTEXT}
-    @torch.no_grad()
-    def forward_auxencoder(self, auxencoder_input):
-        if not self.has_auxencoder():
-            return None
-        return [model.auxencoder(**auxencoder_input) for model in self.models]
 
     @torch.no_grad()
     def forward_encoder(self, encoder_input):
@@ -590,27 +544,20 @@ class EnsembleModel(torch.nn.Module):
         return [model.encoder(**encoder_input) for model in self.models]
 
     @torch.no_grad()
-    # [CONTEXT]
-    # def forward_decoder(self, tokens, encoder_outs):
-    def forward_decoder(self, tokens, encoder_outs, auxencoder_outs):
+    def forward_decoder(self, tokens, encoder_outs):
         if len(self.models) == 1:
             return self._decode_one(
                 tokens,
                 self.models[0],
                 encoder_outs[0] if self.has_encoder() else None,
-                auxencoder_outs[0] if self.has_auxencoder() else None,  # [CONTEXT]
                 self.incremental_states,
                 log_probs=True,
             )
 
         log_probs = []
         avg_attn = None
-        # [CONTEXT]
-        # for model, encoder_out in zip(self.models, encoder_outs):
-        for model, encoder_out, auxencoder_out in zip(self.models, encoder_outs, auxencoder_outs):
-            # [CONTEXT]
-            # probs, attn = self._decode_one(tokens, model, encoder_out, self.incremental_states, log_probs=True)
-            probs, attn = self._decode_one(tokens, model, encoder_out, auxencoder_out, self.incremental_states, log_probs=True)
+        for model, encoder_out in zip(self.models, encoder_outs):
+            probs, attn = self._decode_one(tokens, model, encoder_out, self.incremental_states, log_probs=True)
             log_probs.append(probs)
             if attn is not None:
                 if avg_attn is None:
@@ -622,23 +569,11 @@ class EnsembleModel(torch.nn.Module):
             avg_attn.div_(len(self.models))
         return avg_probs, avg_attn
 
-    # [CONTEXT]
-    # def _decode_one(self, tokens, model, encoder_out, incremental_states, log_probs):
-    def _decode_one(self, tokens, model, encoder_out, auxencoder_out, incremental_states, log_probs):
+    def _decode_one(self, tokens, model, encoder_out, incremental_states, log_probs):
         if self.incremental_states is not None:
-            # [CONTEXT]
-            # decoder_out = list(model.decoder(tokens, encoder_out, incremental_state=self.incremental_states[model]))
-            if auxencoder_out:
-                decoder_out = list(model.decoder(tokens, auxencoder_out, encoder_out, incremental_state=self.incremental_states[model]))
-            else:
-                decoder_out = list(model.decoder(tokens, encoder_out, incremental_state=self.incremental_states[model]))
+            decoder_out = list(model.decoder(tokens, encoder_out, incremental_state=self.incremental_states[model]))
         else:
-            # [CONTEXT]
-            # decoder_out = list(model.decoder(tokens, encoder_out))
-            if auxencoder_out:
-                decoder_out = list(model.decoder(tokens, auxencoder_out, encoder_out))
-            else:
-                decoder_out = list(model.decoder(tokens, encoder_out))
+            decoder_out = list(model.decoder(tokens, encoder_out))
         decoder_out[0] = decoder_out[0][:, -1:, :]
         attn = decoder_out[1]
         if type(attn) is dict:
@@ -650,15 +585,6 @@ class EnsembleModel(torch.nn.Module):
         probs = model.get_normalized_probs(decoder_out, log_probs=log_probs)
         probs = probs[:, -1, :]
         return probs, attn
-
-    # [CONTEXT]
-    def reorder_auxencoder_out(self, auxencoder_outs, new_order):
-        if not self.has_auxencoder():
-            return
-        return [
-            model.auxencoder.reorder_auxencoder_out(auxencoder_out, new_order)
-            for model, auxencoder_out in zip(self.models, auxencoder_outs)
-        ]
 
     def reorder_encoder_out(self, encoder_outs, new_order):
         if not self.has_encoder():

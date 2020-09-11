@@ -4,6 +4,9 @@ prepare.py
 gec/filepath.py
 gec/track.py
 [NEW] gec/make_sp_context.py
+gec/generate.py
+
+[EXTEND] fairseq/fairseq/multiinput_sequence_generator.py FROM */sequence_generator.py
 
 fairseq/fairseq/data/__init__.py
 [EXTEND] fairseq/fairseq/data/language_triple_dataset.py FROM */language_pair_dataset.py
@@ -15,3 +18,4 @@ fairseq/fairseq/models/fairseq_model.py
 [EXTEND] fairseq/fairseq/tasks/translation_ctx.py FROM */translation.py
 
 fairseq/fairseq_cli/preprocess.py
+fairseq/fairseq_cli/generate.py
