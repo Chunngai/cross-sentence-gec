@@ -241,16 +241,45 @@ class TranslationContextTask(FairseqTask):
             max_context_positions=self.args.max_context_positions,  # [CONTEXT]
         )
 
-    def build_dataset_for_inference(self, src_tokens, src_lengths):
+    def build_dataset_for_inference(self, src_tokens, src_lengths, ctx_tokens, ctx_lengths):
         # [CONTEXT]/
         # return LanguagePairDataset(src_tokens, src_lengths, self.source_dictionary)
-        return LanguageTripleDataset(src_tokens, src_lengths, self.source_dictionary)
+        return LanguageTripleDataset(
+            src=src_tokens, src_sizes=src_lengths, src_dict=self.source_dictionary,
+            ctx=ctx_tokens, ctx_sizes=ctx_lengths, ctx_dict=self.context_dictionary
+        )
 
     def max_positions(self):
         """Return the max sentence length allowed by the task."""
         # [CONTEXT]/
         # return (self.args.max_source_positions, self.args.max_target_positions)
         return (self.args.max_context_positions, self.args.max_source_positions, self.args.max_target_positions)
+
+    # [CONTEXT]
+    def build_generator(self, args):
+        if args.score_reference:
+            from fairseq.sequence_scorer import SequenceScorer
+            return SequenceScorer(self.target_dictionary)
+        else:
+            from fairseq.multiinput_sequence_generator import MultiInputSequenceGenerator
+            return MultiInputSequenceGenerator(
+                self.target_dictionary,
+                beam_size=args.beam,
+                max_len_a=args.max_len_a,
+                max_len_b=args.max_len_b,
+                min_len=args.min_len,
+                stop_early=(not args.no_early_stop),
+                normalize_scores=(not args.unnormalized),
+                len_penalty=args.lenpen,
+                unk_penalty=args.unkpen,
+                sampling=args.sampling,
+                sampling_topk=args.sampling_topk,
+                sampling_temperature=args.sampling_temperature,
+                diverse_beam_groups=args.diverse_beam_groups,
+                diverse_beam_strength=args.diverse_beam_strength,
+                match_source_len=args.match_source_len,
+                no_repeat_ngram_size=args.no_repeat_ngram_size,
+            )
 
     # [CONTEXT]
     @property

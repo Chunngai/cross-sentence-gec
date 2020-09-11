@@ -6,16 +6,21 @@ gec/track.py
 [NEW] gec/make_sp_context.py
 gec/generate.py
 
-[EXTEND] fairseq/fairseq/multiinput_sequence_generator.py FROM */sequence_generator.py
+[EXTEND] fairseq/fairseq/multiinput_sequence_generator.py 
+    [FROM] */sequence_generator.py
 
 fairseq/fairseq/data/__init__.py
-[EXTEND] fairseq/fairseq/data/language_triple_dataset.py FROM */language_pair_dataset.py
+[EXTEND] fairseq/fairseq/data/language_triple_dataset.py 
+    [FROM] */language_pair_dataset.py
 
 fairseq/fairseq/models/__init__.py
 fairseq/fairseq/models/fairseq_model.py
-[EXTEND] fairseq/fairseq/models/document_level_transformer.py FROM */transformer.py
+[EXTEND] fairseq/fairseq/models/document_level_transformer.py 
+    [FROM] */transformer.py
 
-[EXTEND] fairseq/fairseq/tasks/translation_ctx.py FROM */translation.py
+[EXTEND] fairseq/fairseq/tasks/translation_ctx.py 
+    [FROM] */translation.py
 
 fairseq/fairseq_cli/preprocess.py
 fairseq/fairseq_cli/generate.py
+fairseq/fairseq_cli/interactive.py
