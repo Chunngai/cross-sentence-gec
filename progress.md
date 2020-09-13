@@ -1053,17 +1053,12 @@ Extend fairseq to support context.
 
 ---
 
-# Sep 5
+# Sep 9 - Sep 12
+Extend fairseq to support context. Mainly modify the generation and interaction part.
 
-Ready to extend fairseq.
-
----
-
-# Sep 6
-
-Download data.
 
 ---
+
 
 # Papers
 
