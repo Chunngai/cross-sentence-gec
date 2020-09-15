@@ -346,7 +346,9 @@ class DocumentLevelTransformerAuxiliaryEncoder(FairseqEncoder):
 
         self.layers = nn.ModuleList([])
         self.layers.extend([
-            TransformerEncoderLayer(args)
+            # [CONTEXT]
+            # TransformerEncoderLayer(args)
+            DocumentLevelTransformerAuxiliaryEncoderLayer(args)
             for i in range(args.auxencoder_layers)
         ])
         self.register_buffer('version', torch.Tensor([2]))
@@ -469,7 +471,9 @@ class DocumentLevelTransformerEncoder(FairseqEncoder):
 
         self.layers = nn.ModuleList([])
         self.layers.extend([
-            TransformerEncoderLayer(args)
+            # [CONTEXT]
+            # TransformerEncoderLayer(args)
+            DocumentLevelTransformerEncoderLayer(args)
             for i in range(args.encoder_layers)
         ])
         self.register_buffer('version', torch.Tensor([2]))
@@ -477,7 +481,9 @@ class DocumentLevelTransformerEncoder(FairseqEncoder):
         if self.normalize:
             self.layer_norm = LayerNorm(embed_dim)
 
-    def forward(self, src_tokens, src_lengths):
+    # [CONTEXT]
+    # def forward(self, src_tokens, src_lengths):
+    def forward(self, src_tokens, src_lengths, auxencoder_out=None):
         """
         Args:
             src_tokens (LongTensor): tokens in the source language of shape
@@ -508,7 +514,12 @@ class DocumentLevelTransformerEncoder(FairseqEncoder):
 
         # encoder layers
         for layer in self.layers:
-            x = layer(x, encoder_padding_mask)
+            # [CONTEXT]
+            # x = layer(x, encoder_padding_mask)
+            x = layer(
+                x, encoder_padding_mask,
+                auxencoder_out["auxencoder_out"], auxencoder_out["auxencoder_padding_mask"]
+            )
 
         if self.normalize:
             x = self.layer_norm(x)
@@ -603,7 +614,9 @@ class DocumentLevelTransformerDecoder(FairseqIncrementalDecoder):
 
         self.layers = nn.ModuleList([])
         self.layers.extend([
-            TransformerDecoderLayer(args, no_encoder_attn)
+            # [CONTEXT]
+            # TransformerDecoderLayer(args, no_encoder_attn)
+            DocumentLevelTransformerDecoderLayer(args, no_encoder_attn)
             for _ in range(args.decoder_layers)
         ])
 
@@ -632,7 +645,7 @@ class DocumentLevelTransformerDecoder(FairseqIncrementalDecoder):
 
     # [CONTEXT]
     # def forward(self, prev_output_tokens, encoder_out=None, incremental_state=None):
-    def forward(self, prev_output_tokens, auxencoder_out, encoder_out=None, incremental_state=None):
+    def forward(self, prev_output_tokens, auxencoder_out=None, encoder_out=None, incremental_state=None):
         """
         Args:
             prev_output_tokens (LongTensor): previous decoder outputs of shape
@@ -682,6 +695,11 @@ class DocumentLevelTransformerDecoder(FairseqIncrementalDecoder):
                 x,
                 encoder_out['encoder_out'] if encoder_out is not None else None,
                 encoder_out['encoder_padding_mask'] if encoder_out is not None else None,
+
+                # [CONTEXT]
+                auxencoder_out['auxencoder_out'] if auxencoder_out is not None else None,
+                auxencoder_out['auxencoder_padding_mask'] if auxencoder_out is not None else None,
+
                 incremental_state,
                 self_attn_mask=self.buffered_future_mask(x) if incremental_state is None else None,
             )
@@ -749,7 +767,8 @@ class DocumentLevelTransformerDecoder(FairseqIncrementalDecoder):
         return state_dict
 
 
-class TransformerEncoderLayer(nn.Module):
+# [CONTEXT]
+class DocumentLevelTransformerAuxiliaryEncoderLayer(nn.Module):
     """Encoder layer block.
 
     In the original paper each operation (multi-head attention or FFN) is
@@ -813,7 +832,113 @@ class TransformerEncoderLayer(nn.Module):
             return x
 
 
-class TransformerDecoderLayer(nn.Module):
+# [CONTEXT]
+# class TransformerEncoderLayer(nn.Module):
+class DocumentLevelTransformerEncoderLayer(nn.Module):
+    """Encoder layer block.
+
+    In the original paper each operation (multi-head attention or FFN) is
+    postprocessed with: `dropout -> add residual -> layernorm`. In the
+    tensor2tensor code they suggest that learning is more robust when
+    preprocessing each layer with layernorm and postprocessing with:
+    `dropout -> add residual`. We default to the approach in the paper, but the
+    tensor2tensor approach can be enabled by setting
+    *args.encoder_normalize_before* to ``True``.
+
+    Args:
+        args (argparse.Namespace): parsed command-line arguments
+    """
+
+    def __init__(self, args):
+        super().__init__()
+        self.embed_dim = args.encoder_embed_dim
+        self.self_attn = MultiheadAttention(
+            self.embed_dim, args.encoder_attention_heads,
+            dropout=args.attention_dropout,
+        )
+        self.dropout = args.dropout
+        self.relu_dropout = args.relu_dropout
+        self.normalize_before = args.encoder_normalize_before
+        self.fc1 = Linear(self.embed_dim, args.encoder_ffn_embed_dim)
+        self.fc2 = Linear(args.encoder_ffn_embed_dim, self.embed_dim)
+        # [CONTEXT]
+        # self.layer_norms = nn.ModuleList([LayerNorm(self.embed_dim) for i in range(2)])
+        self.layer_norms = nn.ModuleList([LayerNorm(self.embed_dim) for i in range(3)])
+
+        # [CONTEXT]
+        self.gating = Gating(self.embed_dim, self.embed_dim)
+        self.context_attn = MultiheadAttention(
+            self.embed_dim, args.encoder_attention_heads,
+            dropout=args.attention_dropout,
+        )
+
+    # [CONTEXT]
+    # def forward(self, x, encoder_padding_mask):
+    def forward(self, x, encoder_padding_mask, auxencoder_out, auxencoder_padding_mask):
+        """
+        Args:
+            x (Tensor): input to the layer of shape `(seq_len, batch, embed_dim)`
+            encoder_padding_mask (ByteTensor): binary ByteTensor of shape
+                `(batch, src_len)` where padding elements are indicated by ``1``.
+
+        Returns:
+            encoded output of shape `(batch, src_len, embed_dim)`
+        """
+        residual = x
+        x = self.maybe_layer_norm(0, x, before=True)
+        x, _ = self.self_attn(query=x, key=x, value=x, key_padding_mask=encoder_padding_mask)
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x = residual + x
+        x = self.maybe_layer_norm(0, x, after=True)
+
+        # [CONTEXT]
+        x_before_sublayer = x
+        x = self.maybe_layer_norm(1, x, before=True)
+        x, _ = self.context_attn(
+            query=x,
+            key=auxencoder_out,
+            value=auxencoder_out,
+            key_padding_mask=auxencoder_padding_mask,
+
+            static_kv=True,
+            # need_weights=(not self.training and self.need_attn),
+        )
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x_after_sublayer = x
+
+        lambda_ = self.gating(
+            x_before_sublayer=x_before_sublayer,
+            x_after_sublayer=x_after_sublayer
+        )
+        x = lambda_ * x_before_sublayer + (1 - lambda_) * x_after_sublayer
+
+        x = self.maybe_layer_norm(1, x, after=True)
+
+        residual = x
+        # [CONTEXT]
+        # x = self.maybe_layer_norm(1, x, before=True)
+        x = self.maybe_layer_norm(2, x, before=True)
+        x = F.relu(self.fc1(x))
+        x = F.dropout(x, p=self.relu_dropout, training=self.training)
+        x = self.fc2(x)
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x = residual + x
+        # [CONTEXT]
+        # x = self.maybe_layer_norm(1, x, after=True)
+        x = self.maybe_layer_norm(2, x, after=True)
+        return x
+
+    def maybe_layer_norm(self, i, x, before=False, after=False):
+        assert before ^ after
+        if after ^ self.normalize_before:
+            return self.layer_norms[i](x)
+        else:
+            return x
+
+
+# [CONTEXT]
+# class TransformerDecoderLayer(nn.Module):
+class DocumentLevelTransformerDecoderLayer(nn.Module):
     """Decoder layer block.
 
     In the original paper each operation (multi-head attention, encoder
@@ -861,12 +986,25 @@ class TransformerDecoderLayer(nn.Module):
 
         self.onnx_trace = False
 
+        # [CONTEXT]
+        self.gating = Gating(self.embed_dim, self.embed_dim)
+        self.context_attn = MultiheadAttention(
+            self.embed_dim, args.decoder_attention_heads,
+            dropout=args.attention_dropout,
+        )
+        self.context_attn_layer_norm = LayerNorm(self.embed_dim)
+
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
 
-    def forward(self, x, encoder_out, encoder_padding_mask, incremental_state,
-                prev_self_attn_state=None, prev_attn_state=None, self_attn_mask=None,
-                self_attn_padding_mask=None):
+    # [CONTEXT]
+    # def forward(self, x, encoder_out, encoder_padding_mask,
+    def forward(self, x, auxencoder_out, auxencoder_padding_mask, encoder_out, encoder_padding_mask,
+                incremental_state,
+                # [CONTEXT]
+                # prev_self_attn_state=None, prev_attn_state=None,
+                prev_self_attn_state=None, prev_context_attn_state=None, prev_attn_state=None,
+                self_attn_mask=None, self_attn_padding_mask=None):
         """
         Args:
             x (Tensor): input to the layer of shape `(seq_len, batch, embed_dim)`
@@ -896,6 +1034,35 @@ class TransformerDecoderLayer(nn.Module):
         x = F.dropout(x, p=self.dropout, training=self.training)
         x = residual + x
         x = self.maybe_layer_norm(self.self_attn_layer_norm, x, after=True)
+
+        # [CONTEXT]
+        x_before_sublayer = x
+        x = self.maybe_layer_norm(self.context_attn_layer_norm, x, before=True)
+        if prev_context_attn_state is not None:
+            if incremental_state is None:
+                incremental_state = {}
+            prev_key, prev_value = prev_context_attn_state
+            saved_state = {"prev_key": prev_key, "prev_value": prev_value}
+            self.context_attn._set_input_buffer(incremental_state, saved_state)
+        x, _ = self.context_attn(
+            query=x,
+            key=auxencoder_out,
+            value=auxencoder_out,
+            key_padding_mask=auxencoder_padding_mask,
+            incremental_state=incremental_state,
+            static_kv=True,
+            need_weights=(not self.training and self.need_attn),
+        )
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x_after_sublayer = x
+
+        lambda_ = self.gating(
+            x_before_sublayer=x_before_sublayer,
+            x_after_sublayer=x_after_sublayer
+        )
+        x = lambda_ * x_before_sublayer + (1 - lambda_) * x_after_sublayer
+
+        x = self.maybe_layer_norm(self.context_attn_layer_norm, x, after=True)
 
         attn = None
         if self.encoder_attn is not None:
@@ -943,6 +1110,23 @@ class TransformerDecoderLayer(nn.Module):
 
     def make_generation_fast_(self, need_attn=False, **kwargs):
         self.need_attn = need_attn
+
+
+# [CONTEXT]
+class Gating(nn.Module):
+    def __init__(self, gate_dim, inputs_dim):
+        super().__init__()
+        self.gate_dim = gate_dim
+        self.before_sublayer_proj = Linear(inputs_dim, gate_dim)
+        self.after_sublayer_proj = Linear(inputs_dim, gate_dim)
+
+    def forward(self, x_before_sublayer, x_after_sublayer):
+        """ computes a gate vector from the provided inputs """
+        gate = torch.sigmoid(
+            self.before_sublayer_proj(x_before_sublayer)
+            + self.after_sublayer_proj(x_after_sublayer)
+        )
+        return gate
 
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):
