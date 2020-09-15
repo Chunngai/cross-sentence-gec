@@ -64,9 +64,15 @@ mkdir repo_info
 mv README.md repo_info
 mv LICENSE repo_info
 
-# average_perceptron_tagger.picker is needed in the perturbation step. 
-sudo mkdir -p /usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/
-sudo mv averaged_perceptron_tagger.pickle  /usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/
+# average_perceptron_tagger.picker is needed.
+AVERAGE_PERCEPTRON_TAGGER_PICKLE_BASEDIR="/usr/local/lib/nltk_data/taggers/averaged_perceptron_tagger/"
+sudo mkdir -p $AVERAGE_PERCEPTRON_TAGGER_PICKLE_BASEDIR
+sudo mv averaged_perceptron_tagger.pickle  $AVERAGE_PERCEPTRON_TAGGER_PICKLE_BASEDIR
+
+# english.pickle is needed.
+ENGLISH_PICKLE_BASEDIR="/usr/local/lib/nltk_data/tokenizers/punkt/PY3/"
+sudo mkdir -p $ENGLISH_PICKLE_BASEDIR
+sudo mv english.pickle $ENGLISH_PICKLE_BASEDIR
 
 # m2scorer.
 wget https://www.comp.nus.edu.sg/~nlp/sw/m2scorer.tar.gz

@@ -171,7 +171,10 @@ pip install --editable fairseq
 #git clone https://github.com/chrisjbryant/errant
 # [Note] Ver. of errant should be compatible.
 # [MODIFIED] Specifies the bea2019st branch of errant.
-git clone https://github.com/chrisjbryant/errant -b bea2019st
+if [ ! -d errant ]
+then
+	git clone https://github.com/chrisjbryant/errant -b bea2019st
+fi
 
 # pattern3 (see https://www.clips.uantwerpen.be/pages/pattern for any installation issues)
 pip install pattern3 --timeout $TIMEOUT -i $INDEX_URL  # [MODIFIED] Adds -i and --timeout.
