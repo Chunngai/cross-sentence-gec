@@ -334,12 +334,12 @@ class DocumentLevelTransformerAuxiliaryEncoder(FairseqEncoder):
 
         embed_dim = embed_tokens.embedding_dim
         self.padding_idx = embed_tokens.padding_idx
-        self.max_source_positions = args.max_source_positions
+        self.max_context_positions = args.max_context_positions
 
         self.embed_tokens = embed_tokens
         self.embed_scale = math.sqrt(embed_dim)
         self.embed_positions = PositionalEmbedding(
-            args.max_source_positions, embed_dim, self.padding_idx,
+            args.max_context_positions, embed_dim, self.padding_idx,
             left_pad=left_pad,
             learned=args.auxencoder_learned_pos,
         ) if not args.no_token_positional_embeddings else None
@@ -420,8 +420,8 @@ class DocumentLevelTransformerAuxiliaryEncoder(FairseqEncoder):
     def max_positions(self):
         """Maximum input length supported by the encoder."""
         if self.embed_positions is None:
-            return self.max_source_positions
-        return min(self.max_source_positions, self.embed_positions.max_positions())
+            return self.max_context_positions
+        return min(self.max_context_positions, self.embed_positions.max_positions())
 
     def upgrade_state_dict_named(self, state_dict, name):
         """Upgrade a (possibly old) state dict for new versions of fairseq."""
