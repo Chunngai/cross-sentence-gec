@@ -1,27 +1,43 @@
-preprocess.py
-prepare.py
+setup.sh
 
-gec/filepath.py
-gec/track.py
-[NEW/ gec/make_raw_context.py
+---
+
+# Needed modifications mentioned in README.md.
+
+preprocess.py (mod)  # Lots of modifications.
+train.py  # ln 43: os.system(f"cp {restore_ckpt} {finetune_ckpt}") -> os.system(f"cp {restore_ckpt} {util.change_ckpt_dir(restore_ckpt, ckpt_dir)}")
+evaluate.py  # ln 129: max_edits -> max-edits
+gec/filepath (mod)  # ln 26: m2scorer = f"{root}/data/conll2014/m2scorer/m2scorer.py" -> m2scorer = f"{root}/m2scorer/scripts/m2scorer.py"
+
+---
+
+# Supports context.
+# All modifications are marked with "[CONTEXT]".
+
+[MOD] preprocess.py
+[MOD] prepare.py
+
+[MOD] gec/filepath.py
+[MOD] gec/track.py
+[NEW] gec/make_raw_context.py
 [NEW] gec/make_sp_context.py
-gec/generate.py
+[MOD] gec/generate.py
 
 [EXTEND] fairseq/fairseq/multiinput_sequence_generator.py 
     [FROM] */sequence_generator.py
 
-fairseq/fairseq/data/__init__.py
+[MOD] fairseq/fairseq/data/__init__.py
 [EXTEND] fairseq/fairseq/data/language_triple_dataset.py 
     [FROM] */language_pair_dataset.py
 
-fairseq/fairseq/models/__init__.py
-fairseq/fairseq/models/fairseq_model.py
+[MOD] fairseq/fairseq/models/__init__.py
+[MOD] fairseq/fairseq/models/fairseq_model.py
 [EXTEND] fairseq/fairseq/models/document_level_transformer.py 
     [FROM] */transformer.py
 
 [EXTEND] fairseq/fairseq/tasks/translation_ctx.py 
     [FROM] */translation.py
 
-fairseq/fairseq_cli/preprocess.py
-fairseq/fairseq_cli/generate.py
-fairseq/fairseq_cli/interactive.py
+[MOD] fairseq/fairseq_cli/preprocess.py
+[MOD] fairseq/fairseq_cli/generate.py
+[MOD] fairseq/fairseq_cli/interactive.py
