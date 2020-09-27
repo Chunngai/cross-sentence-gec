@@ -27,7 +27,7 @@ class Path:
 
     # scorer
     errant = f"{root}/errant/compare_m2.py"
-    m2scorer = f"{root}/m2scorer/scripts/m2scorer.py"  # (MODIFIED)
+    m2scorer = f"{root}/m2scorer/scripts/m2scorer.py"
 
 
 class FilePath(object):
