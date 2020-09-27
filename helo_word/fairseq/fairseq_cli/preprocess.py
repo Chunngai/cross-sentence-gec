@@ -192,10 +192,10 @@ def main(args):
                 outprefix = "test{}".format(k) if k > 0 else "test"
                 make_dataset(vocab, testpref, outprefix, lang, num_workers=args.workers)
 
+    make_all('ctx', ctx_dict)  # [CONTEXT]
     make_all(args.source_lang, src_dict)
     if target:
         make_all(args.target_lang, tgt_dict)
-    make_all('ctx', ctx_dict)  # [CONTEXT]
 
     print("| Wrote preprocessed data to {}".format(args.destdir))
 
