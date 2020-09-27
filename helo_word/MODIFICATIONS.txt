@@ -4,14 +4,14 @@ setup.sh
 
 # Needed modifications mentioned in README.md.
 
-preprocess.py (mod)  # Lots of modifications.
-train.py  # ln 43: 
+"preprocess (mod).py"  # Lots of modifications.
+"train (mod).py"  # ln 43: 
     # [ORIG] os.system(f"cp {restore_ckpt} {finetune_ckpt}")
     # [MOD]  os.system(f"cp {restore_ckpt} {util.change_ckpt_dir(restore_ckpt, ckpt_dir)}")
-evaluate.py  # ln 129: 
+"evaluate (mod).py"  # ln 129: 
     # [ORIG] max_edits
     # [MOD] max-edits
-gec/filepath (mod)  # ln 26: 
+"gec/filepath (mod).py"  # ln 26: 
     # [ORIG] m2scorer = f"{root}/data/conll2014/m2scorer/m2scorer.py"
     # [MOD] m2scorer = f"{root}/m2scorer/scripts/m2scorer.py"
 
