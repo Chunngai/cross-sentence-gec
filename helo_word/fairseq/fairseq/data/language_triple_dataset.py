@@ -130,9 +130,11 @@ class LanguageTripleDataset(FairseqDataset):
         shuffle=True, input_feeding=True, remove_eos_from_source=False, append_eos_to_target=False,
     ):
         # [CONTEXT]/
-        assert src_dict.pad() == ctx_dict.pad()
-        assert src_dict.eos() == ctx_dict.eos()
-        assert src_dict.unk() == ctx_dict.unk()
+        if ctx_dict is not None:
+            assert src_dict.pad() == ctx_dict.pad()
+            assert src_dict.eos() == ctx_dict.eos()
+            assert src_dict.unk() == ctx_dict.unk()
+
         if tgt_dict is not None:
             assert src_dict.pad() == tgt_dict.pad()
             assert src_dict.eos() == tgt_dict.eos()
