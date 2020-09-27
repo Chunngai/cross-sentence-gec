@@ -785,19 +785,19 @@ class DocumentLevelTransformerAuxiliaryEncoderLayer(nn.Module):
 
     def __init__(self, args):
         super().__init__()
-        self.embed_dim = args.encoder_embed_dim
+        self.embed_dim = args.auxencoder_embed_dim
         self.self_attn = MultiheadAttention(
-            self.embed_dim, args.encoder_attention_heads,
+            self.embed_dim, args.auxencoder_attention_heads,
             dropout=args.attention_dropout,
         )
         self.dropout = args.dropout
         self.relu_dropout = args.relu_dropout
-        self.normalize_before = args.encoder_normalize_before
-        self.fc1 = Linear(self.embed_dim, args.encoder_ffn_embed_dim)
-        self.fc2 = Linear(args.encoder_ffn_embed_dim, self.embed_dim)
+        self.normalize_before = args.auxencoder_normalize_before
+        self.fc1 = Linear(self.embed_dim, args.auxencoder_ffn_embed_dim)
+        self.fc2 = Linear(args.auxencoder_ffn_embed_dim, self.embed_dim)
         self.layer_norms = nn.ModuleList([LayerNorm(self.embed_dim) for i in range(2)])
 
-    def forward(self, x, encoder_padding_mask):
+    def forward(self, x, auxencoder_padding_mask):
         """
         Args:
             x (Tensor): input to the layer of shape `(seq_len, batch, embed_dim)`
@@ -809,7 +809,7 @@ class DocumentLevelTransformerAuxiliaryEncoderLayer(nn.Module):
         """
         residual = x
         x = self.maybe_layer_norm(0, x, before=True)
-        x, _ = self.self_attn(query=x, key=x, value=x, key_padding_mask=encoder_padding_mask)
+        x, _ = self.self_attn(query=x, key=x, value=x, key_padding_mask=auxencoder_padding_mask)
         x = F.dropout(x, p=self.dropout, training=self.training)
         x = residual + x
         x = self.maybe_layer_norm(0, x, after=True)
