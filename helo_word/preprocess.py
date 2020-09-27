@@ -6,8 +6,8 @@ import logging
 import os
 from glob import glob
 import argparse
-from gec import filepath, word_tokenize, bpe, perturb, m2, spell, \
-    make_sp_context  # [CONTEXT]
+from gec import filepath, word_tokenize, bpe, perturb, m2, spell
+from gec import make_sp_context  # [CONTEXT]
 
 logging.basicConfig(level=logging.INFO)
 
@@ -49,7 +49,7 @@ def print_log(log_info):
 # [CONTEXT]
 def make_pretrain_context(ori_file_path, ctx_file_path):
     with open(ori_file_path) as ori_file, open(ctx_file_path, 'w') as ctx_file:
-        for line in ori_file:
+        for _ in ori_file:
             ctx_file.write(f'{(" " + args.previous_context_label + " ") * int(args.previous_sentence_number)}'
                            f'{(" " + args.following_context_label + " ") * int(args.following_sentence_number)}'
                            f'\n')
@@ -80,8 +80,8 @@ if __name__ == "__main__":
     # 4. context
     parser.add_argument("--previous_sentence_number", type=int, default=1)
     parser.add_argument("--following_sentence_number", type=int, default=0)
-    parser.add_argument("--previous_context_label", type=str, default="<prev>")
-    parser.add_argument("--following_context_label", type=str, default="<fol>")
+    parser.add_argument("--previous_context_label", type=str, default="")
+    parser.add_argument("--following_context_label", type=str, default="")
 
     args = parser.parse_args()
 
@@ -319,7 +319,6 @@ if __name__ == "__main__":
                   eval(f"fp.WIKI103_ORI{track_no}"), eval(f"fp.WIKI103_COR{track_no}"), args.n_epochs[2],
                   args.word_change_prob, args.type_change_prob))
 
-
         # [CONTEXT]
         maybe_do(eval(f"fp.WIKI103_CTX{track_no}"), make_pretrain_context,
                  (eval(f"fp.WIKI103_ORI{track_no}"), eval(f"fp.WIKI103_CTX{track_no}")))
@@ -508,5 +507,3 @@ if __name__ == "__main__":
     maybe_do(fp.CONLL2014_TOK_ORI, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2014_SP_ORI, fp.CONLL2014_TOK_ORI))
     maybe_do(fp.CONLL2014_TOK_COR, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2014_COR, fp.CONLL2014_TOK_COR))
     maybe_do(fp.CONLL2014_TOK_CTX, bpe.bpe_tokenize, (fp.BPE_MODEL, fp.CONLL2014_SP_CTX, fp.CONLL2014_TOK_CTX))  # [CONTEXT]
-
-
