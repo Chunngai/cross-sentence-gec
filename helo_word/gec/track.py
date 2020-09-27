@@ -1,3 +1,7 @@
+"""
+Code for supporting context is marked with [CONTEXT].
+"""
+
 from abc import abstractmethod
 import os
 
@@ -86,35 +90,49 @@ class Track:
 
     @staticmethod
     def get_model_config(model, lr, dropout, max_epoch, seed, reset=False):
-        assert model in ['base', 'copy', 't2t']
+        # [CONTEXT]
+        # assert model in ['base', 'copy', 't2t']
+        assert model in ['base', 'copy', 't2t',
+                         'doc_base', 'doc_copy', 'doc_t2t']
         if model == 'base':
-            # [CONTEXT]
-            # model_config = f"--arch transformer --share-all-embeddings " \
-            model_config = f"--arch document_level_transformer --share-all-embeddings " \
+            model_config = f"--arch transformer --share-all-embeddings " \
                            f"--optimizer adam --lr {lr} --label-smoothing 0.1 --dropout {dropout} " \
-                 f"--max-tokens 4000 --min-lr '1e-09' --lr-scheduler inverse_sqrt " \
-                 f"--weight-decay 0.0001 --criterion label_smoothed_cross_entropy " \
-                 f"--max-epoch {max_epoch} --warmup-updates 4000 --warmup-init-lr '1e-07' --max-tokens 4000 " \
-                 f"--adam-betas '(0.9, 0.98)' --save-interval-updates 5000 " \
-                 f"--task translation_ctx "  # [CONTEXT]
+                           f"--max-tokens 4000 --min-lr '1e-09' --lr-scheduler inverse_sqrt " \
+                           f"--weight-decay 0.0001 --criterion label_smoothed_cross_entropy " \
+                           f"--max-epoch {max_epoch} --warmup-updates 4000 --warmup-init-lr '1e-07' --max-tokens 4000 " \
+                           f"--adam-betas '(0.9, 0.98)' --save-interval-updates 5000 "
 
         elif model == 'copy':
             model_config = f"--ddp-backend=no_c10d --arch copy_augmented_transformer " \
                 f"--update-freq 8 --alpha-warmup 10000 --optimizer adam --lr {lr} " \
                 f"--dropout {dropout} --max-tokens 4000 --min-lr '1e-09' --save-interval-updates 5000 " \
                 f"--lr-scheduler inverse_sqrt --weight-decay 0.0001 --max-epoch {max_epoch} " \
-                f"--warmup-updates 4000 --warmup-init-lr '1e-07' --adam-betas '(0.9, 0.98)' " \
-                f"--task translation_ctx "  # [CONTEXT]
+                f"--warmup-updates 4000 --warmup-init-lr '1e-07' --adam-betas '(0.9, 0.98)' "
 
-        else:   # model == 't2t':
+        # [CONTEXT]
+        # else:  # model == 't2t':
+        elif model == 't2t':
 
             model_config = f"--arch transformer_wmt_en_de_big_t2t --share-all-embeddings " \
                            f"--criterion label_smoothed_cross_entropy --label-smoothing 0.1 " \
                            f"--optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 " \
                            f"--lr-scheduler inverse_sqrt --warmup-init-lr '1e-07' --max-epoch {max_epoch} " \
                            f"--warmup-updates 4000 --lr {lr} --min-lr '1e-09' --dropout {dropout} " \
-                           f"--weight-decay 0.0 --max-tokens 4000 --save-interval-updates 5000 " \
-                           f"--task translation_ctx "  # [CONTEXT]
+                           f"--weight-decay 0.0 --max-tokens 4000 --save-interval-updates 5000 "
+
+        # [CONTEXT]
+        elif model == 'doc_base':
+            model_config = f"--arch document_level_transformer --share-all-embeddings " \
+                           f"--optimizer adam --lr {lr} --label-smoothing 0.1 --dropout {dropout} " \
+                           f"--max-tokens 4000 --min-lr '1e-09' --lr-scheduler inverse_sqrt " \
+                           f"--weight-decay 0.0001 --criterion label_smoothed_cross_entropy " \
+                           f"--max-epoch {max_epoch} --warmup-updates 4000 --warmup-init-lr '1e-07' --max-tokens 4000 " \
+                           f"--adam-betas '(0.9, 0.98)' --save-interval-updates 5000 " \
+                           f"--task translation_ctx "
+        elif model == 'doc_copy':
+            model_config = ""
+        else:  # model == 'doc_t2t'
+            model_config = ""
 
         if seed is not None:
             model_config += f"--seed {seed} "
