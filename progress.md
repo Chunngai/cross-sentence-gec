@@ -1062,12 +1062,16 @@ Extend fairseq to support context. Mainly modify the generation and interaction 
 3. Run the base model in the lab server.
 
 ## · Notes ·
+(1)  
 The base: update-freq = 1
 The copy: update-freq = 8
 
 update-freq: update parameters every N_i batches, when in epoch i
 
 Base: updates more, so more checkpoints.
+
+(2)  
+multi input generator: get the output of aux enc then feed it into the enc. The output of aux enc is the original one without changing the size according to beam size.
 
 ---
 
