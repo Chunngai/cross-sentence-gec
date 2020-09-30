@@ -1056,6 +1056,18 @@ Extend fairseq to support context.
 # Sep 9 - Sep 12
 Extend fairseq to support context. Mainly modify the generation and interaction part.
 
+# Sep 13 - Sep 30
+1. Extend fairseq to support context.
+2. Check the modification.
+3. Run the base model in the lab server.
+
+## · Notes ·
+The base: update-freq = 1
+The copy: update-freq = 8
+
+update-freq: update parameters every N_i batches, when in epoch i
+
+Base: updates more, so more checkpoints.
 
 ---
 
