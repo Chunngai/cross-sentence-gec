@@ -160,20 +160,26 @@ class MultiInputSequenceGenerator(object):
                 model.max_decoder_positions() - 1,
             )
 
-        # compute the encoder output for each beam
-        encoder_outs = model.forward_encoder(encoder_input)
-        new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
-        new_order = new_order.to(src_tokens.device).long()
-        encoder_outs = model.reorder_encoder_out(encoder_outs, new_order)
-
         # [CONTEXT]
         if model.has_auxencoder():
             auxencoder_outs = model.forward_auxencoder(auxencoder_input)
+
+            import copy
+            auxencoder_outs_orig = copy.deepcopy(auxencoder_outs)
+
             new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
             new_order = new_order.to(ctx_tokens.device).long()
             auxencoder_outs = model.reorder_auxencoder_out(auxencoder_outs, new_order)
         else:
             auxencoder_outs = None
+
+        # compute the encoder output for each beam
+        # [CONTEXT]
+        # encoder_outs = model.forward_encoder(encoder_input)
+        encoder_outs = model.forward_encoder(encoder_input, auxencoder_outs_orig)
+        new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
+        new_order = new_order.to(src_tokens.device).long()
+        encoder_outs = model.reorder_encoder_out(encoder_outs, new_order)
 
         # initialize buffers
         scores = src_tokens.new(bsz * beam_size, max_len + 1).float().fill_(0)
@@ -584,10 +590,18 @@ class EnsembleModel(torch.nn.Module):
         return [model.auxencoder(**auxencoder_input) for model in self.models]
 
     @torch.no_grad()
-    def forward_encoder(self, encoder_input):
+    # [CONTEXT]
+    # def forward_encoder(self, encoder_input):
+    def forward_encoder(self, encoder_input, auxencoder_outs):
         if not self.has_encoder():
             return None
-        return [model.encoder(**encoder_input) for model in self.models]
+
+        # [CONTEXT]
+        if auxencoder_outs is not None:
+            return [model.encoder(**encoder_input, auxencoder_out=auxencoder_out)
+                    for model, auxencoder_out in zip(self.models, auxencoder_outs)]
+        else:
+            return [model.encoder(**encoder_input) for model in self.models]
 
     @torch.no_grad()
     # [CONTEXT]
