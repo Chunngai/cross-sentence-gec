@@ -872,6 +872,9 @@ class DocumentLevelTransformerEncoderLayer(nn.Module):
             dropout=args.attention_dropout,
         )
 
+        # [CONTEXT]
+        self.need_attn = True
+
     # [CONTEXT]
     # def forward(self, x, encoder_padding_mask):
     def forward(self, x, encoder_padding_mask, auxencoder_out, auxencoder_padding_mask):
@@ -894,14 +897,14 @@ class DocumentLevelTransformerEncoderLayer(nn.Module):
         # [CONTEXT]
         x_before_sublayer = x
         x = self.maybe_layer_norm(1, x, before=True)
-        x, _ = self.context_attn(
+        x, ctx_attn = self.context_attn(
             query=x,
             key=auxencoder_out,
             value=auxencoder_out,
             key_padding_mask=auxencoder_padding_mask,
 
             static_kv=True,
-            # need_weights=(not self.training and self.need_attn),
+            need_weights=(not self.training and self.need_attn),
         )
         x = F.dropout(x, p=self.dropout, training=self.training)
         x_after_sublayer = x
@@ -1044,7 +1047,7 @@ class DocumentLevelTransformerDecoderLayer(nn.Module):
             prev_key, prev_value = prev_context_attn_state
             saved_state = {"prev_key": prev_key, "prev_value": prev_value}
             self.context_attn._set_input_buffer(incremental_state, saved_state)
-        x, _ = self.context_attn(
+        x, ctx_attn = self.context_attn(
             query=x,
             key=auxencoder_out,
             value=auxencoder_out,
