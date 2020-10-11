@@ -693,14 +693,15 @@ class DocumentLevelTransformerDecoder(FairseqIncrementalDecoder):
         for layer in self.layers:
             x, attn = layer(
                 x,
-                encoder_out['encoder_out'] if encoder_out is not None else None,
-                encoder_out['encoder_padding_mask'] if encoder_out is not None else None,
 
                 # [CONTEXT]
-                auxencoder_out['auxencoder_out'] if auxencoder_out is not None else None,
-                auxencoder_out['auxencoder_padding_mask'] if auxencoder_out is not None else None,
+                auxencoder_out=auxencoder_out['auxencoder_out'] if auxencoder_out is not None else None,
+                auxencoder_padding_mask=auxencoder_out['auxencoder_padding_mask'] if auxencoder_out is not None else None,
 
-                incremental_state,
+                encoder_out=encoder_out['encoder_out'] if encoder_out is not None else None,
+                encoder_padding_mask=encoder_out['encoder_padding_mask'] if encoder_out is not None else None,
+
+                incremental_state=incremental_state,
                 self_attn_mask=self.buffered_future_mask(x) if incremental_state is None else None,
             )
             inner_states.append(x)
