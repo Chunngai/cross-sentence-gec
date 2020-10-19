@@ -685,3 +685,12 @@ m2scorer = f"{root}/m2scorer/scripts/m2scorer.py"
 &emsp;&emsp;否则无法找到m2scorer路径。
 
 &emsp;&emsp;修改这三个地方之后按照文档的步骤训练模型就行了。
+
+# 融合上下文
+1. 用该文件夹里的文件替换"helo_word"的对应文件。（merge&replace）
+2. "preprocess.py" 额外参数：  
+	`--previous_sentence_number`  
+	`--following_sentence_number`  
+	`--previous_context_label`  
+	`--following_context_label`  
+3. "train.py" 的`--model`：doc_base, doc_copy, doc_t2t.
