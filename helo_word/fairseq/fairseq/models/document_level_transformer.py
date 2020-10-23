@@ -897,27 +897,27 @@ class DocumentLevelTransformerEncoderLayer(nn.Module):
         x = self.maybe_layer_norm(0, x, after=True)
 
         # [CONTEXT]
-        # x_before_sublayer = x
-        # x = self.maybe_layer_norm(1, x, before=True)
-        # x, ctx_attn = self.context_attn(
-        #     query=x,
-        #     key=auxencoder_out,
-        #     value=auxencoder_out,
-        #     key_padding_mask=auxencoder_padding_mask,
-        #
-        #     static_kv=True,
-        #     need_weights=(not self.training and self.need_attn),
-        # )
-        # x = F.dropout(x, p=self.dropout, training=self.training)
-        # x_after_sublayer = x
-        #
-        # lambda_ = self.gating(
-        #     x_before_sublayer=x_before_sublayer,
-        #     x_after_sublayer=x_after_sublayer
-        # )
-        # x = lambda_ * x_before_sublayer + (1 - lambda_) * x_after_sublayer
-        #
-        # x = self.maybe_layer_norm(1, x, after=True)
+        x_before_sublayer = x
+        x = self.maybe_layer_norm(1, x, before=True)
+        x, ctx_attn = self.context_attn(
+            query=x,
+            key=auxencoder_out,
+            value=auxencoder_out,
+            key_padding_mask=auxencoder_padding_mask,
+
+            static_kv=True,
+            need_weights=(not self.training and self.need_attn),
+        )
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x_after_sublayer = x
+
+        lambda_ = self.gating(
+            x_before_sublayer=x_before_sublayer,
+            x_after_sublayer=x_after_sublayer
+        )
+        x = lambda_ * x_before_sublayer + (1 - lambda_) * x_after_sublayer
+
+        x = self.maybe_layer_norm(1, x, after=True)
 
         residual = x
         # [CONTEXT]
@@ -1041,33 +1041,33 @@ class DocumentLevelTransformerDecoderLayer(nn.Module):
         x = self.maybe_layer_norm(self.self_attn_layer_norm, x, after=True)
 
         # [CONTEXT]
-        # x_before_sublayer = x
-        # x = self.maybe_layer_norm(self.context_attn_layer_norm, x, before=True)
-        # if prev_context_attn_state is not None:
-        #     if incremental_state is None:
-        #         incremental_state = {}
-        #     prev_key, prev_value = prev_context_attn_state
-        #     saved_state = {"prev_key": prev_key, "prev_value": prev_value}
-        #     self.context_attn._set_input_buffer(incremental_state, saved_state)
-        # x, ctx_attn = self.context_attn(
-        #     query=x,
-        #     key=auxencoder_out,
-        #     value=auxencoder_out,
-        #     key_padding_mask=auxencoder_padding_mask,
-        #     incremental_state=incremental_state,
-        #     static_kv=True,
-        #     need_weights=(not self.training and self.need_attn),
-        # )
-        # x = F.dropout(x, p=self.dropout, training=self.training)
-        # x_after_sublayer = x
-        #
-        # lambda_ = self.gating(
-        #     x_before_sublayer=x_before_sublayer,
-        #     x_after_sublayer=x_after_sublayer
-        # )
-        # x = lambda_ * x_before_sublayer + (1 - lambda_) * x_after_sublayer
-        #
-        # x = self.maybe_layer_norm(self.context_attn_layer_norm, x, after=True)
+        x_before_sublayer = x
+        x = self.maybe_layer_norm(self.context_attn_layer_norm, x, before=True)
+        if prev_context_attn_state is not None:
+            if incremental_state is None:
+                incremental_state = {}
+            prev_key, prev_value = prev_context_attn_state
+            saved_state = {"prev_key": prev_key, "prev_value": prev_value}
+            self.context_attn._set_input_buffer(incremental_state, saved_state)
+        x, ctx_attn = self.context_attn(
+            query=x,
+            key=auxencoder_out,
+            value=auxencoder_out,
+            key_padding_mask=auxencoder_padding_mask,
+            incremental_state=incremental_state,
+            static_kv=True,
+            need_weights=(not self.training and self.need_attn),
+        )
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x_after_sublayer = x
+
+        lambda_ = self.gating(
+            x_before_sublayer=x_before_sublayer,
+            x_after_sublayer=x_after_sublayer
+        )
+        x = lambda_ * x_before_sublayer + (1 - lambda_) * x_after_sublayer
+
+        x = self.maybe_layer_norm(self.context_attn_layer_norm, x, after=True)
 
         attn = None
         if self.encoder_attn is not None:
