@@ -180,8 +180,8 @@ class FairseqModel(BaseFairseqModel):
         Returns:
             the decoder's output, typically of shape `(batch, tgt_len, vocab)`
         """
-        encoder_out = self.encoder(src_tokens, src_lengths)
-        decoder_out = self.decoder(prev_output_tokens, encoder_out)
+        encoder_out = self.encoder(src_tokens=src_tokens, src_lengths=src_lengths)
+        decoder_out = self.decoder(prev_output_tokens=prev_output_tokens, encoder_out=encoder_out)
         return decoder_out
 
     def max_positions(self):
@@ -319,9 +319,9 @@ class FairseqDualEncoderModel(BaseFairseqModel):
         assert isinstance(self.decoder, FairseqDecoder)
 
     def forward(self, ctx_tokens, ctx_lengths, src_tokens, src_lengths, prev_output_tokens):
-        auxencoder_out = self.auxencoder(ctx_tokens, ctx_lengths)
-        encoder_out = self.encoder(src_tokens, src_lengths, auxencoder_out)
-        decoder_out = self.decoder(prev_output_tokens, auxencoder_out, encoder_out)
+        auxencoder_out = self.auxencoder(ctx_tokens=ctx_tokens, ctx_lengths=ctx_lengths)
+        encoder_out = self.encoder(src_tokens=src_tokens, src_lengths=src_lengths, auxencoder_out=auxencoder_out)
+        decoder_out = self.decoder(prev_output_tokens=prev_output_tokens, auxencoder_out=auxencoder_out, encoder_out=encoder_out)
         return decoder_out
 
     def max_positions(self):
